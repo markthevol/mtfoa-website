@@ -210,6 +210,24 @@
 
   if (!MOBILE) buildDesktop(); else buildPhone();
 
+  /* If the window is later made bigger again — after the demotion above, or just starting narrow and
+     growing — try the desktop menu again once there is plausibly enough room. buildDesktop()'s own
+     checkFit() immediately bounces back to the phone menu if it turns out it still doesn't really fit,
+     so this can't get stuck showing a crowded desktop menu either. */
+  var mnPromoteTimer;
+  window.addEventListener('resize', function () {
+    if (!MOBILE) return;   // desktop's own resize watcher (inside buildDesktop) handles shrinking back down
+    clearTimeout(mnPromoteTimer);
+    mnPromoteTimer = setTimeout(function () {
+      if (!MOBILE || (window.innerWidth || 960) < 720) return;
+      var btn = inner.querySelector('.mm-btn'); if (btn) btn.remove();
+      var panel = root.querySelector('.mm-panel'); if (panel) panel.remove();
+      root.classList.remove('m');
+      MOBILE = false; BAR_H = 68;
+      buildDesktop();
+    }, 150);
+  });
+
   /* fade the contents in once the built-in font is ready */
   function ready() { root.classList.add('ready'); }
   try { document.fonts.load("600 16px 'MN Barlow Condensed'").then(ready, ready); } catch (e) { ready(); }
