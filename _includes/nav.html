@@ -277,8 +277,13 @@
       BAR_H = 64;
       buildPhone();
     }
-    checkFit();
-    try { document.fonts.ready.then(checkFit); } catch (e) {}
+    // Measuring before the custom condensed font has actually loaded can catch the text still laid
+    // out in a wider fallback font, which reads as overflow that was never really there — and since
+    // checkFit() only ever demotes once, one bad early reading before the font swaps in would lock in
+    // the phone menu for the rest of this page view. So the first real check waits for that same font
+    // load the reveal fade-in already waits for; the plain timeout is just a backstop in case the font
+    // promise never settles.
+    try { document.fonts.load("600 16px 'MN Barlow Condensed'").then(checkFit, checkFit); } catch (e) { checkFit(); }
     setTimeout(checkFit, 500);
     var mnFitResizeTimer;
     function onFitResize() {
