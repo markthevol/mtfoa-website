@@ -1,0 +1,658 @@
+---
+title: Education
+description: >-
+  Tackle and flag football officiating resources: axioms, mechanics, rules, and training videos.
+permalink: /education
+---
+<!-- ============================================================
+     MTFOA Education page: Tackle Football + Flag Football
+     One page that replaces the old Education menu (Axioms & Philosophy,
+     Flag Football, Clock Operation, Non-Player Fouls, Mechanics, Videos).
+
+       TACKLE FOOTBALL: officiating axioms, MTFOA philosophy (written out
+       on the page, no PDF downloads), the TSSAA officials' manual, clock
+       operation, non-player fouls, and the instructional videos.
+       FLAG FOOTBALL:   TSSAA girls flag football resources.
+
+     Removed on purpose: the 3-Man Mechanics link, the Case Study
+     Flashcards link, and the "Download as PDF" buttons.
+
+     The Tackle / Flag buttons and the chips under "Tackle Football" are
+     TABS (they show and hide content), not scroll links: a fixed-height
+     embed cannot scroll the page around it on a phone, so scroll links
+     did nothing on mobile. Only one part is on screen at a time.
+
+     This block has no data feed. To change a link or a line of text,
+     edit it below and paste the block back into the embed.
+
+     WHERE IT GOES: one WebsiteBuilder HTML embed on the Education page,
+     dragged out to full page width. Set the box height to about 2050 px
+     on desktop and 3700 px on a phone (a little extra is fine; the shorter
+     views leave empty space below).
+   ============================================================ -->
+<div class="mtfoa-edu" id="edRoot">
+<style>
+  .mtfoa-edu {
+    --ed-navy: #1f3864;
+    --ed-navy-deep: #142a4d;
+    --ed-columbia: #6f90b5;
+    --ed-red: #d6291a;
+    --ed-white: #ffffff;
+    --ed-tint: #c9d6e8;
+    --ed-chalk: #f4f6fa;
+    --ed-slate: #5b6879;
+    --ed-ink: #1c2530;
+    --ed-border: #dbe1ea;
+
+    container-type: inline-size;
+    font-family: 'Barlow', Arial, Helvetica, sans-serif;
+    background: var(--ed-chalk);
+    -webkit-font-smoothing: antialiased;
+  }
+  .mtfoa-edu, .mtfoa-edu * { box-sizing: border-box; }
+  .mtfoa-edu :where(p, h1, h2, h3, ul, ol) { margin: 0; }
+  .mtfoa-edu :where(ul, ol) { list-style: none; padding: 0; }
+  .mtfoa-edu :where(a) { text-decoration: none; color: inherit; }
+  .mtfoa-edu :where(button) { font: inherit; color: inherit; }
+  .mtfoa-edu a:focus-visible, .mtfoa-edu button:focus-visible { outline: 3px solid var(--ed-red); outline-offset: 2px; }
+
+  .ed-in { max-width: 1000px; margin: 0 auto; }
+
+  /* ---------- Header band ---------- */
+  .ed-head {
+    position: relative; overflow: hidden;
+    background:
+      radial-gradient(120% 160% at 88% 0%, #2c4d86 0%, rgba(44,77,134,0) 55%),
+      linear-gradient(160deg, var(--ed-navy) 0%, var(--ed-navy-deep) 100%);
+    border-bottom: 4px solid var(--ed-red);
+    padding: 28px 22px 24px;
+  }
+  .ed-head::before {
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    background-image:
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.10) 0 3px, transparent 3px 160px),
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.05) 0 2px, transparent 2px 32px);
+  }
+  .ed-head .ed-in { position: relative; }
+  .ed-eyebrow {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-family: 'Barlow Condensed', Arial, sans-serif;
+    font-weight: 700; font-size: 13px; letter-spacing: 2.4px;
+    text-transform: uppercase; color: var(--ed-tint); margin-bottom: 8px;
+  }
+  .ed-eyebrow::before { content: ''; width: 26px; height: 4px; background: var(--ed-red); }
+  .ed-title {
+    font-family: 'Anton', Impact, 'Arial Narrow', sans-serif;
+    font-weight: 400; font-size: clamp(32px, 8.5vw, 44px);
+    line-height: 1.02; letter-spacing: 0.5px; text-transform: uppercase; color: var(--ed-white);
+  }
+  .ed-sub { margin-top: 8px; font-size: 15.5px; line-height: 1.5; color: var(--ed-tint); max-width: 58ch; }
+
+  .ed-body { padding: 24px 20px 36px; }
+
+  /* ---------- Big two-way chooser ---------- */
+  .ed-choose { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .ed-pick {
+    display: flex; flex-direction: column; align-items: flex-start; text-align: left;
+    width: 100%; cursor: pointer;
+    background: var(--ed-white);
+    border: 1px solid var(--ed-border); border-top: 5px solid var(--ed-navy);
+    border-radius: 6px; padding: 16px 18px 16px;
+    box-shadow: 0 8px 22px rgba(20,42,77,0.08);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .ed-pick.flag { border-top-color: var(--ed-red); }
+  .ed-pick[aria-selected="true"] { background: var(--ed-navy); border-color: var(--ed-navy); box-shadow: 0 12px 28px rgba(20,42,77,0.22); }
+  .ed-pick.flag[aria-selected="true"] { background: var(--ed-navy-deep); border-top-color: var(--ed-red); }
+  .ed-pick[aria-selected="true"] .k { color: var(--ed-white); }
+  .ed-pick[aria-selected="true"] .d { color: var(--ed-tint); }
+  .ed-pick[aria-selected="true"] .go { color: var(--ed-white); }
+  .ed-pick .go.on { display: none; }
+  .ed-pick[aria-selected="true"] .go.on { display: block; }
+  .ed-pick[aria-selected="true"] .go.off { display: none; }
+  .mtfoa-edu [hidden] { display: none !important; }
+  .ed-pick:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(20,42,77,0.14); }
+  .ed-pick .k {
+    font-family: 'Anton', Impact, 'Arial Narrow', sans-serif; font-weight: 400;
+    font-size: 26px; line-height: 1.05; letter-spacing: 0.4px; text-transform: uppercase; color: var(--ed-navy);
+  }
+  .ed-pick .d { margin-top: 6px; font-size: 15px; line-height: 1.45; color: var(--ed-slate); }
+  .ed-pick .go {
+    margin-top: 10px;
+    font-family: 'Barlow Condensed', Arial, sans-serif; font-weight: 700;
+    font-size: 13px; letter-spacing: 1.8px; text-transform: uppercase; color: var(--ed-red);
+  }
+
+  /* ---------- Section banners ---------- */
+  .ed-sec { margin-top: 34px; scroll-margin-top: 76px; }
+  .ed-ban {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--ed-navy); color: var(--ed-white);
+    border-radius: 6px; padding: 14px 18px;
+    border-left: 8px solid var(--ed-red);
+  }
+  .ed-sec.flag .ed-ban { background: var(--ed-navy-deep); border-left-color: var(--ed-columbia); }
+  .ed-ban h2 {
+    font-family: 'Anton', Impact, 'Arial Narrow', sans-serif; font-weight: 400;
+    font-size: clamp(26px, 6.5vw, 34px); line-height: 1; letter-spacing: 0.5px; text-transform: uppercase;
+  }
+  .ed-jump { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px; }
+  .ed-chip {
+    cursor: pointer;
+    font-family: 'Barlow Condensed', Arial, sans-serif; font-weight: 600; font-size: 14px;
+    letter-spacing: 1px; text-transform: uppercase;
+    background: var(--ed-white); color: var(--ed-navy);
+    border: 1px solid var(--ed-border); border-radius: 999px; padding: 7px 14px;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+  .ed-chip:hover { border-color: var(--ed-navy); }
+  .ed-chip[aria-selected="true"] { background: var(--ed-navy); color: var(--ed-white); border-color: var(--ed-navy); }
+
+  /* ---------- Content cards ---------- */
+  .ed-card {
+    margin-top: 16px; scroll-margin-top: 76px;
+    background: var(--ed-white);
+    border: 1px solid var(--ed-border); border-top: 5px solid var(--ed-navy);
+    border-radius: 6px; padding: 18px 18px 20px;
+  }
+  .ed-card.red { border-top-color: var(--ed-red); }
+  .ed-card h3 {
+    font-family: 'Anton', Impact, 'Arial Narrow', sans-serif; font-weight: 400;
+    font-size: clamp(22px, 5.5vw, 26px); line-height: 1.1; letter-spacing: 0.4px;
+    text-transform: uppercase; color: var(--ed-navy);
+  }
+  .ed-lead { margin-top: 6px; font-size: 15.5px; line-height: 1.5; color: var(--ed-slate); max-width: 64ch; }
+  .ed-p { margin-top: 10px; font-size: 15.5px; line-height: 1.55; color: var(--ed-ink); max-width: 72ch; }
+
+  .ed-list { margin-top: 12px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 9px 28px; }
+  .ed-list li {
+    position: relative; padding-left: 20px;
+    font-size: 15.5px; line-height: 1.5; color: var(--ed-ink);
+  }
+  .ed-list li::before {
+    content: ''; position: absolute; left: 2px; top: 0.55em;
+    width: 8px; height: 8px; background: var(--ed-red); transform: rotate(45deg);
+  }
+  .ed-keep {
+    margin-top: 14px; padding: 10px 14px;
+    background: #fdf1ef; border-left: 4px solid var(--ed-red); border-radius: 3px;
+    font-family: 'Barlow Condensed', Arial, sans-serif; font-weight: 700;
+    font-size: 17px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--ed-navy);
+  }
+
+  /* Philosophy groups */
+  .ed-groups { margin-top: 14px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .ed-group {
+    background: var(--ed-chalk); border: 1px solid var(--ed-border);
+    border-radius: 5px; padding: 14px 15px 16px;
+  }
+  .ed-group h4 {
+    margin: 0 0 4px;
+    font-family: 'Barlow Condensed', Arial, sans-serif; font-weight: 700;
+    font-size: 15px; letter-spacing: 1.8px; text-transform: uppercase; color: var(--ed-red);
+  }
+  .ed-group .ed-list { margin-top: 8px; gap: 8px; }
+  .ed-group .ed-list li { font-size: 15px; line-height: 1.48; }
+
+  /* Buttons + link rows */
+  .ed-btn {
+    display: inline-block; text-align: center;
+    font-family: 'Barlow Condensed', Arial, sans-serif; font-weight: 600; font-size: 15px;
+    letter-spacing: 1px; text-transform: uppercase;
+    padding: 12px 20px; border-radius: 3px;
+    background: var(--ed-red); color: var(--ed-white);
+    box-shadow: 0 6px 18px rgba(214,41,26,0.28);
+    transition: background 0.15s ease, transform 0.15s ease;
+  }
+  .ed-btn:hover { background: #e5432f; transform: translateY(-1px); }
+  .ed-actions { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 10px; }
+
+  .ed-note {
+    margin-top: 12px; padding: 10px 12px;
+    background: #fdf1ef; border-left: 4px solid var(--ed-red); border-radius: 3px;
+    font-size: 15px; line-height: 1.5; color: var(--ed-ink);
+  }
+
+  /* Clock + non-player side by side on wide */
+  .ed-pair { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0 16px; }
+  .ed-pair > .ed-card { margin-top: 16px; display: flex; flex-direction: column; }
+
+  /* ---------- Videos ---------- */
+  .ed-vids { margin-top: 14px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .ed-vid { min-width: 0; }
+  .ed-frame {
+    position: relative; width: 100%; aspect-ratio: 16 / 9; background: #0d1a30;
+    border-radius: 5px; overflow: hidden;
+  }
+  .ed-frame img, .ed-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; object-fit: cover; }
+  .ed-play {
+    position: absolute; inset: 0; width: 100%; height: 100%; cursor: pointer; padding: 0; border: 0;
+    background: rgba(13,26,48,0.28); display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s ease;
+  }
+  .ed-play:hover { background: rgba(13,26,48,0.10); }
+  .ed-play span {
+    width: 62px; height: 62px; border-radius: 50%; background: var(--ed-red);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.35);
+  }
+  .ed-play svg { margin-left: 4px; }
+  .ed-vid h4 {
+    margin: 10px 0 0;
+    font-weight: 600; font-size: 17px; line-height: 1.3; color: var(--ed-navy);
+  }
+  .ed-vid p { margin-top: 4px; font-size: 14.5px; line-height: 1.45; color: var(--ed-slate); }
+  .ed-vid .yt {
+    display: inline-block; margin-top: 6px;
+    font-family: 'Barlow Condensed', Arial, sans-serif; font-weight: 700;
+    font-size: 13px; letter-spacing: 1.6px; text-transform: uppercase; color: var(--ed-red);
+  }
+  .ed-vid .yt:hover { text-decoration: underline; }
+
+  /* ---------- Flag football resource tiles ---------- */
+  .ed-tiles { margin-top: 14px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .ed-tile {
+    display: flex; align-items: center; gap: 14px;
+    background: var(--ed-white); border: 1px solid var(--ed-border); border-left: 5px solid var(--ed-red);
+    border-radius: 6px; padding: 14px 16px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .ed-tile:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(20,42,77,0.12); }
+  .ed-ico {
+    flex: none; width: 42px; height: 42px; border-radius: 50%;
+    background: var(--ed-navy); color: var(--ed-white);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .ed-tile .t { min-width: 0; display: block; }
+  .ed-tile .n { display: block; font-weight: 600; font-size: 16.5px; line-height: 1.25; color: var(--ed-ink); }
+  .ed-tile .m {
+    display: block; margin-top: 2px;
+    font-family: 'Barlow Condensed', Arial, sans-serif; font-weight: 700;
+    font-size: 12.5px; letter-spacing: 1.6px; text-transform: uppercase; color: var(--ed-slate);
+  }
+  .ed-tile .arr { margin-left: auto; flex: none; color: var(--ed-red); }
+
+  /* ---------- Phone: tighter spacing so the long text stays readable ---------- */
+  @container (max-width: 619px) {
+    .ed-head { padding: 22px 16px 20px; }
+    .ed-body { padding: 16px 12px 28px; }
+    .ed-sec { margin-top: 26px; }
+    .ed-card { margin-top: 12px; padding: 14px 14px 16px; }
+    .ed-group { padding: 12px 12px 14px; }
+    .ed-groups { gap: 12px; }
+    .ed-list li, .ed-p { font-size: 15px; line-height: 1.47; }
+    .ed-group .ed-list li { font-size: 14.5px; line-height: 1.45; }
+    .ed-list { gap: 8px; }
+    .ed-pair > .ed-card { margin-top: 12px; }
+  }
+
+  /* ---------- Wider layouts ---------- */
+  @container (min-width: 620px) {
+    .ed-head { padding: 34px 32px 28px; }
+    .ed-body { padding: 30px 32px 44px; }
+    .ed-choose { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    .ed-list.two { display: block; column-count: 2; column-gap: 32px; }
+    .ed-list.two > li { break-inside: avoid; margin-bottom: 9px; }
+    .ed-groups { display: block; column-count: 2; column-gap: 16px; }
+    .ed-groups > .ed-group { break-inside: avoid; margin-bottom: 16px; }
+    .ed-pair { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .ed-vids { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 22px; }
+    .ed-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .ed-card { padding: 22px 24px 24px; }
+  }
+</style>
+
+<header class="ed-head">
+  <div class="ed-in">
+    <div class="ed-eyebrow">Officials Education</div>
+    <h1 class="ed-title">Education</h1>
+    <p class="ed-sub">Rules, mechanics and training for MTFOA officials. Choose tackle or flag football to get started.</p>
+  </div>
+</header>
+
+<div class="ed-body">
+  <div class="ed-in">
+
+    <div class="ed-choose" role="tablist" aria-label="Tackle or flag football">
+      <button type="button" class="ed-pick" role="tab" id="edTabTackle" data-panel="edTackle" aria-selected="true" aria-controls="edTackle">
+        <span class="k">Tackle Football</span>
+        <span class="d">Axioms and philosophy, the TSSAA officials&rsquo; manual, clock operation, non-player fouls and instructional videos.</span>
+        <span class="go off">Show tackle &rarr;</span>
+        <span class="go on">Showing tackle &#10003;</span>
+      </button>
+      <button type="button" class="ed-pick flag" role="tab" id="edTabFlag" data-panel="edFlag" aria-selected="false" aria-controls="edFlag">
+        <span class="k">Flag Football</span>
+        <span class="d">TSSAA girls flag football rule books, mechanics, rule adoptions and training.</span>
+        <span class="go off">Show flag &rarr;</span>
+        <span class="go on">Showing flag &#10003;</span>
+      </button>
+    </div>
+
+    <!-- ===================== TACKLE FOOTBALL ===================== -->
+    <section class="ed-sec" id="edTackle" role="tabpanel" aria-labelledby="edTabTackle">
+      <div class="ed-ban"><h2>Tackle Football</h2></div>
+      <div class="ed-jump" role="tablist" aria-label="Tackle football topics">
+        <button type="button" class="ed-chip" role="tab" data-view="axioms" aria-selected="true">Axioms</button>
+        <button type="button" class="ed-chip" role="tab" data-view="phil1" aria-selected="false">Philosophy: scrimmage &amp; passing</button>
+        <button type="button" class="ed-chip" role="tab" data-view="phil2" aria-selected="false">Philosophy: blocking, kicking &amp; fouls</button>
+        <button type="button" class="ed-chip" role="tab" data-view="mech" aria-selected="false">Mechanics</button>
+        <button type="button" class="ed-chip" role="tab" data-view="rules" aria-selected="false">Clock &amp; non-player fouls</button>
+        <button type="button" class="ed-chip" role="tab" data-view="videos" aria-selected="false">Videos</button>
+      </div>
+
+      <div class="ed-card red" id="edAxioms" data-view-of="axioms">
+        <h3>Officiating Axioms</h3>
+        <ul class="ed-list two">
+          <li>Call only &ldquo;quality fouls,&rdquo; which are fouls that have a direct effect upon the play.</li>
+          <li>Do not reach for your flag unless you intend to drop it. Get a number and keep officiating. When you put your flag on the field, your integrity is linked to it.</li>
+          <li>Always see the ball before you blow your whistle.</li>
+          <li>Be a good &ldquo;dead ball&rdquo; official. View all players until they are back with their teammates.</li>
+          <li>Be deliberate when ruling on a fumble &ndash; and get a bean bag down.</li>
+          <li>Crisp ball movement.</li>
+          <li>Count players EVERY down.</li>
+          <li>Maintain excellent and respectful communication with coaches.</li>
+          <li>If you miss one &ndash; Do not look back! Always be ready to officiate the next play.</li>
+          <li>Concentrate. Be mentally and physically prepared to work and give everything you have every play.</li>
+          <li>Practice preventive officiating and do what you can to prevent fouls from happening.</li>
+          <li>Always display integrity, courage, and poise. Stress and pressure reveal your true character.</li>
+          <li>If you need help, ask for it; if you can give help with confidence, give it.</li>
+        </ul>
+        <div class="ed-keep">And above all else&hellip; Keep Hustling!</div>
+      </div>
+
+      <div class="ed-card" id="edPhil" data-view-of="phil1" hidden>
+        <h3>MTFOA Officiating Philosophy</h3>
+        <div class="ed-groups">
+          <div class="ed-group">
+            <h4>Line of Scrimmage</h4>
+            <ul class="ed-list">
+              <li>Officials will work to keep interior linemen legal and will only put a player in the backfield when it is obvious or when repeated warnings are ignored. Do not wait until the fourth quarter to enforce the rule.</li>
+              <li>If an interior offensive player is lined up with his head clearly behind the rear-end of the snapper or clearly beyond the neutral zone, a foul should be called without a warning.</li>
+              <li>Do not be overly technical on an offensive player who is a wide receiver or slot back in determining if he is off the line of scrimmage. When in question, it is not a foul but a warning may be warranted.</li>
+              <li>Wide receivers or slot-backs lined up outside a tight end will be ruled on the line of scrimmage and covering the tight end if there is no stagger between their alignments.</li>
+              <li>If there is a question, a player with an eligible number is not covered up, but a warning may be warranted.</li>
+              <li>Formations during the execution of a trick or unusual play have the highest degree of scrutiny and must be completely legal.</li>
+            </ul>
+          </div>
+          <div class="ed-group">
+            <h4>Defensive Pass Interference</h4>
+            <ul class="ed-list">
+              <li>Early contact is required.</li>
+              <li>Early contact by a defender who is not playing the ball is defensive pass interference if he demonstrates an obvious intent to impede the offensive player&rsquo;s ability to complete the catch. The categories of defensive pass interference are the following:
+                <ul class="ed-list" style="margin-top:8px">
+                  <li>Playing through the back of a receiver in an attempt to make a play on the ball.</li>
+                  <li>Grabbing and restricting a receiver&rsquo;s arm(s) or body in a manner that restricts his opportunity to catch a pass.</li>
+                  <li>Extending an arm across the body (armbar) of a receiver thus restricting his ability to catch a pass, regardless of the fact of whether or not the defender is looking for the ball.</li>
+                  <li>Cutting-off or riding the receiver out of the path to the ball by making contact with him without playing the ball.</li>
+                  <li>Hooking and restricting a receiver in an attempt to get to the ball in such a manner that causes the receiver&rsquo;s body to turn prior to the ball arriving.</li>
+                </ul>
+              </li>
+              <li>The defensive player has an equal right to the ball, so he must demonstrate the obvious intent to impede the offensive player.</li>
+            </ul>
+          </div>
+          <div class="ed-group">
+            <h4>Offensive Pass Interference</h4>
+            <p class="ed-p" style="margin:0 0 6px;font-size:15px">Actions that constitute offensive pass interference include but are not limited to the following categories:</p>
+            <ul class="ed-list">
+              <li>Initiating contact with a defender by shoving or pushing off to create separation in an attempt to catch a pass.</li>
+              <li>Driving through a defender who has established a position on the field.</li>
+              <li>Offensive pass interference will not be called on a screen pass when the ball is overthrown behind the line of scrimmage but subsequently, lands beyond the expanded neutral zone (up to two yards), and linemen are blocking downfield unless such blocking prevents a defensive player from catching the ball.</li>
+              <li>It is not offensive pass interference on a pick play if the defensive player is blocking the offensive player when the pick occurs and the offensive player does not make a separate action.</li>
+            </ul>
+          </div>
+          <div class="ed-group">
+            <h4>Passing Situations</h4>
+            <ul class="ed-list">
+              <li>When in question on action against the passer, it is roughing the passer if the defender&rsquo;s intent is to punish.</li>
+              <li>If an interception is near the goal line (inside the one-yard line) and there is a question as to whether possession is gained in the field of play or end zone, make the play a touchback.</li>
+              <li>When in question on quarterback pass/fumble, rule pass.</li>
+              <li>When in question whether the pass was complete or incomplete, rule incomplete.</li>
+              <li>When in question whether a pass was forward or backward, rule forward if it was thrown from behind the line of scrimmage.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="ed-card" id="edPhil2" data-view-of="phil2" hidden>
+        <h3>MTFOA Officiating Philosophy <span style="color:var(--ed-slate)">(cont.)</span></h3>
+        <div class="ed-groups">
+          <div class="ed-group">
+            <h4>Blocking</h4>
+            <ul class="ed-list">
+              <li>If there is a potential offensive holding but the action occurs clearly away from the point of attack and has no effect on the play, offensive holding should not be called (a warning may be warranted), except that a takedown should always be called anywhere on the field.</li>
+              <li>If there is a potential for defensive holding but the action occurs clearly away from the point of attack and has no effect on the play, defensive holding should not be called (a warning may be warranted). Example: A defensive back on the opposite side of the field holding a wide receiver on a designed run play to the other side.</li>
+              <li>Holding can be called even if the quarterback is subsequently sacked as it may be the other half of an offsetting foul.</li>
+              <li>A slight jersey pull does not necessarily mean that offensive holding should be called&mdash;a material restriction against an opponent is necessary for a foul.</li>
+              <li>Rarely should you have a hold on a double team block unless there is a takedown or the defender breaks the double team and is pulled back.</li>
+              <li>For blocks in the back, indicators of the force of the contact include whether the blocking player was in a &ldquo;chase mode&rdquo; and how the blocked player falls&mdash;if he falls forward (rather than on his side), the contact was to the back. The force of the block could be slight and still a foul if the contact propels the player past the runner or prevents him from making the play. If the force is clearly on the side, it is not a foul.</li>
+              <li>An illegal block in the back can still be called on fair catches, but should not be called if the illegal block occurs away from the play as the fair catch is being made or a touchback occurs and the contact is slight, except blocks in the back which are personal foul in nature should be called regardless of their timing relative to a fair catch or the tackling of a runner.</li>
+              <li>When in question if an illegal block occurs in the end zone or field of play, it occurs in the field of play.</li>
+            </ul>
+          </div>
+          <div class="ed-group">
+            <h4>Kicking</h4>
+            <ul class="ed-list">
+              <li>The kicker&rsquo;s restraining line on onside and short pooch kickoffs should be officiated as a plane and any player (other than the kicker or holder) breaking the plane before the ball is kicked should be called offside. For deep kickoffs, also officiate the restraining line as a plane but do not be overly technical.</li>
+              <li>When in question if a kick was touched, rule it was not touched.</li>
+            </ul>
+            <h4 style="margin-top:16px">Runner Down</h4>
+            <ul class="ed-list">
+              <li>When in question, the runner was down and there was not a fumble.</li>
+              <li>It is not a foul if legal contact occurs before the runner has a foot down out of bounds unless the runner has eased up as he is stepping out of bounds.</li>
+              <li>When in question, the runner did not step out of bounds.</li>
+            </ul>
+          </div>
+          <div class="ed-group">
+            <h4>Personal Fouls &amp; Unsportsmanlike Conduct</h4>
+            <ul class="ed-list">
+              <li>Unsportsmanlike conduct is a non-contact foul under NFHS rules.</li>
+              <li>If action is deemed to be &ldquo;fighting,&rdquo; then the player must be disqualified. Preventive officiating often can help to de-escalate the situation.</li>
+              <li>For late hits away from the ball near the end of the play, when in question lean toward a dead-ball foul rather than a live-ball foul.</li>
+              <li>Spitting on an opponent requires disqualification.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="ed-card red" id="edMech" data-view-of="mech" hidden>
+        <h3>Mechanics</h3>
+        <p class="ed-lead">The TSSAA Football Officials&rsquo; Manual, with the new mechanics for 2026.</p>
+        <div class="ed-actions">
+          <a class="ed-btn" href="https://storage.googleapis.com/wzukusers/user-12863925/documents/0b75047a08d1499fb43d27e55ccae41b/ASB%20TSSAA%20Football%20Officials%20Manual%20inside%202026-2027%20042926%20rev2%20(1).pdf" target="_blank" rel="noopener">Open the manual</a>
+        </div>
+      </div>
+
+      <div class="ed-pair" data-view-of="rules" hidden>
+        <div class="ed-card" id="edClock">
+          <h3>Clock Operation</h3>
+          <p class="ed-lead">Clock rules to live by.</p>
+          <ul class="ed-list">
+            <li>Touchdown signal stops the clock.</li>
+            <li>Timeout signal stops the clock.</li>
+            <li>If the clock is stopped, do not take your eyes off of the referee.</li>
+            <li>There will be no ready-for-play whistle or chop from the Referee when the play clock is to be set for 40 seconds, although the Referee will re-start the game clock (with a silent wind) after it was stopped for the first-down inbounds.</li>
+          </ul>
+          <div class="ed-actions">
+            <a class="ed-btn" href="https://storage.googleapis.com/wzukusers/user-12863925/documents/7eee052284604aff9891fb279d5100ec/Summary%20of%20Play%20Clock%20Operation.pdf" target="_blank" rel="noopener">40-second play clock</a>
+          </div>
+        </div>
+
+        <div class="ed-card red" id="edNonPlayer">
+          <h3>Non-Player Fouls</h3>
+          <p class="ed-lead">How to officiate physical contact between an official and a team nonplayer, including a coach.</p>
+          <ul class="ed-list">
+            <li>If you judge the contact as intentional, it&rsquo;s a 15-yard penalty and disqualification of the nonplayer who contacted the official.</li>
+            <li>If the contact is entirely unintentional and in the restricted area while the ball is live, it&rsquo;s a 15-yard penalty from the succeeding spot. A second offense would result in disqualification of the head coach.</li>
+            <li>There may be situations where officials determine the foul for unintentional contact is &ldquo;flagrant,&rdquo; such as if the nonplayer&rsquo;s conduct is &ldquo;abusive.&rdquo; Any flagrant foul carries with it immediate disqualification.</li>
+          </ul>
+          <p class="ed-p" style="font-weight:600;color:var(--ed-navy)">Considerations for a potential flagrant foul:</p>
+          <ul class="ed-list" style="margin-top:8px">
+            <li>Officials should consider all circumstances in making a decision.</li>
+            <li>If there are circumstances suggesting the contact wasn&rsquo;t entirely unintentional, calling a flagrant foul may be appropriate.</li>
+            <li>The location of the foul may also be considered. For example, contact that occurs on the field of play will involve heightened considerations that the nonplayer&rsquo;s conduct is abusive and, thus, flagrant.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="ed-card" id="edVideos" data-view-of="videos" hidden>
+        <h3>Instructional Videos</h3>
+        <div class="ed-vids">
+          <div class="ed-vid" data-yt="E5ObYpXCmsQ">
+            <div class="ed-frame">
+              <img src="https://i.ytimg.com/vi/E5ObYpXCmsQ/hqdefault.jpg" alt="" loading="lazy">
+              <button type="button" class="ed-play" aria-label="Play: 2022 NFHS Grounding Rule Change"><span><svg width="24" height="24" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg></span></button>
+            </div>
+            <h4>2022 NFHS Grounding Rule Change</h4>
+            <p>NFHS football rule change allowing under certain conditions the passer to throw the ball away without it being an illegal forward pass or intentional grounding.</p>
+            <a class="yt" href="https://youtu.be/E5ObYpXCmsQ" target="_blank" rel="noopener">Watch on YouTube &rarr;</a>
+          </div>
+          <div class="ed-vid" data-yt="xDGiue8K8mg">
+            <div class="ed-frame">
+              <img src="https://i.ytimg.com/vi/xDGiue8K8mg/hqdefault.jpg" alt="" loading="lazy">
+              <button type="button" class="ed-play" aria-label="Play: 2022 Preseason Video"><span><svg width="24" height="24" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg></span></button>
+            </div>
+            <h4>2022 Preseason Video</h4>
+            <p>An in depth look at hurdling and excessive contact to a defenseless player.</p>
+            <a class="yt" href="https://youtu.be/xDGiue8K8mg" target="_blank" rel="noopener">Watch on YouTube &rarr;</a>
+          </div>
+          <div class="ed-vid" data-yt="HtRNTeZKS1g">
+            <div class="ed-frame">
+              <img src="https://i.ytimg.com/vi/HtRNTeZKS1g/hqdefault.jpg" alt="" loading="lazy">
+              <button type="button" class="ed-play" aria-label="Play: Blocks Below the Waist by the Offense"><span><svg width="24" height="24" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg></span></button>
+            </div>
+            <h4>Blocks Below the Waist by the Offense</h4>
+            <p>Discussion of the new 2021 rule regarding blocks below the waist in the free blocking zone. This episode focuses on the offense.</p>
+            <a class="yt" href="https://youtu.be/HtRNTeZKS1g" target="_blank" rel="noopener">Watch on YouTube &rarr;</a>
+          </div>
+          <div class="ed-vid" data-yt="3sq6mZncBlA">
+            <div class="ed-frame">
+              <img src="https://i.ytimg.com/vi/3sq6mZncBlA/hqdefault.jpg" alt="" loading="lazy">
+              <button type="button" class="ed-play" aria-label="Play: Blocks Below the Waist by the Defense"><span><svg width="24" height="24" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg></span></button>
+            </div>
+            <h4>Blocks Below the Waist by the Defense</h4>
+            <p>Discussion of legal and illegal blocks below the waist by the defense.</p>
+            <a class="yt" href="https://youtu.be/3sq6mZncBlA" target="_blank" rel="noopener">Watch on YouTube &rarr;</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== FLAG FOOTBALL ===================== -->
+    <section class="ed-sec flag" id="edFlag" role="tabpanel" aria-labelledby="edTabFlag" hidden>
+      <div class="ed-ban"><h2>Flag Football</h2></div>
+      <div class="ed-card red">
+        <h3>TSSAA Girls Flag Football</h3>
+        <p class="ed-lead">Rule books, mechanics and training for officiating girls flag football.</p>
+        <div class="ed-tiles">
+          <a class="ed-tile" href="https://drive.google.com/file/d/1eD3pQbrJaVSGAi7dLP37qnqImHgrA4jO/view" target="_blank" rel="noopener">
+            <span class="ed-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5"/></svg></span>
+            <span class="t"><span class="n">NFHS Rule Book</span><span class="m">Rules</span></span>
+            <svg class="arr" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>
+          </a>
+          <a class="ed-tile" href="https://drive.google.com/file/d/1-34IJuuSrU5Q2hA5LImZY7eymbkh0usn/view" target="_blank" rel="noopener">
+            <span class="ed-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/></svg></span>
+            <span class="t"><span class="n">Mechanics</span><span class="m">Positioning and signals</span></span>
+            <svg class="arr" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>
+          </a>
+          <a class="ed-tile" href="https://drive.google.com/file/d/1kqafz8BFpS05SWgr1aOfQMKsrYqPH28l/view" target="_blank" rel="noopener">
+            <span class="ed-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg></span>
+            <span class="t"><span class="n">TSSAA Rule Adoptions</span><span class="m">Rules</span></span>
+            <svg class="arr" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>
+          </a>
+          <a class="ed-tile" href="https://tssaa.org/2025-2026-girls-flag-football-rules-meeting-slides" target="_blank" rel="noopener">
+            <span class="ed-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg></span>
+            <span class="t"><span class="n">TSSAA Flag Football Rules Presentation</span><span class="m">Slides on tssaa.org</span></span>
+            <svg class="arr" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>
+          </a>
+          <a class="ed-tile" href="https://youtu.be/fMRzSgXKirU" target="_blank" rel="noopener">
+            <span class="ed-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></span>
+            <span class="t"><span class="n">2026 MTFOA Rules Meeting</span><span class="m">Video</span></span>
+            <svg class="arr" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>
+          </a>
+          <a class="ed-tile" href="https://drive.google.com/file/d/1M6nhBvH2OO_CMO_y8rLKrnmgirWOuIG7/view" target="_blank" rel="noopener">
+            <span class="ed-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="10" cy="7" r="4"/><path d="M21 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+            <span class="t"><span class="n">Unified Flag Football Officials Training</span><span class="m">Training</span></span>
+            <svg class="arr" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>
+          </a>
+        </div>
+        <div class="ed-note">Looking for more resources or information? Visit <a href="https://tssaa.org/sports/football-flag-girls" target="_blank" rel="noopener" style="color:var(--ed-navy);font-weight:600;text-decoration:underline">tssaa.org/sports/football-flag-girls</a> for the latest from the TSSAA on this fast growing and exciting sport.</div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700&display=swap">
+<script>
+(function () {
+  var root = document.getElementById('edRoot');
+  if (!root) return;
+
+  /* Tabs: Tackle / Flag, and the topics inside Tackle. They show and hide
+     content (nothing scrolls), so they work the same on a phone. */
+  function q(sel, ctx) { return Array.prototype.slice.call((ctx || root).querySelectorAll(sel)); }
+  root.addEventListener('click', function (ev) {
+    var pick = ev.target.closest ? ev.target.closest('.ed-pick') : null;
+    if (pick && root.contains(pick)) {
+      var id = pick.getAttribute('data-panel');
+      q('.ed-pick').forEach(function (p) { p.setAttribute('aria-selected', p === pick ? 'true' : 'false'); });
+      q('.ed-sec').forEach(function (sec) { sec.hidden = (sec.id !== id); });
+      return;
+    }
+    var chip = ev.target.closest ? ev.target.closest('.ed-chip') : null;
+    if (chip && root.contains(chip)) {
+      var v = chip.getAttribute('data-view');
+      q('.ed-chip').forEach(function (c) { c.setAttribute('aria-selected', c === chip ? 'true' : 'false'); });
+      q('[data-view-of]').forEach(function (el) { el.hidden = (el.getAttribute('data-view-of') !== v); });
+    }
+  });
+
+  /* Videos: show a thumbnail, load the player only when asked. */
+  root.addEventListener('click', function (ev) {
+    var play = ev.target.closest ? ev.target.closest('.ed-play') : null;
+    if (!play) return;
+    var box = play.closest('.ed-vid');
+    var id = box && box.getAttribute('data-yt');
+    var frame = box && box.querySelector('.ed-frame');
+    if (!id || !frame) return;
+    var f = document.createElement('iframe');
+    f.src = 'https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1&rel=0';
+    f.title = 'Instructional video';
+    f.setAttribute('allow', 'autoplay; encrypted-media; picture-in-picture; fullscreen');
+    f.setAttribute('allowfullscreen', '');
+    frame.innerHTML = '';
+    frame.appendChild(f);
+  });
+})();
+</script>
+</div>
+
+<script>
+/* AUTO HEIGHT: the box (and, on a computer, the whole page) fits itself to what is being shown, so there is no blank
+   gap above the footer when a tab, filter or sign-in changes the content. Only runs on the live site (never in the
+   editor or Preview, where it would change the saved layout).
+     phone (box under 720px wide): AppsApi.setAppSize - the box follows the content, but never gets shorter than the
+                                   phone height set in the editor, so keep that below the shortest state of the page.
+     computer:                     AppsApi.setDocumentSize - the page itself follows the content. */
+(function () {
+  var root = document.querySelector('[class^="mtfoa-"]') || document.body;
+  var last = 0, mode = '';
+  function fit() {
+    var extra = 0;
+    if (root === document.body) { var cs = getComputedStyle(document.body); extra = (parseFloat(cs.marginTop) || 0) + (parseFloat(cs.marginBottom) || 0); }
+    var h = Math.ceil(root.getBoundingClientRect().height + extra) + 2;
+    if (h < 300 || Math.abs(h - last) < 3) return;
+    try {
+      if (!(window.AppsApi && AppsApi.getViewMode && AppsApi.getViewMode() === 'view')) return;
+      var w = window.innerWidth || 0;
+      if (w < 300) return;                               // frame not laid out yet: measure again later
+      if (!mode) mode = w < 720 ? 'phone' : 'desktop';    // decide once, so a narrow moment never resizes the box
+      if (mode === 'phone') { if (AppsApi.setAppSize) AppsApi.setAppSize({ width: w, height: h }); }
+      else if (AppsApi.setDocumentSize) AppsApi.setDocumentSize({ width: w, height: h });
+      last = h;                                          // only remembered once the size was really sent
+    } catch (e) {}
+  }
+  fit(); window.addEventListener('load', fit); setTimeout(fit, 600); setTimeout(fit, 1800); setTimeout(fit, 4500);
+  try { new ResizeObserver(fit).observe(root); } catch (e) {}
+})();
+</script>

@@ -1,0 +1,621 @@
+---
+title: News & Info
+description: >-
+  Meeting schedule, playoff-eligibility rules, and announcements for MTFOA officials.
+permalink: /news
+---
+<!-- ============================================================
+     MTFOA News & Info page: Meetings + Announcements
+     Replaces the News page's single "2026 Local Meeting Schedule"
+     article with one designed page: the next meeting up front, the
+     full season schedule, the playoff-eligibility rules, and short
+     announcements.
+
+     DATA: the "Meetings" and "News" tabs of your "MTFOA Roster" Google
+     Sheet, served by the Roster and Schedule Script. Edit the sheet and
+     this page updates within about a minute. The next meeting is worked
+     out from today's date, so nobody has to mark it.
+     If the sheet cannot be reached, the page shows the built-in copy of
+     the schedule below (FALLBACK_MEETINGS).
+
+     ALSO ON THIS PAGE: how to join and register: the two registration options
+     (MTFOA first, then TSSAA), linking to /register and /tssaa-registration.
+
+     WHERE IT GOES: one WebsiteBuilder HTML embed on the News & Info page,
+     dragged out to full page width. Set the box height to about 2500px on
+     desktop and 4000px on a phone (a little extra is fine).
+   ============================================================ -->
+<div class="mtfoa-news" id="mnRoot">
+<style>
+  .mtfoa-news {
+    --mn-navy: #1f3864;
+    --mn-navy-deep: #142a4d;
+    --mn-columbia: #6f90b5;
+    --mn-red: #d6291a;
+    --mn-white: #ffffff;
+    --mn-tint: #c9d6e8;
+    --mn-chalk: #f4f6fa;
+    --mn-slate: #5b6879;
+    --mn-ink: #1c2530;
+    --mn-border: #dbe1ea;
+
+    container-type: inline-size;
+    font-family: 'Barlow', Arial, Helvetica, sans-serif;
+    background: var(--mn-chalk);
+    -webkit-font-smoothing: antialiased;
+  }
+  .mtfoa-news, .mtfoa-news * { box-sizing: border-box; }
+  .mtfoa-news :where(p, h1, h2, h3, ul) { margin: 0; }
+  .mtfoa-news :where(ul) { list-style: none; padding: 0; }
+  .mtfoa-news :where(a) { text-decoration: none; color: inherit; }
+  .mtfoa-news a:focus-visible { outline: 3px solid var(--mn-red); outline-offset: 2px; }
+  .mtfoa-news [hidden] { display: none !important; }
+
+  .mn-in { max-width: 1000px; margin: 0 auto; }
+
+  /* ---------- Header band ---------- */
+  .mn-head {
+    position: relative; overflow: hidden;
+    background:
+      radial-gradient(120% 160% at 88% 0%, #2c4d86 0%, rgba(44,77,134,0) 55%),
+      linear-gradient(160deg, var(--mn-navy) 0%, var(--mn-navy-deep) 100%);
+    border-bottom: 4px solid var(--mn-red);
+    padding: 28px 22px 24px;
+  }
+  .mn-head::before {
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    background-image:
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.10) 0 3px, transparent 3px 160px),
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.05) 0 2px, transparent 2px 32px);
+  }
+  .mn-head .mn-in { position: relative; }
+  .mn-eyebrow {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-family: 'Barlow Condensed', Arial, sans-serif;
+    font-weight: 700; font-size: 13px; letter-spacing: 2.4px;
+    text-transform: uppercase; color: var(--mn-tint); margin-bottom: 8px;
+  }
+  .mn-eyebrow::before { content: ''; width: 26px; height: 4px; background: var(--mn-red); }
+  .mn-title {
+    font-family: 'Anton', Impact, 'Arial Narrow', sans-serif;
+    font-weight: 400; font-size: clamp(32px, 8.5vw, 44px);
+    line-height: 1.02; letter-spacing: 0.5px; text-transform: uppercase; color: var(--mn-white);
+  }
+  .mn-sub { margin-top: 8px; font-size: 15.5px; line-height: 1.5; color: var(--mn-tint); max-width: 56ch; }
+
+  .mn-body { padding: 24px 20px 34px; }
+  .mn-h2 {
+    font-family: 'Anton', Impact, 'Arial Narrow', sans-serif;
+    font-weight: 400; font-size: clamp(22px, 5.5vw, 28px);
+    letter-spacing: 0.4px; text-transform: uppercase; color: var(--mn-navy);
+    margin-bottom: 14px;
+  }
+  .mn-section + .mn-section { margin-top: 30px; }
+
+  /* ---------- Next meeting ---------- */
+  .mn-next {
+    display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px;
+    background: var(--mn-white);
+    border: 1px solid var(--mn-border); border-top: 5px solid var(--mn-red);
+    border-radius: 6px; padding: 20px 18px 20px;
+    box-shadow: 0 10px 28px rgba(20,42,77,0.10);
+  }
+  .mn-datebox {
+    display: flex; align-items: center; gap: 14px;
+  }
+  .mn-cal {
+    flex: none; width: 84px; text-align: center;
+    background: var(--mn-navy); color: var(--mn-white); border-radius: 5px; overflow: hidden;
+  }
+  .mn-cal .mn-mon {
+    background: var(--mn-red);
+    font-family: 'Barlow Condensed', Arial, sans-serif; font-weight: 700;
+    font-size: 14px; letter-spacing: 2px; text-transform: uppercase; padding: 4px 0;
+  }
+  .mn-cal .mn-day {
+    font-family: 'Anton', Impact, 'Arial Narrow', sans-serif;
+    font-size: 44px; line-height: 1; padding: 8px 0 4px;
+  }
+  .mn-cal .mn-dow {
+    font-family: 'Barlow Condensed', Arial, sans-serif; font-weight: 700;
+    font-size: 13px; letter-spacing: 1.6px; text-transform: uppercase;
+    color: var(--mn-tint); padding-bottom: 8px;
+  }
+  .mn-kicker {
+    font-family: 'Barlow Condensed', Arial, sans-serif;
+    font-weight: 700; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: var(--mn-red);
+  }
+  .mn-what {
+    font-family: 'Anton', Impact, 'Arial Narrow', sans-serif;
+    font-weight: 400; font-size: clamp(22px, 5.5vw, 28px); line-height: 1.1;
+    letter-spacing: 0.4px; text-transform: uppercase; color: var(--mn-navy); margin-top: 3px;
+  }
+  .mn-facts { margin-top: 10px; display: grid; gap: 6px; }
+  .mn-fact { display: flex; gap: 9px; align-items: flex-start; font-size: 15.5px; line-height: 1.4; color: var(--mn-ink); }
+  .mn-fact svg { flex: none; margin-top: 2px; color: var(--mn-navy); }
+  .mn-note {
+    margin-top: 12px; padding: 10px 12px;
+    background: #fdf1ef; border-left: 4px solid var(--mn-red); border-radius: 3px;
+    font-size: 15px; line-height: 1.45; color: var(--mn-ink);
+  }
+  .mn-actions { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 10px; }
+  .mn-btn {
+    display: inline-block; text-align: center;
+    font-family: 'Barlow Condensed', Arial, sans-serif; font-weight: 600; font-size: 15px;
+    letter-spacing: 1px; text-transform: uppercase;
+    padding: 12px 20px; border-radius: 3px;
+    background: var(--mn-red); color: var(--mn-white);
+    box-shadow: 0 6px 18px rgba(214,41,26,0.28);
+    transition: background 0.15s ease, transform 0.15s ease;
+  }
+  .mn-btn:hover { background: #e5432f; transform: translateY(-1px); }
+  .mn-btn.alt { background: var(--mn-white); color: var(--mn-navy); border: 1px solid var(--mn-navy); box-shadow: none; }
+  .mn-btn.alt:hover { background: var(--mn-chalk); }
+  .mn-none { color: var(--mn-slate); font-size: 16px; line-height: 1.5; }
+
+  /* ---------- Registration ---------- */
+  .mn-reg-lead { margin: -4px 0 14px; font-size: 15.5px; line-height: 1.5; color: var(--mn-slate); max-width: 62ch; }
+  .mn-regs { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .mn-reg {
+    display: flex; flex-direction: column;
+    background: var(--mn-white);
+    border: 1px solid var(--mn-border); border-top: 5px solid var(--mn-navy);
+    border-radius: 6px; padding: 18px 18px 18px;
+  }
+  .mn-reg.two { border-top-color: var(--mn-red); }
+  .mn-step {
+    align-self: flex-start;
+    font-family: 'Barlow Condensed', Arial, sans-serif; font-weight: 700;
+    font-size: 12.5px; letter-spacing: 1.8px; text-transform: uppercase;
+    color: var(--mn-white); background: var(--mn-navy); border-radius: 999px; padding: 3px 11px;
+  }
+  .mn-reg.two .mn-step { background: var(--mn-red); }
+  .mn-reg h3 {
+    margin-top: 10px;
+    font-family: 'Anton', Impact, 'Arial Narrow', sans-serif; font-weight: 400;
+    font-size: 24px; line-height: 1.1; letter-spacing: 0.4px; text-transform: uppercase; color: var(--mn-navy);
+  }
+  .mn-reg p { margin-top: 8px; font-size: 15.5px; line-height: 1.55; color: var(--mn-ink); }
+  .mn-reg ul { margin-top: 10px; display: grid; gap: 6px; }
+  .mn-reg li { position: relative; padding-left: 20px; font-size: 15px; line-height: 1.45; color: var(--mn-ink); }
+  .mn-reg li::before {
+    content: ''; position: absolute; left: 2px; top: 0.55em;
+    width: 8px; height: 8px; background: var(--mn-red); transform: rotate(45deg);
+  }
+  .mn-reg .mn-grow { flex: 1; }
+  .mn-reg .mn-btn { margin-top: 16px; align-self: flex-start; }
+
+  /* ---------- Schedule ---------- */
+  .mn-list { background: var(--mn-white); border: 1px solid var(--mn-border); border-radius: 6px; overflow: hidden; }
+  .mn-row {
+    display: grid; grid-template-columns: 62px minmax(0, 1fr); gap: 4px 14px; align-items: center;
+    padding: 12px 14px; border-bottom: 1px solid var(--mn-border);
+  }
+  .mn-row:last-child { border-bottom: none; }
+  .mn-row.has-rsvp { grid-template-columns: 62px minmax(0, 1fr) auto; }
+  .mn-rd { text-align: center; line-height: 1; }
+  .mn-rd .m {
+    font-family: 'Barlow Condensed', Arial, sans-serif; font-weight: 700;
+    font-size: 12.5px; letter-spacing: 1.6px; text-transform: uppercase; color: var(--mn-slate);
+  }
+  .mn-rd .d { font-family: 'Anton', Impact, 'Arial Narrow', sans-serif; font-size: 28px; color: var(--mn-navy); margin-top: 3px; }
+  .mn-rm { min-width: 0; }
+  .mn-rl {
+    font-weight: 600; font-size: 16px; line-height: 1.3; color: var(--mn-ink);
+    display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center;
+  }
+  .mn-rs { margin-top: 2px; font-size: 14.5px; line-height: 1.4; color: var(--mn-slate); }
+  .mn-tag {
+    font-family: 'Barlow Condensed', Arial, sans-serif; font-weight: 700;
+    font-size: 12px; letter-spacing: 1.2px; text-transform: uppercase;
+    padding: 2px 8px; border-radius: 999px; background: #e6ecf4; color: var(--mn-navy);
+  }
+  .mn-tag.v { background: #e3eefb; color: #1d4f91; }
+  .mn-tag.b { background: #fdf1ef; color: #a51f14; }
+  .mn-tag.nx { background: var(--mn-red); color: var(--mn-white); }
+  a.mn-rsvp {
+    display: inline-block; white-space: nowrap; text-align: center; text-decoration: none;
+    font-family: 'Barlow Condensed', Arial, sans-serif; font-weight: 600; font-size: 15px;
+    letter-spacing: 1px; text-transform: uppercase;
+    padding: 12px 20px; border-radius: 3px;
+    background: var(--mn-red); color: var(--mn-white);
+    box-shadow: 0 6px 18px rgba(214,41,26,0.28);
+    transition: background 0.15s ease, transform 0.15s ease;
+  }
+  a.mn-rsvp:hover { background: #e5432f; transform: translateY(-1px); }
+  .mn-h3 {
+    margin: 22px 0 10px;
+    font-family: 'Barlow Condensed', Arial, sans-serif; font-weight: 700;
+    font-size: 14px; letter-spacing: 2px; text-transform: uppercase; color: var(--mn-slate);
+  }
+  .mn-row.past { background: #fafbfd; }
+  .mn-row.past .mn-rd .d, .mn-row.past .mn-rl { color: #8a95a5; }
+  .mn-row.past .mn-tag { background: #eef1f5; color: #8a95a5; }
+  .mn-row.next { background: #fff8f7; box-shadow: inset 4px 0 0 var(--mn-red); }
+
+  /* ---------- Please read ---------- */
+  .mn-read {
+    background: var(--mn-white); border: 1px solid var(--mn-border);
+    border-left: 5px solid var(--mn-navy); border-radius: 6px; padding: 18px 18px 16px;
+  }
+  .mn-read h3 {
+    font-family: 'Anton', Impact, 'Arial Narrow', sans-serif; font-weight: 400;
+    font-size: 20px; letter-spacing: 0.5px; text-transform: uppercase; color: var(--mn-navy); margin-bottom: 8px;
+  }
+  .mn-read p { font-size: 15.5px; line-height: 1.55; color: var(--mn-ink); }
+  .mn-read p + p { margin-top: 10px; }
+  .mn-read strong { color: var(--mn-navy); }
+  .mn-read a { color: var(--mn-red); font-weight: 600; border-bottom: 1px solid currentColor; }
+  .mn-fine { margin-top: 12px; font-size: 14px; line-height: 1.5; color: var(--mn-slate); }
+
+  /* ---------- Announcements ---------- */
+  .mn-ann { background: var(--mn-white); border: 1px solid var(--mn-border); border-radius: 6px; padding: 16px 18px; }
+  .mn-ann + .mn-ann { margin-top: 12px; }
+  .mn-ann-d {
+    font-family: 'Barlow Condensed', Arial, sans-serif; font-weight: 700;
+    font-size: 13px; letter-spacing: 1.6px; text-transform: uppercase; color: var(--mn-red);
+  }
+  .mn-ann h3 { margin-top: 3px; font-weight: 600; font-size: 18px; line-height: 1.3; color: var(--mn-navy); }
+  .mn-ann p { margin-top: 6px; font-size: 15.5px; line-height: 1.55; color: var(--mn-ink); white-space: pre-line; }
+
+  @container (min-width: 700px) {
+    .mn-head { padding: 34px 28px 28px; }
+    .mn-body { padding: 30px 28px 42px; }
+    .mn-next { grid-template-columns: auto minmax(0, 1fr); gap: 26px; padding: 24px 26px; align-items: start; }
+    .mn-datebox { align-items: flex-start; }
+    .mn-cal { width: 108px; }
+    .mn-cal .mn-day { font-size: 58px; padding-top: 10px; }
+    .mn-regs { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    .mn-reg { padding: 22px 24px 22px; }
+    .mn-row { grid-template-columns: 78px minmax(0, 1fr); padding: 13px 20px; gap: 4px 20px; }
+    .mn-row.has-rsvp { grid-template-columns: 78px minmax(0, 1fr) auto; }
+    .mn-rd .d { font-size: 32px; }
+    .mn-read { padding: 20px 24px 18px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mtfoa-news * { transition: none !important; }
+  }
+</style>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700&display=swap">
+
+<div class="mn-head">
+  <div class="mn-in">
+    <p class="mn-eyebrow">News &amp; Info</p>
+    <h1 class="mn-title">Meetings &amp; News</h1>
+    <p class="mn-sub">When and where we meet, how to join the association and register for the season, and the latest word from the MTFOA.</p>
+  </div>
+</div>
+
+<div class="mn-body">
+  <div class="mn-in">
+
+    <section class="mn-section" aria-labelledby="mnNextH">
+      <h2 class="mn-h2" id="mnNextH">Next meeting</h2>
+      <div class="mn-next" id="mnNext"><p class="mn-none">Loading the schedule...</p></div>
+    </section>
+
+    <section class="mn-section" aria-labelledby="mnRegH">
+      <h2 class="mn-h2" id="mnRegH">Join &amp; register</h2>
+      <p class="mn-reg-lead">Joining the association, or renewing for the season, takes two separate registrations. Register with the MTFOA first, then with the TSSAA.</p>
+      <div class="mn-regs">
+
+        <div class="mn-reg">
+          <span class="mn-step">Step 1</span>
+          <h3>MTFOA registration</h3>
+          <p>Your annual membership in the Middle Tennessee Football Officials Association.</p>
+          <ul>
+            <li>Use the same email you use in Arbiter.</li>
+            <li>You are given a payment link when you submit the form. PayPal, Venmo and credit or debit cards are accepted.</li>
+            <li>Your membership is not valid until you have paid.</li>
+          </ul>
+          <span class="mn-grow"></span>
+          <a class="mn-btn" href="https://mtfoa.org/register" target="_top">Register with the MTFOA</a>
+        </div>
+
+        <div class="mn-reg two">
+          <span class="mn-step">Step 2</span>
+          <h3>TSSAA registration</h3>
+          <p>Your state registration, completed in your Arbiter account after you have registered with the MTFOA.</p>
+          <ul>
+            <li>Opens each year on June 1.</li>
+            <li>Choose football as your sport and select the MTFOA as your association.</li>
+            <li>The step-by-step guide has screenshots of every screen.</li>
+          </ul>
+          <span class="mn-grow"></span>
+          <a class="mn-btn" href="https://mtfoa.org/tssaa-registration" target="_top">TSSAA registration guide</a>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="mn-section" aria-labelledby="mnSchedH">
+      <h2 class="mn-h2" id="mnSchedH"><span id="mnYear">2026</span> meeting schedule</h2>
+      <ul class="mn-list" id="mnList"></ul>
+      <h3 class="mn-h3" id="mnPastH" hidden>Earlier this season</h3>
+      <ul class="mn-list mn-pastlist" id="mnPast" hidden></ul>
+      <p class="mn-fine">All dates, times and locations are subject to change, including because of activities at the host school. Local meetings are held at Goodpasture Christian School, 619 W. Due West Ave., Madison, TN 37115, unless noted.</p>
+    </section>
+
+    <section class="mn-section" aria-labelledby="mnReadH">
+      <div class="mn-read">
+        <h3 id="mnReadH">Please read: playoff eligibility</h3>
+        <p>To be eligible to work the <strong>playoffs</strong>, you need credit for <strong>six local meetings</strong> and the <strong>state meeting</strong>.</p>
+        <p>Of the six required meetings, <strong>five must be in person</strong>. You may receive credit for one meeting by viewing one of the meeting recordings placed on the Member page. <a href="https://mtfoa.org/member-resources" target="_top">Go to Member Resources</a></p>
+      </div>
+    </section>
+
+    <section class="mn-section" id="mnAnnWrap" aria-labelledby="mnAnnH" hidden>
+      <h2 class="mn-h2" id="mnAnnH">Announcements</h2>
+      <div id="mnAnn"></div>
+    </section>
+
+  </div>
+</div>
+
+<script>
+(function () {
+  // Web app URL of your "Roster and Schedule Script" (the same URL the Member
+  // Roster page uses), followed by ?type=schedule
+  var SCHEDULE_URL = "https://script.google.com/macros/s/AKfycbzrUU5NYuD3X_3ljgA92e_hnMJNs8efwNYwTzttqO7-dy7v2uvZnG4Iu5NjPcr36nkw/exec?type=schedule";
+
+  var DEFAULT_PLACE = 'Goodpasture Christian School, Madison';
+  var CACHE_KEY = 'mtfoa-schedule-v1';
+  var TZ = 'America/Chicago';
+  var MID = '\u00b7';   // middle dot
+
+  // Used only if the sheet cannot be reached and nothing is cached.
+  var FALLBACK_MEETINGS = [
+    { d: '2026-07-20', t: '6:00 pm', k: 'Local',   l: '', n: '' },
+    { d: '2026-07-27', t: '6:00 pm', k: 'Local',   l: '', n: '' },
+    { d: '2026-08-13', t: '6:00 pm', k: 'Virtual', l: '', n: '' },
+    { d: '2026-08-20', t: '6:00 pm', k: 'Local',   l: '', n: '' },
+    { d: '2026-08-31', t: '6:00 pm', k: 'Local',   l: '', n: '' },
+    { d: '2026-09-09', t: '6:00 pm', k: 'Local',   l: '', n: '' },
+    { d: '2026-09-23', t: '',        k: 'Virtual', l: '', n: 'Posted by this date, by position.' },
+    { d: '2026-10-14', t: '6:00 pm', k: 'Local',   l: '', n: '' },
+    { d: '2026-10-28', t: '6:00 pm', k: 'Banquet', l: 'Location to be determined', n: '' }
+  ];
+
+  var DOW = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  var MON = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+  var nextEl = document.getElementById('mnNext');
+  var listEl = document.getElementById('mnList');
+  var pastEl = document.getElementById('mnPast');
+  var pastH = document.getElementById('mnPastH');
+  var yearEl = document.getElementById('mnYear');
+  var annWrap = document.getElementById('mnAnnWrap');
+  var annEl = document.getElementById('mnAnn');
+
+  var meetings = null, news = [];
+
+  /* ---------- dates ---------- */
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function todayISO() {
+    if (window.__TODAY__) return window.__TODAY__;
+    try {
+      return new Intl.DateTimeFormat('en-CA', { timeZone: TZ, year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
+    } catch (e) {
+      var d = new Date();
+      return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+    }
+  }
+  function parseISO(s) { var p = String(s).split('-'); return new Date(+p[0], +p[1] - 1, +p[2]); }
+  function longDate(s) { var d = parseISO(s); return DOW[d.getDay()] + ', ' + MON[d.getMonth()] + ' ' + d.getDate(); }
+
+  /* ---------- describing one meeting ---------- */
+  function describe(m) {
+    var k = String(m.k || 'Local').toLowerCase();
+    var kind = k === 'virtual' ? 'Virtual meeting' : k === 'banquet' ? 'Banquet' : k === 'state' ? 'State meeting' : 'Local meeting';
+    var place = k === 'virtual' ? '' : (m.l || (k === 'banquet' ? 'Location to be determined' : DEFAULT_PLACE));
+    var time = m.t || (k === 'virtual' ? 'No set time' : '');
+    return { kind: kind, tag: k === 'virtual' ? 'Virtual' : k === 'banquet' ? 'Banquet' : k === 'state' ? 'State' : 'In person',
+             tagCls: k === 'virtual' ? 'v' : k === 'banquet' ? 'b' : '', time: time, place: place, note: m.n || '' };
+  }
+
+  function calendarLink(m, info) {
+    var ymd = m.d.replace(/-/g, '');
+    var dates;
+    var t = /(\d{1,2})(?::(\d{2}))?\s*(am|pm)/i.exec(m.t || '');
+    if (t) {
+      var h = (+t[1]) % 12 + (/pm/i.test(t[3]) ? 12 : 0), mi = +(t[2] || 0);
+      var end = h * 60 + mi + 90;
+      dates = ymd + 'T' + pad(h) + pad(mi) + '00/' + ymd + 'T' + pad(Math.floor(end / 60) % 24) + pad(end % 60) + '00';
+    } else {
+      var d2 = parseISO(m.d); d2.setDate(d2.getDate() + 1);
+      dates = ymd + '/' + d2.getFullYear() + pad(d2.getMonth() + 1) + pad(d2.getDate());
+    }
+    var details = (info.note ? info.note + '\n\n' : '') + 'Details: https://mtfoa.org/news';
+    return 'https://calendar.google.com/calendar/render?action=TEMPLATE'
+      + '&text=' + encodeURIComponent('MTFOA ' + info.kind)
+      + '&dates=' + dates + '&ctz=' + encodeURIComponent(TZ)
+      + '&details=' + encodeURIComponent(details)
+      + (info.place ? '&location=' + encodeURIComponent(info.place) : '');
+  }
+
+  /* ---------- little DOM helpers ---------- */
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+  var ICON_CLOCK = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>';
+  var ICON_PIN = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.1-7-11.5a7 7 0 0 1 14 0C19 14.9 12 21 12 21Z"></path><circle cx="12" cy="9.5" r="2.5"></circle></svg>';
+  function fact(icon, text) {
+    var f = el('div', 'mn-fact');
+    f.innerHTML = icon;
+    f.appendChild(el('span', null, text));
+    return f;
+  }
+
+  /* ---------- rendering ---------- */
+  function pickNext(list, today) {
+    for (var i = 0; i < list.length; i++) if (list[i].d >= today) return i;
+    return -1;
+  }
+
+  function renderNext(list, idx, today) {
+    nextEl.innerHTML = '';
+    if (idx < 0) {
+      nextEl.appendChild(el('p', 'mn-none', list.length
+        ? 'The scheduled meetings for this season are complete. Watch this page for next season\u2019s dates.'
+        : 'No meetings are scheduled right now. Check back soon.'));
+      return;
+    }
+    var m = list[idx], info = describe(m), d = parseISO(m.d);
+
+    var box = el('div', 'mn-datebox');
+    var cal = el('div', 'mn-cal');
+    cal.appendChild(el('div', 'mn-mon', MON[d.getMonth()].slice(0, 3)));
+    cal.appendChild(el('div', 'mn-day', String(d.getDate())));
+    cal.appendChild(el('div', 'mn-dow', DOW[d.getDay()].slice(0, 3)));
+    box.appendChild(cal);
+    nextEl.appendChild(box);
+
+    var right = el('div');
+    right.appendChild(el('div', 'mn-kicker', m.d === today ? 'Today' : 'Coming up'));
+    right.appendChild(el('div', 'mn-what', info.kind));
+    var facts = el('div', 'mn-facts');
+    facts.appendChild(fact(ICON_CLOCK, longDate(m.d) + (info.time ? ' \u00b7 ' + info.time : '')));
+    if (info.place) facts.appendChild(fact(ICON_PIN, info.place));
+    right.appendChild(facts);
+    if (info.note) right.appendChild(el('div', 'mn-note', info.note));
+
+    var acts = el('div', 'mn-actions');
+    var cl = el('a', 'mn-btn', 'Add to Google Calendar');
+    cl.href = calendarLink(m, info); cl.target = '_blank'; cl.rel = 'noopener';
+    acts.appendChild(cl);
+    var rec = el('a', 'mn-btn alt', 'Meeting recordings');
+    rec.href = 'https://mtfoa.org/member-resources'; rec.target = '_top';
+    acts.appendChild(rec);
+    right.appendChild(acts);
+    nextEl.appendChild(right);
+  }
+
+  function rowNode(m, isNext, past) {
+    var info = describe(m), d = parseISO(m.d);
+    var showRsvp = !past && String(m.k || '').toLowerCase() === 'banquet';
+    var li = el('li', 'mn-row' + (past ? ' past' : '') + (isNext ? ' next' : '') + (showRsvp ? ' has-rsvp' : ''));
+    var rd = el('div', 'mn-rd');
+    rd.appendChild(el('div', 'm', MON[d.getMonth()].slice(0, 3)));
+    rd.appendChild(el('div', 'd', String(d.getDate())));
+    li.appendChild(rd);
+
+    var mid = el('div', 'mn-rm');
+    var line = el('div', 'mn-rl');
+    line.appendChild(document.createTextNode(DOW[d.getDay()] + (info.time ? ' ' + MID + ' ' + info.time : '')));
+    line.appendChild(el('span', 'mn-tag ' + info.tagCls, info.tag));
+    if (isNext) line.appendChild(el('span', 'mn-tag nx', 'Next'));
+    if (past) line.appendChild(el('span', 'mn-tag', 'Done'));
+    mid.appendChild(line);
+    var sub = info.place || '';
+    if (info.note) sub = sub ? sub + ' ' + MID + ' ' + info.note : info.note;
+    if (sub) mid.appendChild(el('div', 'mn-rs', sub));
+    li.appendChild(mid);
+
+    if (showRsvp) {
+      var rsvp = document.createElement('a');
+      rsvp.className = 'mn-rsvp';
+      rsvp.href = 'https://mtfoa.org/mtfoamembers#attendance';
+      rsvp.target = '_top';
+      rsvp.textContent = 'RSVP';
+      li.appendChild(rsvp);
+    }
+    return li;
+  }
+
+  function renderList(list, idx, today) {
+    listEl.innerHTML = '';
+    pastEl.innerHTML = '';
+    var upcoming = [], past = [];
+    list.forEach(function (m, i) { (m.d < today ? past : upcoming).push({ m: m, i: i }); });
+    if (!upcoming.length) {
+      var none = el('li', 'mn-row');
+      none.appendChild(el('div', 'mn-rm', 'No more meetings are scheduled this season.'));
+      listEl.appendChild(none);
+    }
+    upcoming.forEach(function (x) { listEl.appendChild(rowNode(x.m, x.i === idx, false)); });
+    past.forEach(function (x) { pastEl.appendChild(rowNode(x.m, false, true)); });
+    pastH.hidden = pastEl.hidden = !past.length;
+  }
+
+  function renderNews(items) {
+    annEl.innerHTML = '';
+    if (!items || !items.length) { annWrap.hidden = true; return; }
+    items.slice(0, 3).forEach(function (n) {
+      var c = el('article', 'mn-ann');
+      if (n.d) c.appendChild(el('div', 'mn-ann-d', longDate(n.d) + ', ' + parseISO(n.d).getFullYear()));
+      c.appendChild(el('h3', null, n.h));
+      if (n.t) c.appendChild(el('p', null, n.t));
+      annEl.appendChild(c);
+    });
+    annWrap.hidden = false;
+  }
+
+  function render() {
+    var list = (meetings || FALLBACK_MEETINGS).slice().sort(function (a, b) { return a.d < b.d ? -1 : a.d > b.d ? 1 : 0; });
+    var today = todayISO();
+    var idx = pickNext(list, today);
+    if (list.length) yearEl.textContent = list[0].d.slice(0, 4);
+    renderNext(list, idx, today);
+    renderList(list, idx, today);
+    renderNews(news);
+  }
+
+  /* ---------- loading ---------- */
+  function validMeetings(a) {
+    return a && a.length !== undefined && a.every(function (m) { return m && /^\d{4}-\d{2}-\d{2}$/.test(m.d || ''); });
+  }
+  function readCache() {
+    try { var c = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null'); return c && validMeetings(c.meetings) ? c : null; } catch (e) { return null; }
+  }
+  var cached = readCache();
+  if (cached) { meetings = cached.meetings; news = cached.news || []; }
+  render();
+
+  fetch(SCHEDULE_URL)
+    .then(function (r) { return r.json(); })
+    .then(function (data) {
+      if (!data || data.status !== 'ok' || !validMeetings(data.meetings)) return;   // sheet tab not set up yet: keep what we have
+      meetings = data.meetings;
+      news = data.news || [];
+      try { localStorage.setItem(CACHE_KEY, JSON.stringify({ meetings: meetings, news: news })); } catch (e) {}
+      render();
+    })
+    .catch(function () {});
+})();
+</script>
+</div>
+
+<script>
+/* AUTO HEIGHT: the box (and, on a computer, the whole page) fits itself to what is being shown, so there is no blank
+   gap above the footer when a tab, filter or sign-in changes the content. Only runs on the live site (never in the
+   editor or Preview, where it would change the saved layout).
+     phone (box under 720px wide): AppsApi.setAppSize - the box follows the content, but never gets shorter than the
+                                   phone height set in the editor, so keep that below the shortest state of the page.
+     computer:                     AppsApi.setDocumentSize - the page itself follows the content. */
+(function () {
+  var root = document.querySelector('[class^="mtfoa-"]') || document.body;
+  var last = 0, mode = '';
+  function fit() {
+    var extra = 0;
+    if (root === document.body) { var cs = getComputedStyle(document.body); extra = (parseFloat(cs.marginTop) || 0) + (parseFloat(cs.marginBottom) || 0); }
+    var h = Math.ceil(root.getBoundingClientRect().height + extra) + 2;
+    if (h < 300 || Math.abs(h - last) < 3) return;
+    try {
+      if (!(window.AppsApi && AppsApi.getViewMode && AppsApi.getViewMode() === 'view')) return;
+      var w = window.innerWidth || 0;
+      if (w < 300) return;                               // frame not laid out yet: measure again later
+      if (!mode) mode = w < 720 ? 'phone' : 'desktop';    // decide once, so a narrow moment never resizes the box
+      if (mode === 'phone') { if (AppsApi.setAppSize) AppsApi.setAppSize({ width: w, height: h }); }
+      else if (AppsApi.setDocumentSize) AppsApi.setDocumentSize({ width: w, height: h });
+      last = h;                                          // only remembered once the size was really sent
+    } catch (e) {}
+  }
+  fit(); window.addEventListener('load', fit); setTimeout(fit, 600); setTimeout(fit, 1800); setTimeout(fit, 4500);
+  try { new ResizeObserver(fit).observe(root); } catch (e) {}
+})();
+</script>

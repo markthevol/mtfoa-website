@@ -1,0 +1,291 @@
+---
+title: MTFOA Store
+description: >-
+  Shop official MTFOA apparel and gear through our SquadLocker team store.
+permalink: /mtfoa-store
+---
+<!-- ============================================================
+     MTFOA Store Page
+     A landing block for your Store page. It explains the store
+     and sends people to your SquadLocker team store, which opens
+     in a new tab (so visitors keep your site open behind it).
+
+     WHERE IT GOES: one WebsiteBuilder HTML embed on your Store
+     page, dragged out to full page width.
+
+     Store link: if the store address ever changes, search for
+     "squadlocker" and update it in the two buttons.
+   ============================================================ -->
+<div class="mtfoa-store">
+<style>
+  .mtfoa-store {
+    --ms-navy: #1f3864;
+    --ms-navy-deep: #142a4d;
+    --ms-columbia: #6f90b5;
+    --ms-red: #d6291a;
+    --ms-white: #ffffff;
+    --ms-tint: #c9d6e8;
+    --ms-chalk: #f4f6fa;
+    --ms-slate: #5b6879;
+    --ms-border: #dbe1ea;
+
+    container-type: inline-size;
+    font-family: 'Barlow', Arial, Helvetica, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .mtfoa-store, .mtfoa-store * { box-sizing: border-box; }
+  .mtfoa-store :where(p, h1, h2, h3, ul) { margin: 0; }
+  .mtfoa-store :where(ul) { list-style: none; padding: 0; }
+  .mtfoa-store :where(a) { text-decoration: none; color: inherit; }
+  .mtfoa-store a:focus-visible { outline: 3px solid var(--ms-red); outline-offset: 3px; }
+
+  .ms-band { position: relative; overflow: hidden; }
+
+  /* ---------- Header (same compact header as the other pages) ---------- */
+  .ms-hero {
+    background:
+      radial-gradient(120% 160% at 88% 0%, #2c4d86 0%, rgba(44,77,134,0) 55%),
+      linear-gradient(160deg, var(--ms-navy) 0%, var(--ms-navy-deep) 100%);
+    border-bottom: 4px solid var(--ms-red);
+    padding: 22px 16px 20px;
+  }
+  .ms-lines {
+    position: absolute; inset: 0; pointer-events: none;
+    background-image:
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.10) 0 3px, transparent 3px 160px),
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.05) 0 2px, transparent 2px 32px);
+  }
+  .ms-hero-in { position: relative; max-width: 1000px; margin: 0 auto; }
+  .ms-eyebrow {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-family: 'Barlow Condensed', Arial, sans-serif;
+    font-weight: 700; font-size: 13px; letter-spacing: 2.4px;
+    text-transform: uppercase; color: var(--ms-tint);
+    margin-bottom: 8px;
+  }
+  .ms-eyebrow::before { content: ''; width: 26px; height: 4px; background: var(--ms-red); }
+  .ms-title {
+    font-family: 'Anton', Impact, 'Arial Narrow', sans-serif;
+    font-weight: 400; font-size: clamp(32px, 8.5vw, 44px);
+    line-height: 1.02; letter-spacing: 0.5px;
+    text-transform: uppercase; color: var(--ms-white);
+  }
+  .ms-sub { margin-top: 8px; font-size: 15.5px; line-height: 1.5; color: var(--ms-tint); max-width: 60ch; }
+
+  /* Shop button strip, right under the header */
+  .ms-shop { background: var(--ms-chalk); padding: 24px 20px 0; }
+  .ms-shop-in { max-width: 1000px; margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px 18px; }
+  .ms-shop .ms-btn { margin-top: 0; }
+  .ms-shop .ms-note { margin-top: 0; color: var(--ms-slate); opacity: 1; }
+
+  .ms-btn {
+    display: inline-block;
+    margin-top: 24px;
+    font-family: 'Barlow Condensed', Arial, sans-serif;
+    font-weight: 600; font-size: 17px; letter-spacing: 1.2px;
+    text-transform: uppercase; text-align: center;
+    padding: 15px 30px;
+    border-radius: 3px;
+    background: var(--ms-red); color: var(--ms-white);
+    box-shadow: 0 8px 22px rgba(214,41,26,0.42);
+    transition: background 0.15s ease, transform 0.15s ease;
+  }
+  .ms-btn:hover { background: #e5432f; transform: translateY(-1px); }
+  .ms-btn .ms-arrow { display: inline-block; margin-left: 6px; }
+  .ms-note { margin-top: 10px; font-size: 13px; color: var(--ms-tint); opacity: 0.85; }
+
+  /* ---------- Why order here ---------- */
+  .ms-why { background: var(--ms-chalk); padding: 30px 20px 8px; }
+  .ms-inner { max-width: 1000px; margin: 0 auto; }
+  .ms-h2 {
+    font-family: 'Anton', Impact, 'Arial Narrow', sans-serif;
+    font-weight: 400; font-size: clamp(24px, 6vw, 30px);
+    letter-spacing: 0.3px; text-transform: uppercase;
+    color: var(--ms-navy); text-align: center;
+    margin-bottom: 20px; text-wrap: balance;
+  }
+  .ms-perks { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .ms-perk {
+    display: grid; grid-template-columns: 48px minmax(0, 1fr); gap: 4px 16px; align-items: center;
+    background: var(--ms-white);
+    border: 1px solid var(--ms-border);
+    border-left: 4px solid var(--ms-red);
+    border-radius: 4px;
+    padding: 16px 18px;
+  }
+  .ms-ico {
+    grid-row: span 2;
+    width: 48px; height: 48px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--ms-navy); color: var(--ms-white);
+  }
+  .ms-perk h3 {
+    font-family: 'Anton', Impact, 'Arial Narrow', sans-serif;
+    font-weight: 400; font-size: 19px; letter-spacing: 0.5px;
+    text-transform: uppercase; color: var(--ms-navy);
+    align-self: end;
+  }
+  .ms-perk p { font-size: 14.5px; line-height: 1.5; color: var(--ms-slate); align-self: start; }
+
+  /* ---------- What is in the store ---------- */
+  .ms-find { background: var(--ms-chalk); padding: 30px 20px 40px; }
+  .ms-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+  .ms-chip {
+    font-family: 'Barlow Condensed', Arial, sans-serif;
+    font-weight: 700; font-size: 14px; letter-spacing: 1.2px;
+    text-transform: uppercase; color: var(--ms-navy);
+    background: var(--ms-white);
+    border: 1px solid var(--ms-border);
+    border-radius: 999px;
+    padding: 9px 16px;
+  }
+  .ms-fine {
+    margin: 16px auto 0; max-width: 60ch; text-align: center;
+    font-size: 14px; line-height: 1.5; color: var(--ms-slate);
+  }
+
+  /* ---------- Closing band ---------- */
+  .ms-cta {
+    background: linear-gradient(160deg, var(--ms-navy) 0%, var(--ms-navy-deep) 100%);
+    border-top: 5px solid var(--ms-red);
+    padding: 34px 22px 38px;
+    text-align: center;
+  }
+  .ms-cta-in { position: relative; max-width: 1000px; margin: 0 auto; }
+  .ms-cta .ms-h2 { color: var(--ms-white); margin-bottom: 4px; }
+  .ms-cta .ms-btn { margin-top: 16px; }
+  .ms-cta .ms-note { margin-top: 12px; }
+
+  @container (min-width: 700px) {
+    .ms-hero { padding: 30px 28px 26px; }
+    .ms-why { padding: 44px 28px 10px; }
+    .ms-perks { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+    .ms-perk {
+      grid-template-columns: minmax(0, 1fr);
+      border-left: 1px solid var(--ms-border);
+      border-top: 4px solid var(--ms-red);
+      padding: 22px 20px;
+      gap: 8px;
+      align-items: start;
+    }
+    .ms-ico { grid-row: auto; }
+    .ms-find { padding: 34px 28px 46px; }
+    .ms-cta { padding: 40px 28px 44px; }
+  }
+  @container (max-width: 320px) {
+    .ms-btn { display: block; padding: 14px 12px; }
+    .ms-btn .ms-arrow { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mtfoa-store * { transition: none !important; }
+  }
+</style>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700&display=swap">
+
+<!-- Header -->
+<div class="ms-band ms-hero">
+  <div class="ms-lines"></div>
+  <div class="ms-hero-in">
+    <p class="ms-eyebrow">Official gear</p>
+    <h1 class="ms-title">MTFOA Store</h1>
+    <p class="ms-sub">Shirts, pullovers, headwear and more with the MTFOA logo, ordered online through our SquadLocker team store.</p>
+  </div>
+</div>
+
+<!-- Shop button -->
+<div class="ms-band ms-shop">
+  <div class="ms-shop-in">
+    <a class="ms-btn" href="https://teamlocker.squadlocker.com/#/lockers/middle-tn-football-officials-association/landing" target="_blank" rel="noopener">Shop the MTFOA Store <span class="ms-arrow" aria-hidden="true">&rarr;</span></a>
+    <p class="ms-note">Opens the SquadLocker store in a new tab.</p>
+  </div>
+</div>
+
+<!-- Why order here -->
+<div class="ms-band ms-why">
+  <div class="ms-inner">
+    <h2 class="ms-h2">Easy to order, all season</h2>
+    <div class="ms-perks">
+      <div class="ms-perk">
+        <div class="ms-ico">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 8l-9-5-9 5v8l9 5 9-5V8z"></path><path d="M3 8l9 5 9-5"></path><path d="M12 13v8"></path></svg>
+        </div>
+        <h3>No order minimums</h3>
+        <p>Order one item or several. There is no minimum.</p>
+      </div>
+      <div class="ms-perk">
+        <div class="ms-ico">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>
+        </div>
+        <h3>Store never closes</h3>
+        <p>Shop any time, day or night, from your phone or computer.</p>
+      </div>
+      <div class="ms-perk">
+        <div class="ms-ico">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="1.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><line x1="8" y1="3" x2="8" y2="7"></line><line x1="16" y1="3" x2="16" y2="7"></line></svg>
+        </div>
+        <h3>Order all season long</h3>
+        <p>Need something new mid-season? The store stays open.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- What is in the store -->
+<div class="ms-band ms-find">
+  <div class="ms-inner">
+    <h2 class="ms-h2">What you will find</h2>
+    <ul class="ms-chips">
+      <li class="ms-chip">Polos</li>
+      <li class="ms-chip">Quarter-zips</li>
+      <li class="ms-chip">Tees</li>
+      <li class="ms-chip">Headwear</li>
+      <li class="ms-chip">Bags</li>
+      <li class="ms-chip">Compression</li>
+      <li class="ms-chip">Footwear</li>
+      <li class="ms-chip">Accessories</li>
+    </ul>
+    <p class="ms-fine">Current items, sizes and prices are always on the store itself, so what you see there is up to date.</p>
+  </div>
+</div>
+
+<!-- Closing band -->
+<div class="ms-band ms-cta">
+  <div class="ms-cta-in">
+    <h2 class="ms-h2">Ready to gear up?</h2>
+    <a class="ms-btn" href="https://teamlocker.squadlocker.com/#/lockers/middle-tn-football-officials-association/landing" target="_blank" rel="noopener">Go to the Store <span class="ms-arrow" aria-hidden="true">&rarr;</span></a>
+    <p class="ms-note">Powered by SquadLocker. Opens in a new tab.</p>
+  </div>
+</div>
+</div>
+
+<script>
+/* AUTO HEIGHT: the box (and, on a computer, the whole page) fits itself to what is being shown, so there is no blank
+   gap above the footer when a tab, filter or sign-in changes the content. Only runs on the live site (never in the
+   editor or Preview, where it would change the saved layout).
+     phone (box under 720px wide): AppsApi.setAppSize - the box follows the content, but never gets shorter than the
+                                   phone height set in the editor, so keep that below the shortest state of the page.
+     computer:                     AppsApi.setDocumentSize - the page itself follows the content. */
+(function () {
+  var root = document.querySelector('[class^="mtfoa-"]') || document.body;
+  var last = 0, mode = '';
+  function fit() {
+    var extra = 0;
+    if (root === document.body) { var cs = getComputedStyle(document.body); extra = (parseFloat(cs.marginTop) || 0) + (parseFloat(cs.marginBottom) || 0); }
+    var h = Math.ceil(root.getBoundingClientRect().height + extra) + 2;
+    if (h < 300 || Math.abs(h - last) < 3) return;
+    try {
+      if (!(window.AppsApi && AppsApi.getViewMode && AppsApi.getViewMode() === 'view')) return;
+      var w = window.innerWidth || 0;
+      if (w < 300) return;                               // frame not laid out yet: measure again later
+      if (!mode) mode = w < 720 ? 'phone' : 'desktop';    // decide once, so a narrow moment never resizes the box
+      if (mode === 'phone') { if (AppsApi.setAppSize) AppsApi.setAppSize({ width: w, height: h }); }
+      else if (AppsApi.setDocumentSize) AppsApi.setDocumentSize({ width: w, height: h });
+      last = h;                                          // only remembered once the size was really sent
+    } catch (e) {}
+  }
+  fit(); window.addEventListener('load', fit); setTimeout(fit, 600); setTimeout(fit, 1800); setTimeout(fit, 4500);
+  try { new ResizeObserver(fit).observe(root); } catch (e) {}
+})();
+</script>

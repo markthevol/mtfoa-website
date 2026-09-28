@@ -1,0 +1,791 @@
+---
+title: Halls of Fame
+description: >-
+  The MTFOA Hall of Fame, TSSAA Hall of Fame, and Coaches Wall of Fame inductees.
+permalink: /halls-of-fame
+---
+<!-- ============================================================
+     MTFOA Halls of Fame page: MTFOA + TSSAA + Coaches on one page
+     One page under the Member Roster menu (a single "Halls of Fame"
+     entry instead of three) with three buttons at the top:
+
+       MTFOA HALL OF FAME    all 40 inductees with photos and class years,
+                             how to nominate, and the Cliff Willis story (with his video)
+       TSSAA HALL OF FAME    the seven MTFOA members in the TSSAA Hall of
+                             Fame (bios) and the Ray "Hoss" Fuller story
+       COACHES HALL OF FAME  the three coaches, Carlton Flatt's biography,
+                             and the nine-photo gallery from his induction
+
+     This block has no data feed. To add an inductee, copy one of the
+     <li class="hf-p"> cards in the MTFOA grid and change the photo, name
+     and class year. Photos are the images already stored on the site.
+
+     WHERE IT GOES: one WebsiteBuilder HTML embed on the Halls of Fame
+     page, dragged out to full page width. Set the box height to about
+     3750px on desktop and 7000px on a phone (a little
+     extra is fine). The height is set for the tallest of the three views;
+     the shorter views leave empty space below the content.
+   ============================================================ -->
+<div class="mtfoa-hf" id="hfRoot">
+<style>
+  .mtfoa-hf {
+    --hf-navy: #1f3864;
+    --hf-navy-deep: #142a4d;
+    --hf-columbia: #6f90b5;
+    --hf-red: #d6291a;
+    --hf-white: #ffffff;
+    --hf-tint: #c9d6e8;
+    --hf-chalk: #f4f6fa;
+    --hf-slate: #5b6879;
+    --hf-ink: #1c2530;
+    --hf-border: #dbe1ea;
+    --hf-gold: #c9a227;
+
+    container-type: inline-size;
+    font-family: 'Barlow', Arial, Helvetica, sans-serif;
+    background: var(--hf-chalk);
+    -webkit-font-smoothing: antialiased;
+  }
+  .mtfoa-hf, .mtfoa-hf * { box-sizing: border-box; }
+  .mtfoa-hf :where(p, h1, h2, h3, ul) { margin: 0; }
+  .mtfoa-hf :where(ul) { list-style: none; padding: 0; }
+  .mtfoa-hf :where(a) { text-decoration: none; color: inherit; }
+  .mtfoa-hf :where(button) { font: inherit; color: inherit; }
+  .mtfoa-hf a:focus-visible, .mtfoa-hf button:focus-visible { outline: 3px solid var(--hf-red); outline-offset: 2px; }
+
+  .hf-in { max-width: 1000px; margin: 0 auto; }
+
+  /* ---------- Header band ---------- */
+  .hf-head {
+    position: relative; overflow: hidden;
+    background:
+      radial-gradient(120% 160% at 88% 0%, #2c4d86 0%, rgba(44,77,134,0) 55%),
+      linear-gradient(160deg, var(--hf-navy) 0%, var(--hf-navy-deep) 100%);
+    border-bottom: 4px solid var(--hf-red);
+    padding: 22px 16px 20px;
+  }
+  .hf-head::before {
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    background-image:
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.10) 0 3px, transparent 3px 160px),
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.05) 0 2px, transparent 2px 32px);
+  }
+  .hf-head .hf-in { position: relative; }
+  .hf-eyebrow {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-family: 'Barlow Condensed', Arial, sans-serif;
+    font-weight: 700; font-size: 13px; letter-spacing: 2.4px;
+    text-transform: uppercase; color: var(--hf-tint); margin-bottom: 8px;
+  }
+  .hf-eyebrow::before { content: ''; width: 26px; height: 4px; background: var(--hf-red); }
+  .hf-title {
+    font-family: 'Anton', Impact, 'Arial Narrow', sans-serif;
+    font-weight: 400; font-size: clamp(32px, 8.5vw, 44px);
+    line-height: 1.02; letter-spacing: 0.5px; text-transform: uppercase; color: var(--hf-white);
+  }
+  .hf-sub { margin-top: 8px; font-size: 15.5px; line-height: 1.5; color: var(--hf-tint); max-width: 60ch; }
+
+  .hf-body { padding: 18px 12px 30px; }
+
+  /* ---------- Selector buttons ---------- */
+  .hf-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+  .hf-tab {
+    cursor: pointer;
+    font-family: 'Barlow Condensed', Arial, sans-serif; font-weight: 600; font-size: 16px;
+    letter-spacing: 1px; text-transform: uppercase;
+    background: var(--hf-white); color: var(--hf-navy);
+    border: 1px solid var(--hf-border); border-radius: 999px; padding: 10px 20px;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+  .hf-tab:hover { border-color: var(--hf-navy); }
+  .hf-tab[aria-selected="true"] { background: var(--hf-navy); color: var(--hf-white); border-color: var(--hf-navy); }
+  .hf-panel[hidden] { display: none !important; }
+
+  /* ---------- Shared ---------- */
+  .hf-h {
+    font-family: 'Anton', Impact, 'Arial Narrow', sans-serif; font-weight: 400;
+    font-size: clamp(22px, 5.5vw, 26px); line-height: 1.1; letter-spacing: 0.4px;
+    text-transform: uppercase; color: var(--hf-navy);
+  }
+  .hf-group + .hf-group { margin-top: 28px; }
+  .hf-lead { margin-top: 6px; font-size: 15.5px; line-height: 1.5; color: var(--hf-slate); max-width: 66ch; }
+  .hf-card {
+    background: var(--hf-white); border: 1px solid var(--hf-border); border-top: 5px solid var(--hf-navy);
+    border-radius: 6px; padding: 16px 18px 18px;
+  }
+  .hf-card.red { border-top-color: var(--hf-red); }
+  .hf-card p { margin-top: 10px; font-size: 15.5px; line-height: 1.55; color: var(--hf-ink); }
+  .hf-card p:first-child { margin-top: 0; }
+  .hf-list { margin-top: 10px; display: grid; gap: 8px; }
+  .hf-list li { position: relative; padding-left: 20px; font-size: 15.5px; line-height: 1.5; color: var(--hf-ink); }
+  .hf-list li::before { content: ''; position: absolute; left: 2px; top: 0.55em; width: 8px; height: 8px; background: var(--hf-red); transform: rotate(45deg); }
+  .hf-link { color: var(--hf-navy); font-weight: 600; text-decoration: underline; }
+  .hf-link:hover { color: var(--hf-red); }
+
+  /* ---------- People cards ---------- */
+  .hf-people { margin-top: 14px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .hf-people.three { max-width: 700px; }
+  .hf-p {
+    display: flex; flex-direction: column; min-width: 0;
+    background: var(--hf-white); border: 1px solid var(--hf-border); border-bottom: 4px solid var(--hf-gold);
+    border-radius: 6px; overflow: hidden;
+    box-shadow: 0 6px 16px rgba(20,42,77,0.08);
+  }
+  .hf-ph { display: block; width: 100%; aspect-ratio: 4 / 5; background: #e9eef6; overflow: hidden; }
+  .hf-ph img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; }
+  .hf-pn { display: block; padding: 10px 12px 0; font-weight: 600; font-size: 16px; line-height: 1.25; color: var(--hf-ink); }
+  .hf-pc {
+    display: block; padding: 3px 12px 12px;
+    font-family: 'Barlow Condensed', Arial, sans-serif; font-weight: 700;
+    font-size: 13px; letter-spacing: 1.6px; text-transform: uppercase; color: var(--hf-red);
+  }
+
+  /* ---------- TSSAA bios ---------- */
+  .hf-bios { margin-top: 14px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .hf-bio { background: var(--hf-white); border: 1px solid var(--hf-border); border-top: 5px solid var(--hf-navy); border-radius: 6px; padding: 14px 16px 16px; }
+  .hf-bh { display: flex; gap: 14px; align-items: center; }
+  .hf-bph { flex: none; width: 84px; height: 104px; border-radius: 4px; overflow: hidden; background: #e9eef6; display: block; }
+  .hf-bph img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; }
+  .hf-bt { min-width: 0; }
+  .hf-cls { font-family: 'Barlow Condensed', Arial, sans-serif; font-weight: 700; font-size: 12.5px; letter-spacing: 1.8px; text-transform: uppercase; color: var(--hf-red); }
+  .hf-bn { margin-top: 2px; font-family: 'Anton', Impact, 'Arial Narrow', sans-serif; font-weight: 400; font-size: 23px; line-height: 1.1; letter-spacing: 0.3px; text-transform: uppercase; color: var(--hf-navy); }
+  .hf-br { margin-top: 3px; font-weight: 600; font-size: 14.5px; color: var(--hf-slate); }
+  .hf-bd { margin-top: 1px; font-size: 14px; color: var(--hf-slate); }
+  .hf-bl { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--hf-border); display: grid; gap: 7px; }
+  .hf-bl li { position: relative; padding-left: 18px; font-size: 15px; line-height: 1.45; color: var(--hf-ink); }
+  .hf-bl li::before { content: ''; position: absolute; left: 2px; top: 0.55em; width: 7px; height: 7px; background: var(--hf-red); transform: rotate(45deg); }
+
+  /* ---------- Article + photo strip ---------- */
+  .hf-article h3 { font-family: 'Anton', Impact, 'Arial Narrow', sans-serif; font-weight: 400; font-size: clamp(21px, 5.2vw, 25px); line-height: 1.15; letter-spacing: 0.3px; text-transform: uppercase; color: var(--hf-navy); }
+  .hf-fig { margin: 14px 0 0; max-width: 520px; }
+  .hf-fig img { width: 100%; height: auto; aspect-ratio: 1076 / 841; display: block; border-radius: 4px; background: #e9eef6; }
+  .hf-fig figcaption { margin-top: 5px; font-size: 13.5px; line-height: 1.35; color: var(--hf-slate); }
+  .hf-strip { margin-top: 16px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; max-width: 520px; }
+  .hf-strip figure { margin: 0; min-width: 0; }
+  .hf-strip .im { display: block; aspect-ratio: 3 / 4; background: #e9eef6; border-radius: 4px; overflow: hidden; }
+  .hf-strip img { width: 100%; height: 100%; object-fit: cover; object-position: center 25%; display: block; }
+  .hf-strip figcaption { margin-top: 5px; font-size: 13.5px; line-height: 1.35; color: var(--hf-slate); }
+
+  .hf-cliff { margin-top: 10px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; align-items: start; }
+  .hf-cliff p { margin-top: 10px; }
+  .hf-cliff > div > p:first-child { margin-top: 0; }
+  .hf-vframe { position: relative; aspect-ratio: 16 / 9; background: #0d1a30; border-radius: 5px; overflow: hidden; }
+  .hf-vframe img, .hf-vframe iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; object-fit: cover; }
+  .hf-vplay { position: absolute; inset: 0; width: 100%; height: 100%; padding: 0; border: 0; cursor: pointer; background: rgba(13,26,48,0.28); display: flex; align-items: center; justify-content: center; }
+  .hf-vplay:hover { background: rgba(13,26,48,0.10); }
+  .hf-vplay span { width: 58px; height: 58px; border-radius: 50%; background: var(--hf-red); display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(0,0,0,0.35); }
+  .hf-vplay svg { margin-left: 4px; }
+  .hf-vcap { margin-top: 8px !important; font-size: 14px !important; line-height: 1.4 !important; color: var(--hf-slate) !important; }
+
+  /* ---------- Photo viewer (coaches) ---------- */
+  .hf-view { margin-top: 12px; }
+  .hf-stage { position: relative; background: #0d1a30; border-radius: 5px; overflow: hidden; aspect-ratio: 4 / 3; }
+  .hf-stage img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; display: block; }
+  .hf-nav {
+    position: absolute; top: 50%; transform: translateY(-50%); cursor: pointer;
+    width: 40px; height: 40px; border-radius: 50%; border: 0; background: rgba(13,26,48,0.72); color: var(--hf-white);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .hf-nav:hover { background: var(--hf-red); }
+  .hf-nav.prev { left: 8px; } .hf-nav.next { right: 8px; }
+  .hf-cap { margin-top: 8px; min-height: 2.9em; font-size: 14.5px; line-height: 1.4; color: var(--hf-ink); }
+  .hf-count { font-family: 'Barlow Condensed', Arial, sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 1.6px; text-transform: uppercase; color: var(--hf-slate); }
+  .hf-two { margin-top: 14px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
+
+  @container (min-width: 620px) {
+    .hf-head { padding: 30px 28px 26px; }
+    .hf-body { padding: 26px 28px 40px; }
+    .hf-people { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+    .hf-people.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .hf-bios { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start; }
+    .hf-two { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+    .hf-cliff { grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr); gap: 20px; }
+  }
+  @container (min-width: 820px) {
+    .hf-people { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+    .hf-people.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+</style>
+
+<header class="hf-head">
+  <div class="hf-in">
+    <div class="hf-eyebrow">Honoring Our Own</div>
+    <h1 class="hf-title">Halls of Fame</h1>
+    <p class="hf-sub">The MTFOA officials, and the coaches, who have been honored for a lifetime of service to Middle Tennessee football.</p>
+  </div>
+</header>
+
+<div class="hf-body">
+  <div class="hf-in">
+
+    <div class="hf-tabs" id="hfTabs" role="tablist" aria-label="Halls of Fame">
+      <button type="button" class="hf-tab" role="tab" id="hfTabMtfoa" data-p="hfMtfoa" aria-selected="true" aria-controls="hfMtfoa">MTFOA Hall of Fame</button>
+      <button type="button" class="hf-tab" role="tab" id="hfTabTssaa" data-p="hfTssaa" aria-selected="false" aria-controls="hfTssaa">TSSAA Hall of Fame</button>
+      <button type="button" class="hf-tab" role="tab" id="hfTabCoach" data-p="hfCoach" aria-selected="false" aria-controls="hfCoach">Coaches Hall of Fame</button>
+    </div>
+
+    <!-- ===================== MTFOA HALL OF FAME ===================== -->
+    <section class="hf-panel" id="hfMtfoa" role="tabpanel" aria-labelledby="hfTabMtfoa">
+      <div class="hf-group">
+        <h2 class="hf-h">MTFOA Hall of Fame</h2>
+        <ul class="hf-people">
+          <li class="hf-p">
+            <span class="hf-ph"><img src="https://storage.googleapis.com/wzukusers/user-12863925/images/5c0ee76e01230bHIztoE/heriges.jpg" alt="Bob Heriges" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'"></span>
+            <span class="hf-pn">Bob Heriges</span>
+            <span class="hf-pc">Class of 1987</span>
+          </li>
+          <li class="hf-p">
+            <span class="hf-ph"><img src="https://storage.googleapis.com/wzukusers/user-12863925/images/5c0ee76d93f95ZEcQj4f/scobey.jpg" alt="John David Scobey" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'"></span>
+            <span class="hf-pn">John David Scobey</span>
+            <span class="hf-pc">Class of 1994</span>
+          </li>
+          <li class="hf-p">
+            <span class="hf-ph"><img src="https://storage.googleapis.com/wzukusers/user-12863925/images/5500cef85fbef6FHc5Tq/juniorheadshot.png" alt="Junior Ward" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'"></span>
+            <span class="hf-pn">Junior Ward</span>
+            <span class="hf-pc">Class of 1997</span>
+          </li>
+          <li class="hf-p">
+            <span class="hf-ph"><img src="https://storage.googleapis.com/wzukusers/user-12863925/images/5c0ee76d2a3a52yI3Z88/fuller.jpg" alt="Ray &quot;Hoss&quot; Fuller" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'"></span>
+            <span class="hf-pn">Ray &ldquo;Hoss&rdquo; Fuller</span>
+            <span class="hf-pc">Class of 2003</span>
+          </li>
+          <li class="hf-p">
+            <span class="hf-ph"><img src="https://storage.googleapis.com/wzukusers/user-12863925/images/5c0ee76c7cc6aHGW2duQ/francescon.jpg" alt="Vic Francescon" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'"></span>
+            <span class="hf-pn">Vic Francescon</span>
+            <span class="hf-pc">Class of 2010</span>
+          </li>
+          <li class="hf-p">
+            <span class="hf-ph"><img src="https://storage.googleapis.com/wzukusers/user-12863925/images/5c0ee76be389aoLF4vf5/black.jpg" alt="Melvin Black" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'"></span>
+            <span class="hf-pn">Melvin Black</span>
+            <span class="hf-pc">Class of 2014</span>
+          </li>
+          <li class="hf-p">
+            <span class="hf-ph"><img src="https://storage.googleapis.com/wzukusers/user-12863925/images/5ae09e130ef9dp3Tn6Fv/IMG_2787.jpeg" alt="Butch Burnette" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'"></span>
+            <span class="hf-pn">Butch Burnette</span>
+            <span class="hf-pc">Class of 2017</span>
+          </li>
+          <li class="hf-p">
+            <span class="hf-ph"><img src="https://storage.googleapis.com/wzukusers/user-12863925/images/5c0feccecc31bALHegqH/2018-12-11_10-58-23.jpg" alt="Joe Griffith" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'"></span>
+            <span class="hf-pn">Joe Griffith</span>
+            <span class="hf-pc">Class of 2017</span>
+          </li>
+          <li class="hf-p">
+            <span class="hf-ph"><img src="https://storage.googleapis.com/wzukusers/user-12863925/images/5c0edf888a17dLWPzZNu/kain.jpg" alt="Thomas &quot;Shaky&quot; Kain" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'"></span>
+            <span class="hf-pn">Thomas &ldquo;Shaky&rdquo; Kain</span>
+            <span class="hf-pc">Class of 2017</span>
+          </li>
+          <li class="hf-p">
+            <span class="hf-ph"><img src="https://storage.googleapis.com/wzukusers/user-12863925/images/5c24e70dc09c020DPevd/IMG_2329.png" alt="Joe Shapiro" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'"></span>
+            <span class="hf-pn">Joe Shapiro</span>
+            <span class="hf-pc">Class of 2017</span>
+          </li>
+          <li class="hf-p">
+            <span class="hf-ph"><img src="https://storage.googleapis.com/production-websitebuilder-v1-0-9/049/202049/C1WDSOu0/049c232f89b64791a622d25787aef53e" alt="Richard Green" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'"></span>
+            <span class="hf-pn">Richard Green</span>
+            <span class="hf-pc">Class of 2018</span>
+          </li>
+          <li class="hf-p">
+            <span class="hf-ph"><img src="https://storage.googleapis.com/wzukusers/user-12863925/images/5c0edf8826641Ua1A3fJ/gupton.jpg" alt="William Gupton" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'"></span>
+            <span class="hf-pn">William Gupton</span>
+            <span class="hf-pc">Class of 2018</span>
+          </li>
+          <li class="hf-p">
+            <span class="hf-ph"><img src="https://storage.googleapis.com/wzukusers/user-12863925/images/5c81ad8fae772oFxYLN5/little.jpg" alt="Shannon Little" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'"></span>
+            <span class="hf-pn">Shannon Little</span>
+            <span class="hf-pc">Class of 2018</span>
+          </li>
+          <li class="hf-p">
+            <span class="hf-ph"><img src="https://storage.googleapis.com/production-websitebuilder-v1-0-9/049/202049/C1WDSOu0/697ae6b4e681423c914f43766c7ac6fa" alt="Wilbert Smith" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'"></span>
+            <span class="hf-pn">Wilbert Smith</span>
+            <span class="hf-pc">Class of 2018</span>
+          </li>
+          <li class="hf-p">
+            <span class="hf-ph"><img src="https://storage.googleapis.com/wzukusers/user-12863925/images/5c0ee0d4c81c4ibubkPo/billy.jpg" alt="Billy Still" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'"></span>
+            <span class="hf-pn">Billy Still</span>
+            <span class="hf-pc">Class of 2018</span>
+          </li>
+          <li class="hf-p">
+            <span class="hf-ph"><img src="https://storage.googleapis.com/production-websitebuilder-v1-0-9/049/202049/C1WDSOu0/fa89a6e76f3c4fa0b20cbed1dd51e321" alt="George &quot;Ump&quot; Turner" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'"></span>
+            <span class="hf-pn">George &ldquo;Ump&rdquo; Turner</span>
+            <span class="hf-pc">Class of 2018</span>
+          </li>
+          <li class="hf-p">
+            <span class="hf-ph"><img src="https://storage.googleapis.com/production-websitebuilder-v1-0-9/049/202049/C1WDSOu0/63ca6617e82b4d36bf7df4702a09db51" alt="Stan &quot;Coach&quot; Cioccia" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'"></span>
+            <span class="hf-pn">Stan &ldquo;Coach&rdquo; Cioccia</span>
+            <span class="hf-pc">Class of 2019</span>
+          </li>
+          <li class="hf-p">
+            <span class="hf-ph"><img src="https://storage.googleapis.com/production-websitebuilder-v1-0-9/049/202049/C1WDSOu0/45ab816695df475d9a602fd9882e2fe2" alt="Herb Murphy" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'"></span>
+            <span class="hf-pn">Herb Murphy</span>
+            <span class="hf-pc">Class of 2019</span>
+          </li>
+          <li class="hf-p">
+            <span class="hf-ph"><img src="https://storage.googleapis.com/production-websitebuilder-v1-0-9/049/202049/C1WDSOu0/1b8b9e1950a7407ba7123e8d850f112b" alt="Tom Ritter" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'"></span>
+            <span class="hf-pn">Tom Ritter</span>
+            <span class="hf-pc">Class of 2019</span>
+          </li>
+          <li class="hf-p">
+            <span class="hf-ph"><img src="https://storage.googleapis.com/production-websitebuilder-v1-0-9/049/202049/C1WDSOu0/5f7dc98ab52e48f6b4dc19d805054e31" alt="Chuck Williams" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'"></span>
+            <span class="hf-pn">Chuck Williams</span>
+            <span class="hf-pc">Class of 2019</span>
+          </li>
+          <li class="hf-p">
+            <span class="hf-ph"><img src="https://storage.googleapis.com/wzukusers/user-12863925/images/54f48df10d5f9epm7vma/cliffwillis.jpg" alt="Cliff Willis" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'"></span>
+            <span class="hf-pn">Cliff Willis</span>
+            <span class="hf-pc">Class of 2019</span>
+          </li>
+          <li class="hf-p">
+            <span class="hf-ph"><img src="https://storage.googleapis.com/production-websitebuilder-v1-0-9/049/202049/C1WDSOu0/e7a8a71953f748d7b247f2c43a320217" alt="Wayne Clendenen" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'"></span>
+            <span class="hf-pn">Wayne Clendenen</span>
+            <span class="hf-pc">Class of 2020</span>
+          </li>
+          <li class="hf-p">
+            <span class="hf-ph"><img src="https://storage.googleapis.com/production-websitebuilder-v1-0-9/049/202049/C1WDSOu0/2ebcd41cc825477aa514397390d73d48" alt="Ed Gooding" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'"></span>
+            <span class="hf-pn">Ed Gooding</span>
+            <span class="hf-pc">Class of 2020</span>
+          </li>
+          <li class="hf-p">
+            <span class="hf-ph"><img src="https://storage.googleapis.com/production-websitebuilder-v1-0-9/049/202049/C1WDSOu0/8e19f642d2fb4edbae99f87c02bc00a3" alt="Larry Huddleston" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'"></span>
+            <span class="hf-pn">Larry Huddleston</span>
+            <span class="hf-pc">Class of 2020</span>
+          </li>
+          <li class="hf-p">
+            <span class="hf-ph"><img src="https://storage.googleapis.com/production-websitebuilder-v1-0-9/049/202049/C1WDSOu0/8e9f09a9436e4c14a4ddb97df787b98b" alt="Everette Sams" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'"></span>
+            <span class="hf-pn">Everette Sams</span>
+            <span class="hf-pc">Class of 2020</span>
+          </li>
+          <li class="hf-p">
+            <span class="hf-ph"><img src="https://storage.googleapis.com/production-websitebuilder-v1-0-9/049/202049/C1WDSOu0/a0efb791bbc34353b8a5ea0c85f6a857" alt="Billy Smith" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'"></span>
+            <span class="hf-pn">Billy Smith</span>
+            <span class="hf-pc">Class of 2020</span>
+          </li>
+          <li class="hf-p">
+            <span class="hf-ph"><img src="https://storage.googleapis.com/production-websitebuilder-v1-0-9/049/202049/C1WDSOu0/73ec9e669d5c41f3887514a202886207" alt="W.O. Smith" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'"></span>
+            <span class="hf-pn">W.O. Smith</span>
+            <span class="hf-pc">Class of 2021</span>
+          </li>
+          <li class="hf-p">
+            <span class="hf-ph"><img src="https://storage.googleapis.com/production-websitebuilder-v1-0-9/049/202049/C1WDSOu0/10fc16b2d09a4e478116054a6d452db9" alt="Steve Swift" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'"></span>
+            <span class="hf-pn">Steve Swift</span>
+            <span class="hf-pc">Class of 2021</span>
+          </li>
+          <li class="hf-p">
+            <span class="hf-ph"><img src="https://storage.googleapis.com/production-websitebuilder-v1-0-9/049/202049/C1WDSOu0/c6acfb3db19a4752ac8071631550a262" alt="Roy Woods" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'"></span>
+            <span class="hf-pn">Roy Woods</span>
+            <span class="hf-pc">Class of 2021</span>
+          </li>
+          <li class="hf-p">
+            <span class="hf-ph"><img src="https://storage.googleapis.com/production-websitebuilder-v1-0-9/049/202049/C1WDSOu0/61681c5eb873462da5bd502931190fea" alt="Robert Cannon" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'"></span>
+            <span class="hf-pn">Robert Cannon</span>
+            <span class="hf-pc">Class of 2022</span>
+          </li>
+          <li class="hf-p">
+            <span class="hf-ph"><img src="https://storage.googleapis.com/production-websitebuilder-v1-0-9/049/202049/C1WDSOu0/a0f09b1909d146399c106df19288dd7b" alt="Maynard &quot;Slugger&quot; Carnahan" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'"></span>
+            <span class="hf-pn">Maynard &ldquo;Slugger&rdquo; Carnahan</span>
+            <span class="hf-pc">Class of 2022</span>
+          </li>
+          <li class="hf-p">
+            <span class="hf-ph"><img src="https://storage.googleapis.com/production-websitebuilder-v1-0-9/049/202049/C1WDSOu0/81546eb354184d2287ebbb35b597c039" alt="Steve Chauncy" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'"></span>
+            <span class="hf-pn">Steve Chauncy</span>
+            <span class="hf-pc">Class of 2022</span>
+          </li>
+          <li class="hf-p">
+            <span class="hf-ph"><img src="https://storage.googleapis.com/production-websitebuilder-v1-0-9/049/202049/C1WDSOu0/e87347a25c434eda8ede176d3bbec4ce" alt="Buddy Shafer" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'"></span>
+            <span class="hf-pn">Buddy Shafer</span>
+            <span class="hf-pc">Class of 2022</span>
+          </li>
+          <li class="hf-p">
+            <span class="hf-ph"><img src="https://storage.googleapis.com/production-websitebuilder-v1-0-9/049/202049/C1WDSOu0/fff976aa3bb746fe84c30baca0eb213f" alt="Al Phillips" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'"></span>
+            <span class="hf-pn">Al Phillips</span>
+            <span class="hf-pc">Class of 2023</span>
+          </li>
+          <li class="hf-p">
+            <span class="hf-ph"><img src="https://storage.googleapis.com/production-websitebuilder-v1-0-9/049/202049/C1WDSOu0/ba2fdde4f95044ffacb44bd595e5026f" alt="Eddie Magness" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'"></span>
+            <span class="hf-pn">Eddie Magness</span>
+            <span class="hf-pc">Class of 2023</span>
+          </li>
+          <li class="hf-p">
+            <span class="hf-ph"><img src="https://storage.googleapis.com/production-websitebuilder-v1-0-9/049/202049/C1WDSOu0/aa4dcec74ce842c7b1574b76efc29daf" alt="Richard Shinbaum" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'"></span>
+            <span class="hf-pn">Richard Shinbaum</span>
+            <span class="hf-pc">Class of 2023</span>
+          </li>
+          <li class="hf-p">
+            <span class="hf-ph"><img src="https://storage.googleapis.com/production-websitebuilder-v1-0-0/490/1818490/HCsorkmW/8302460d5cf148a993e4ffda2d3bddc5" alt="Harry Baird" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'"></span>
+            <span class="hf-pn">Harry Baird</span>
+            <span class="hf-pc">Class of 2024</span>
+          </li>
+          <li class="hf-p">
+            <span class="hf-ph"><img src="https://storage.googleapis.com/production-websitebuilder-v1-0-0/490/1818490/HCsorkmW/32120cbed66645cead63add36d16cd55" alt="Walter Overton" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'"></span>
+            <span class="hf-pn">Walter Overton</span>
+            <span class="hf-pc">Class of 2024</span>
+          </li>
+          <li class="hf-p">
+            <span class="hf-ph"><img src="https://storage.googleapis.com/production-websitebuilder-v1-0-0/490/1818490/HCsorkmW/79280a90578d4013b1ad315bc4590966" alt="Ricky Rooker" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'"></span>
+            <span class="hf-pn">Ricky Rooker</span>
+            <span class="hf-pc">Class of 2025</span>
+          </li>
+          <li class="hf-p">
+            <span class="hf-ph"><img src="https://storage.googleapis.com/production-websitebuilder-v1-0-0/490/1818490/HCsorkmW/1047b99a00b644e594c5b0b447d1bed1" alt="Dwight Smith" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'"></span>
+            <span class="hf-pn">Dwight Smith</span>
+            <span class="hf-pc">Class of 2026</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="hf-group">
+        <div class="hf-card red">
+          <h2 class="hf-h">Induction Into the MTFOA Hall of Fame</h2>
+          <p>Do you know of an MTFOA official who has gone above and beyond on behalf of the MTFOA and scholastic football officiating? If so, you should nominate them today for the MTFOA Hall of Fame. Just like the TSSAA Hall of Champions, nominees must exemplify the highest standards of sportsmanship, ethical conduct, and moral character.</p>
+          <p>There are some required qualifiers for nomination and enshrinement into the MTFOA Hall of Fame:</p>
+          <ul class="hf-list">
+            <li>Must have been retired from full-time, on-field, and active officiating for three years.</li>
+            <li>Must have been a member of the MTFOA for a minimum of ten (10) seasons</li>
+            <li>The untimely death of an MTFOA member makes that member eligible for nomination to the next ballot</li>
+            <li>MTFOA football officials who are TSSAA Hall of Fame inductees are automatically enshrined into the MTFOA HoF</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="hf-group">
+        <div class="hf-card">
+          <h2 class="hf-h">Cliff Willis, Class of 2019</h2>
+          <div class="hf-cliff">
+            <div>
+              <p>Cliff Willis learned he had been selected for the MTFOA Hall of Fame in a surprise visit at his hospital bedside at TriStar Centennial Medical Center, with family and friends there. MTFOA Commissioner Junior Ward told WKRN that Willis is &ldquo;so special to all of us.&rdquo; He was named to the Class of 2019.</p>
+              <p>Source: Julia Palazzo, WKRN. <a class="hf-link" href="https://www.wkrn.com/news/middle-tennessee-referee-becomes-hall-of-famer-at-hospital-bedside/" target="_blank" rel="noopener">Read the full story</a></p>
+            </div>
+            <div class="hf-vid" data-vimeo="381655855">
+              <div class="hf-vframe">
+                <img src="https://i.vimeocdn.com/video/842481802-8d23d01bcdd004bd0f1ea6819fdb12dfb67129abfcf2f375553ac484d1206bcf-d_640?region=us" alt="" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'">
+                <button type="button" class="hf-vplay" aria-label="Play video: Cliff Willis Honored With MTFOA Hall of Fame Induction"><span><svg width="22" height="22" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg></span></button>
+              </div>
+              <p class="hf-vcap">Video: Cliff Willis Honored With MTFOA Hall of Fame Induction (1:51). <a class="hf-link" href="https://vimeo.com/381655855" target="_blank" rel="noopener">Watch on Vimeo</a></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== TSSAA HALL OF FAME ===================== -->
+    <section class="hf-panel" id="hfTssaa" role="tabpanel" aria-labelledby="hfTabTssaa" hidden>
+      <div class="hf-group">
+        <h2 class="hf-h">MTFOA Members in the TSSAA Hall of Fame</h2>
+        <div class="hf-bios">
+          <article class="hf-bio">
+            <div class="hf-bh">
+              <span class="hf-bph"><img src="https://storage.googleapis.com/wzukusers/user-12863925/images/5c0ee76e01230bHIztoE/heriges.jpg" alt="Bob Heriges III" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'"></span>
+              <div class="hf-bt">
+                <span class="hf-cls">Class of 1987</span>
+                <h3 class="hf-bn">Bob Heriges III</h3>
+                <p class="hf-br">Official</p>
+                <p class="hf-bd">Born: August 20, 1921 &middot; Died: June 20, 1967</p>
+              </div>
+            </div>
+            <ul class="hf-bl">
+              <li>Coached for six years at Father Ryan High School and Hillsboro High School</li>
+              <li>TSSAA official for over twenty years.</li>
+              <li>Worked the Boys&rsquo; (1957) and Girls&rsquo; (1959) State Basketball Tournaments.</li>
+              <li>TSSAA Supervisor of Officials for fifteen years.</li>
+              <li>President and Secretary of Mid-TN Football and Basketball Officials Associations</li>
+              <li>The baseball complex in Percy Warner Park is named in his honor</li>
+            </ul>
+          </article>
+          <article class="hf-bio">
+            <div class="hf-bh">
+              <span class="hf-bph"><img src="https://storage.googleapis.com/wzukusers/user-12863925/images/5c0ee76d93f95ZEcQj4f/scobey.jpg" alt="John David Scobey" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'"></span>
+              <div class="hf-bt">
+                <span class="hf-cls">Class of 1994</span>
+                <h3 class="hf-bn">John David Scobey</h3>
+                <p class="hf-br">Official</p>
+                <p class="hf-bd">Born: October 7, 1922 &middot; Died: May 11, 2008</p>
+              </div>
+            </div>
+            <ul class="hf-bl">
+              <li>TSSAA Official for 27 years (1945 - 1972)</li>
+              <li>President of Middle Tennessee Football Officials Association</li>
+              <li>Each year, the MTFOA presents an individual with the &ldquo;David Scobey Award&rdquo; for outstanding officiating.</li>
+              <li>Official TSSAA rules interpreter</li>
+              <li>Played and officiated on the collegiate level</li>
+            </ul>
+          </article>
+          <article class="hf-bio">
+            <div class="hf-bh">
+              <span class="hf-bph"><img src="https://storage.googleapis.com/wzukusers/user-12863925/images/5500cef85fbef6FHc5Tq/juniorheadshot.png" alt="Junior Ward" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'"></span>
+              <div class="hf-bt">
+                <span class="hf-cls">Class of 1999</span>
+                <h3 class="hf-bn">Junior Ward</h3>
+                <p class="hf-br">Official</p>
+                <p class="hf-bd">Born: August 5, 1941</p>
+              </div>
+            </div>
+            <ul class="hf-bl">
+              <li>TSSAA Official since 1965</li>
+              <li>Worked over 300 football games and 30 TSSAA football playoff games</li>
+              <li>Officiated in two TSSAA State Football Championships</li>
+              <li>Worked the 1983 TSSAA Boys State Basketball Tournament</li>
+              <li>Has been a teacher and coach since 1965</li>
+              <li>Named Outstanding Prep Official by the Lawrenceburg Quarterback Club</li>
+              <li>Director of TSSAA State Cross Country Meet</li>
+              <li>Founded the A.F. Bridges Cross Country Meet</li>
+            </ul>
+          </article>
+          <article class="hf-bio">
+            <div class="hf-bh">
+              <span class="hf-bph"><img src="https://storage.googleapis.com/wzukusers/user-12863925/images/5c0ee76d2a3a52yI3Z88/fuller.jpg" alt="Ray Fuller" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'"></span>
+              <div class="hf-bt">
+                <span class="hf-cls">Class of 2003</span>
+                <h3 class="hf-bn">Ray Fuller</h3>
+                <p class="hf-br">Official</p>
+                <p class="hf-bd">Born: May 30, 1924 &middot; Died: April 24, 2021</p>
+              </div>
+            </div>
+            <ul class="hf-bl">
+              <li>TSSAA Official since 1955</li>
+              <li>Has officiated football, basketball, baseball, and softball</li>
+              <li>Officiated over 7500 games in college, high school, junior high, and junior pro combined</li>
+              <li>Member of the Mid-TN Basketball Officials Association</li>
+              <li>Worked numerous playoff games in football including the 2001 TSSAA State Finals</li>
+              <li>Inducted into the Middle Tennessee Chapter of the National Football Foundation and College Hall of Fame</li>
+              <li>Received the David Scobey Award in 1984 from the Middle Tennessee Football Officials Association</li>
+              <li>2008 - 2009 Recipient of the Hank Thompson Lifetime Achievement Award</li>
+              <li>2019 Recipient of the Colonel Aide de Camp award (see below)</li>
+            </ul>
+          </article>
+          <article class="hf-bio">
+            <div class="hf-bh">
+              <span class="hf-bph"><img src="https://storage.googleapis.com/wzukusers/user-12863925/images/5c0ee76c7cc6aHGW2duQ/francescon.jpg" alt="Vic Francescon" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'"></span>
+              <div class="hf-bt">
+                <span class="hf-cls">Class of 2010</span>
+                <h3 class="hf-bn">Vic Francescon</h3>
+                <p class="hf-br">Official</p>
+                <p class="hf-bd">Born: May 22, 1931 &middot; Died: January 12, 2024</p>
+              </div>
+            </div>
+            <ul class="hf-bl">
+              <li>Registered with the TSSAA in 1960</li>
+              <li>Has officiated basketball 36 years and football 48 years</li>
+              <li>Has worked in numerous district, region, and sub-state basketball tournaments</li>
+              <li>Officiated many state football playoff games</li>
+              <li>Officiated two TSSAA Football State Championships</li>
+              <li>Officiated the TN East/West Shrine High School Football Classic</li>
+              <li>Past President of the Middle Tennessee Basketball Officials Association and Middle Tennessee Football Officials Association</li>
+              <li>Named &ldquo;Outstanding Official&rdquo; by the Lawrenceburg Quarterback Club and Mid-TN Chapters of the National Football and College Halls of Fame</li>
+            </ul>
+          </article>
+          <article class="hf-bio">
+            <div class="hf-bh">
+              <span class="hf-bph"><img src="https://storage.googleapis.com/wzukusers/user-12863925/images/5c0ee76be389aoLF4vf5/black.jpg" alt="Melvin Black" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'"></span>
+              <div class="hf-bt">
+                <span class="hf-cls">Class of 2014</span>
+                <h3 class="hf-bn">Melvin Black</h3>
+                <p class="hf-br">Official</p>
+                <p class="hf-bd">Born: January 14, 1936</p>
+              </div>
+            </div>
+            <ul class="hf-bl">
+              <li>Teacher and coach at Burt High School in Clarksville and Pearl High School in Nashville for nine years</li>
+              <li>Coached football, basketball, and track</li>
+              <li>In 1962 he began officiating basketball games in the TN High School Athletic Association, which administered to black schools before integration.</li>
+              <li>In 1963 registered with the TSSAA as a basketball official, later adding football, baseball, and track</li>
+              <li>Officiated over 1000 football games, more than 900 baseball games, and more than 900 track meets on the high school and college level</li>
+              <li>Worked in one TSSAA Football Championship and one boys&rsquo; basketball State Championship during his career as a high school official.</li>
+            </ul>
+          </article>
+          <article class="hf-bio">
+            <div class="hf-bh">
+              <span class="hf-bph"><img src="https://storage.googleapis.com/production-websitebuilder-v1-0-9/049/202049/C1WDSOu0/81546eb354184d2287ebbb35b597c039" alt="Steve Chauncy" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'"></span>
+              <div class="hf-bt">
+                <span class="hf-cls">Class of 2022</span>
+                <h3 class="hf-bn">Steve Chauncy</h3>
+                <p class="hf-br">Administrator, Official</p>
+                <p class="hf-bd">Born: August 24, 1952</p>
+              </div>
+            </div>
+            <ul class="hf-bl">
+              <li>Administrator and official from Nashville who has served the TSSAA and its members schools in some capacity for 50 years.</li>
+              <li>First registered as an official in 1972</li>
+              <li>Served in the Metro Nashville Public School system as an administrator for over 30 years</li>
+              <li>Taught and coached several sports before moving into his role Principal, most recently at Hillwood High School before retiring in 2018</li>
+              <li>Served on the TSSAA Board of Control for nine years</li>
+              <li>Continues to serve as a TSSAA basketball official</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+
+      <div class="hf-group">
+        <div class="hf-card red hf-article">
+          <h3>Ray &ldquo;Hoss&rdquo; Fuller Honored by Tennessee Governor, Bill Lee</h3>
+          <p>TSSAA and MTFOA Hall of Fame inductee, and former football, basketball, baseball, and softball official Edwin Ray &ldquo;Hoss&rdquo; Fuller was surrounded by friends, family, former coworkers, and fellow officials, while being honored at East High School on Sunday, March 24, 2019. &ldquo;Hoss&rdquo;, as he is affectionately known, had bestowed upon him the State of Tennessee&rsquo;s Colonel Aide de Camp award. This award was approved and signed by Tennessee Governor, Bill Lee.</p>
+          <p>The Colonel Aide de Camp award is given to a deserving Tennessee citizen for outstanding achievement and bestowed only at the request of a member of the Tennessee General Assembly.</p>
+          <p>Ray served in the Army in World War II and was a member of the 502nd Parachute Infantry Regiment of the 101st Airborne Division. He was part of the force that invaded Germany on D-Day. In the now-famous picture below, Ray can be seen with his fellow soldiers listening to then Allied General Dwight D. Eisenhower.</p>
+          <figure class="hf-fig"><img src="https://storage.googleapis.com/wzukusers/user-12863925/images/5c7ee9fc0b409LfVZ9ev/2019-03-05_15-18-19.jpg" alt="Ray Fuller, marked by an arrow, with fellow paratroopers listening to General Eisenhower" loading="lazy" decoding="async"><figcaption>Ray (marked by the arrow) with fellow soldiers listening to General Eisenhower.</figcaption></figure>
+          <p>Ray started as a TSSAA official in 1955 and officiated over 7,500 games in college, high school, junior high, and junior pro combined. Ray was a member of the Mid-TN Basketball Officials Association and also worked numerous playoff games in football, including the 2001 TSSAA State Finals. Ray has been inducted into the Middle Tennessee Chapter of the National Football Foundation &amp; College Hall of Fame. He received the David Scobey Award in 1984 from the Mid-TN Football Officials Association and was the 2008-2009 recipient of the Hank Thompson Lifetime Achievement Award.</p>
+          <p>The MTFOA is sponsoring a scholarship in Ray&rsquo;s name called the &ldquo;Ray &ldquo;Hoss&rdquo; Fuller Scholarship.&rdquo; The scholarship will pay for three of our local high school players to attend the &ldquo;Food City Border Bowl&rdquo; which is an annual All-Star game played in Gatlinburg, TN between 6 different states.</p>
+          <div class="hf-strip">
+            <figure><span class="im"><img src="https://storage.googleapis.com/wzukusers/user-12863925/images/5c9a4f27e164flMlRCTx/IMG_1230.JPG" alt="Ray Fuller speaking at the 2019 ceremony" loading="lazy" decoding="async"></span></figure>
+            <figure><span class="im"><img src="https://storage.googleapis.com/wzukusers/user-12863925/images/5c87cd610cb97I8STKUr/IMG_1156.JPG" alt="Ray Fuller in his officiating uniform" style="object-position:center top" loading="lazy" decoding="async"></span></figure>
+            <figure><span class="im"><img src="https://storage.googleapis.com/wzukusers/user-12863925/images/5c7eefffd1d0aH76CtXt/IMG_3492.PNG" alt="Ray Fuller officiating a game" loading="lazy" decoding="async"></span></figure>
+          </div>
+          <p>Photos from the award ceremony are in the <a class="hf-link" href="https://www.flickr.com/photos/11281885@N05/albums/72157707813859654" target="_blank" rel="noopener">Ray &ldquo;Hoss&rdquo; Fuller Award Ceremony album</a>, on the Photo Albums page of the website.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== COACHES HALL OF FAME ===================== -->
+    <section class="hf-panel" id="hfCoach" role="tabpanel" aria-labelledby="hfTabCoach" hidden>
+      <div class="hf-group">
+        <h2 class="hf-h">MTFOA Coaches Hall of Fame Members</h2>
+        <ul class="hf-people three">
+          <li class="hf-p">
+            <span class="hf-ph"><img src="https://storage.googleapis.com/production-websitebuilder-v1-0-9/049/202049/C1WDSOu0/66b689670c2746c9b30838552ef96226" alt="Carlton Flatt" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'"></span>
+            <span class="hf-pn">Carlton Flatt</span>
+            <span class="hf-pc">Class of 2024</span>
+          </li>
+          <li class="hf-p">
+            <span class="hf-ph"><img src="https://storage.googleapis.com/production-websitebuilder-v1-0-0/490/1818490/HCsorkmW/2121ff2da4b748d8a716bae129677c97" alt="James Armstrong" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'"></span>
+            <span class="hf-pn">James Armstrong</span>
+            <span class="hf-pc">Class of 2025</span>
+          </li>
+          <li class="hf-p">
+            <span class="hf-ph"><img src="https://storage.googleapis.com/production-websitebuilder-v1-0-0/490/1818490/HCsorkmW/42bb7bceaf054f37a0b46f0af5696de4" alt="Tommy Owen" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'"></span>
+            <span class="hf-pn">Tommy Owen</span>
+            <span class="hf-pc">Class of 2025</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="hf-two">
+        <div class="hf-card">
+          <h3 class="hf-h" style="font-size:22px">Carlton Flatt</h3>
+          <p>Carlton Flatt was born on April 22, 1943, in Nashville, Tennessee. He attended Cumberland High School, where he lettered in football, basketball, track, and baseball. After graduation, he went to Austin Peay State University on a football scholarship, where he became a senior captain and led the 1964 Austin Peay football team to an 8-1-1 record after being only 1-9 the previous season. Flatt was named to the 1964 All-Ohio Valley Conference team as a defensive back, and as the quarterback, he was chosen by the OVC coaches as the Offensive Player of the Year. He also received an Honorable Mention Little All-American in 1963 and 1964. Consequently, he was inducted into the APSU Sports Hall of Fame in 1981.</p>
+          <p>After graduating from APSU in 1965 with a degree in mathematics and physics, he became a football graduate assistant for two years while working on a master&rsquo;s degree in mathematics at Tennessee Technological University. After obtaining his graduate degree, he became a full-time professor and football coach for one year. While he was at Tennessee Tech, he was mentored by Coach Wilburn Tucker, who was the head football coach. Flatt&rsquo;s next stop was two years at Battle Ground Academy as a math teacher and defensive coordinator before heading to his permanent home at Brentwood Academy.</p>
+          <p>In 1970, Coach Flatt became the athletic director, head football coach, and head of the math department at Brentwood Academy. Coach Flatt built the Eagles&rsquo; program, where he became one of Tennessee&rsquo;s all-time winningest high school football coaches. He was the head coach at BA for 34 years retiring with an overall record of 355-68-3 which was the best all-time record in Tennessee at that time. Among the active coaches in 2006, he became the eighth-winningest coach in the nation.</p>
+          <p>His teams went to the state finals 20 times in Coach Flatt&rsquo;s career and won 10 state championships. USA Today has polled his teams nationally in several seasons with the highest ranking at No. 6. Sports Scholastic America ranked Brentwood Academy&rsquo;s football program as the fifth best in the country for the decade of the 1990&rsquo;s.</p>
+          <p>He and his wife Judy have three daughters - Grace Ann Holbert, Lisa Berry and Lara Dawson. All three daughters were football cheerleaders at Brentwood Academy. Currently, Coach Flatt and Judy have seven grandchildren.</p>
+        </div>
+
+        <div class="hf-card red">
+          <h3 class="hf-h" style="font-size:22px">Photo Gallery</h3>
+          <p>The ceremony and Coach Flatt through the years. Special thanks go to Mike Organ with the Tennessean for the images.</p>
+          <div class="hf-view" id="hfView">
+            <div class="hf-stage">
+              <img id="hfImg" src="" alt="">
+              <button type="button" class="hf-nav prev" id="hfPrev" aria-label="Previous photo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+              <button type="button" class="hf-nav next" id="hfNext" aria-label="Next photo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+            </div>
+            <p class="hf-cap"><span class="hf-count" id="hfCount"></span><br><span id="hfCap"></span></p>
+          </div>
+          <ul id="hfSlides" hidden>
+            <li data-src="https://storage.googleapis.com/production-websitebuilder-v1-0-9/049/202049/C1WDSOu0/bbdcb794a772444ea7ffbb3737cd335a" data-cap="Coach Flatt with players from the 1989 team"></li>
+            <li data-src="https://storage.googleapis.com/production-websitebuilder-v1-0-9/049/202049/C1WDSOu0/116b71803d354824b6b04f9147d6193e" data-cap="Coach Flatt at the Brentwood Academy football field named in his honor"></li>
+            <li data-src="https://storage.googleapis.com/production-websitebuilder-v1-0-9/049/202049/C1WDSOu0/6797b32038364aef88e64be77cd09dc6" data-cap="Coach Flatt with MTFOA officials in attendance"></li>
+            <li data-src="https://storage.googleapis.com/production-websitebuilder-v1-0-9/049/202049/C1WDSOu0/2f745f87956b41ca8290b8128e18b6aa" data-cap=""></li>
+            <li data-src="https://storage.googleapis.com/production-websitebuilder-v1-0-9/049/202049/C1WDSOu0/dfb73af53ca34bdcab4b310dc10a1b1e" data-cap="Coach Flatt with some of his former players"></li>
+            <li data-src="https://storage.googleapis.com/production-websitebuilder-v1-0-9/049/202049/C1WDSOu0/77f648fe68164c9b915a7dd47c4fb033" data-cap="The Flatt family"></li>
+            <li data-src="https://storage.googleapis.com/production-websitebuilder-v1-0-9/049/202049/C1WDSOu0/6a3c7680ec84406494f41217aa70c149" data-cap="Former and current Brentwood Academy football coaches Bill Brown, Carlton Flatt and Paul Wade"></li>
+            <li data-src="https://storage.googleapis.com/production-websitebuilder-v1-0-9/049/202049/C1WDSOu0/66b689670c2746c9b30838552ef96226" data-cap="Carlton Flatt"></li>
+            <li data-src="https://storage.googleapis.com/production-websitebuilder-v1-0-9/049/202049/C1WDSOu0/9c70f081b6f64db29160e9b903cef480" data-cap="Carlton Flatt and MTFOA Commissioner Junior Ward"></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700&display=swap">
+<script>
+(function () {
+  var root = document.getElementById('hfRoot');
+  if (!root) return;
+
+  /* Three buttons at the top: show one section at a time. */
+  var tabs = root.querySelectorAll('.hf-tab');
+  var panels = root.querySelectorAll('.hf-panel');
+  function show(id) {
+    for (var i = 0; i < panels.length; i++) {
+      if (panels[i].id === id) panels[i].removeAttribute('hidden'); else panels[i].setAttribute('hidden', '');
+    }
+    for (var j = 0; j < tabs.length; j++) {
+      tabs[j].setAttribute('aria-selected', tabs[j].getAttribute('data-p') === id ? 'true' : 'false');
+    }
+  }
+  root.addEventListener('click', function (ev) {
+    var b = ev.target.closest ? ev.target.closest('.hf-tab') : null;
+    if (b && root.contains(b)) show(b.getAttribute('data-p'));
+  });
+
+
+  /* Cliff Willis video: show a picture, load the player only when asked. */
+  root.addEventListener('click', function (ev) {
+    var play = ev.target.closest ? ev.target.closest('.hf-vplay') : null;
+    if (!play) return;
+    var box = play.closest('.hf-vid');
+    var id = box && box.getAttribute('data-vimeo');
+    var frame = box && box.querySelector('.hf-vframe');
+    if (!id || !frame) return;
+    var f = document.createElement('iframe');
+    f.src = 'https://player.vimeo.com/video/' + id + '?autoplay=1';
+    f.title = 'Cliff Willis Honored With MTFOA Hall of Fame Induction';
+    f.setAttribute('allow', 'autoplay; fullscreen; picture-in-picture');
+    f.setAttribute('allowfullscreen', '');
+    frame.innerHTML = '';
+    frame.appendChild(f);
+  });
+
+  /* Coach Flatt photo gallery: one photo at a time, previous / next. */
+  var items = root.querySelectorAll('#hfSlides li');
+  var img = document.getElementById('hfImg');
+  var cap = document.getElementById('hfCap');
+  var count = document.getElementById('hfCount');
+  var n = items.length, at = 0, loaded = false;
+  function go(k) {
+    if (!n) return;
+    at = (k + n) % n;
+    img.src = items[at].getAttribute('data-src');
+    img.alt = items[at].getAttribute('data-cap') || 'Photo ' + (at + 1);
+    cap.textContent = items[at].getAttribute('data-cap') || '';
+    count.textContent = (at + 1) + ' of ' + n;
+    var nx = new Image(); nx.src = items[(at + 1) % n].getAttribute('data-src');
+  }
+  document.getElementById('hfPrev').addEventListener('click', function () { go(at - 1); });
+  document.getElementById('hfNext').addEventListener('click', function () { go(at + 1); });
+  /* load the first photo only when the Coaches section is opened */
+  root.addEventListener('click', function (ev) {
+    var b = ev.target.closest ? ev.target.closest('.hf-tab') : null;
+    if (b && b.getAttribute('data-p') === 'hfCoach' && !loaded) { loaded = true; go(0); }
+  });
+})();
+</script>
+</div>
+
+<script>
+/* AUTO HEIGHT: the box (and, on a computer, the whole page) fits itself to what is being shown, so there is no blank
+   gap above the footer when a tab, filter or sign-in changes the content. Only runs on the live site (never in the
+   editor or Preview, where it would change the saved layout).
+     phone (box under 720px wide): AppsApi.setAppSize - the box follows the content, but never gets shorter than the
+                                   phone height set in the editor, so keep that below the shortest state of the page.
+     computer:                     AppsApi.setDocumentSize - the page itself follows the content. */
+(function () {
+  var root = document.querySelector('[class^="mtfoa-"]') || document.body;
+  var last = 0, mode = '';
+  function fit() {
+    var extra = 0;
+    if (root === document.body) { var cs = getComputedStyle(document.body); extra = (parseFloat(cs.marginTop) || 0) + (parseFloat(cs.marginBottom) || 0); }
+    var h = Math.ceil(root.getBoundingClientRect().height + extra) + 2;
+    if (h < 300 || Math.abs(h - last) < 3) return;
+    try {
+      if (!(window.AppsApi && AppsApi.getViewMode && AppsApi.getViewMode() === 'view')) return;
+      var w = window.innerWidth || 0;
+      if (w < 300) return;                               // frame not laid out yet: measure again later
+      if (!mode) mode = w < 720 ? 'phone' : 'desktop';    // decide once, so a narrow moment never resizes the box
+      if (mode === 'phone') { if (AppsApi.setAppSize) AppsApi.setAppSize({ width: w, height: h }); }
+      else if (AppsApi.setDocumentSize) AppsApi.setDocumentSize({ width: w, height: h });
+      last = h;                                          // only remembered once the size was really sent
+    } catch (e) {}
+  }
+  fit(); window.addEventListener('load', fit); setTimeout(fit, 600); setTimeout(fit, 1800); setTimeout(fit, 4500);
+  try { new ResizeObserver(fit).observe(root); } catch (e) {}
+})();
+</script>

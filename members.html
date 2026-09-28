@@ -1,0 +1,796 @@
+---
+title: Member Roster
+description: >-
+  The officials of the MTFOA, by position. Filter or search by name.
+permalink: /members
+---
+<!-- ============================================================
+     MTFOA Member Roster
+     One page for every roster: Board & Officers, Referees, Umpires,
+     Head Linesmen, Line Judges, Back Judges, Reserves and the
+     Special List. Filter buttons across the top plus a name search.
+     Names, positions and photos only. No contact information.
+
+     DATA: comes from your "MTFOA Roster" Google Sheet through the
+     Roster Script. Edit the sheet and this page updates within about
+     a minute. Set ROSTER_URL (near the bottom) to your Web app URL.
+
+     WHERE IT GOES: one WebsiteBuilder HTML embed on your Member
+     Roster page (replacing the photo cards), dragged out to full page
+     width and given a height of about 900px on desktop and 750px on
+     a phone. The header and filter buttons stay put and the photo grid
+     scrolls inside the box. On a PHONE (live site) the box instead
+     grows to fit the whole roster and the page scrolls, so nothing traps
+     a thumb; the phone height set in the editor is the minimum.
+   ============================================================ -->
+<div class="mtfoa-roster" id="mrsRoot">
+<style>
+  .mtfoa-roster {
+    --mr-navy: #1f3864;
+    --mr-navy-deep: #142a4d;
+    --mr-columbia: #6f90b5;
+    --mr-red: #d6291a;
+    --mr-white: #ffffff;
+    --mr-tint: #c9d6e8;
+    --mr-chalk: #f4f6fa;
+    --mr-slate: #5b6879;
+    --mr-ink: #1c2530;
+    --mr-border: #dbe1ea;
+    --mr-field: #b9c4d3;
+
+    container-type: inline-size;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    font-family: 'Barlow', Arial, Helvetica, sans-serif;
+    background: var(--mr-chalk);
+    -webkit-font-smoothing: antialiased;
+  }
+  .mtfoa-roster.mrs-auto { height: auto; }
+  .mtfoa-roster, .mtfoa-roster * { box-sizing: border-box; }
+  .mtfoa-roster :where(p, h1, h2, h3, ul) { margin: 0; }
+  .mtfoa-roster :where(ul) { list-style: none; padding: 0; }
+  .mtfoa-roster button:focus-visible,
+  .mtfoa-roster input:focus-visible { outline: 3px solid var(--mr-red); outline-offset: 2px; }
+
+  /* ---------- Header band ---------- */
+  .mrs-head {
+    flex: none;
+    position: relative;
+    overflow: hidden;
+    background:
+      radial-gradient(120% 160% at 88% 0%, #2c4d86 0%, rgba(44,77,134,0) 55%),
+      linear-gradient(160deg, var(--mr-navy) 0%, var(--mr-navy-deep) 100%);
+    border-bottom: 4px solid var(--mr-red);
+    padding: 26px 22px 22px;
+  }
+  .mrs-head::before {
+    content: '';
+    position: absolute; inset: 0; pointer-events: none;
+    background-image:
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.10) 0 3px, transparent 3px 160px),
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.05) 0 2px, transparent 2px 32px);
+  }
+  .mrs-head-in { position: relative; max-width: 1100px; margin: 0 auto; }
+  .mrs-eyebrow {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-family: 'Barlow Condensed', Arial, sans-serif;
+    font-weight: 700; font-size: 13px; letter-spacing: 2.4px;
+    text-transform: uppercase; color: var(--mr-tint);
+    margin-bottom: 8px;
+  }
+  .mrs-eyebrow::before { content: ''; width: 26px; height: 4px; background: var(--mr-red); }
+  .mrs-title {
+    font-family: 'Anton', Impact, 'Arial Narrow', sans-serif;
+    font-weight: 400;
+    font-size: clamp(30px, 8vw, 40px);
+    line-height: 1.02; letter-spacing: 0.5px;
+    text-transform: uppercase; color: var(--mr-white);
+  }
+  .mrs-sub { margin-top: 8px; font-size: 15px; line-height: 1.5; color: var(--mr-tint); max-width: 60ch; }
+
+  /* ---------- Filter bar ---------- */
+  .mrs-bar {
+    flex: none;
+    background: var(--mr-white);
+    border-bottom: 1px solid var(--mr-border);
+    padding: 12px 20px 10px;
+  }
+  .mrs-bar-in { max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px; }
+  .mrs-chips {
+    display: flex; gap: 8px;
+    overflow-x: auto; flex-wrap: nowrap;
+    padding-bottom: 4px;
+    scrollbar-width: thin;
+    -webkit-mask-image: linear-gradient(90deg, #000 86%, transparent 100%);
+            mask-image: linear-gradient(90deg, #000 86%, transparent 100%);
+  }
+  .mrs-chip {
+    flex: none;
+    font-family: 'Barlow Condensed', Arial, sans-serif;
+    font-weight: 700; font-size: 14px; letter-spacing: 1.1px;
+    text-transform: uppercase;
+    color: var(--mr-navy);
+    background: var(--mr-white);
+    border: 1px solid var(--mr-field);
+    border-radius: 999px;
+    padding: 8px 14px;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+  .mrs-chip:hover { border-color: var(--mr-navy); }
+  .mrs-chip[aria-pressed="true"] { background: var(--mr-navy); border-color: var(--mr-navy); color: var(--mr-white); }
+  .mrs-chip .mrs-n { opacity: 0.65; font-weight: 600; margin-left: 4px; }
+
+  .mrs-tools { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .mrs-search { position: relative; flex: 1 1 220px; max-width: 360px; }
+  .mrs-search svg { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--mr-slate); pointer-events: none; }
+  .mrs-search input {
+    width: 100%;
+    font-family: 'Barlow', Arial, sans-serif;
+    font-size: 16px;
+    color: var(--mr-ink);
+    background: var(--mr-white);
+    border: 1px solid var(--mr-field);
+    border-radius: 3px;
+    padding: 9px 12px 9px 36px;
+    min-height: 42px;
+  }
+  .mrs-search input:focus { outline: none; border-color: var(--mr-navy); box-shadow: 0 0 0 3px rgba(31,56,100,0.18); }
+  .mrs-count { font-size: 14px; color: var(--mr-slate); }
+  .mrs-count strong { color: var(--mr-navy); font-weight: 600; }
+
+  /* ---------- Grid ---------- */
+  .mrs-list { flex: 1 1 auto; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 20px 20px 28px; }
+  .mtfoa-roster.mrs-auto .mrs-list { flex: none; overflow: visible; }
+  .mrs-grid {
+    max-width: 1100px; margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px 12px;
+  }
+  .mrs-card {
+    display: flex; flex-direction: column;
+    background: var(--mr-white);
+    border: 1px solid var(--mr-border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .mrs-photo {
+    aspect-ratio: 4 / 5;
+    background: #e6ecf4;
+    overflow: hidden;
+  }
+  .mrs-photo img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 22%; }
+  .mrs-none {
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(160deg, var(--mr-navy) 0%, var(--mr-navy-deep) 100%);
+    color: var(--mr-white);
+    font-family: 'Anton', Impact, 'Arial Narrow', sans-serif;
+    font-size: clamp(30px, 8cqw, 46px);
+    letter-spacing: 1px;
+  }
+  .mrs-info { padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 2px; }
+  .mrs-name { font-weight: 600; font-size: 16px; line-height: 1.2; color: var(--mr-navy); overflow-wrap: anywhere; }
+  .mrs-pos {
+    font-family: 'Barlow Condensed', Arial, sans-serif;
+    font-weight: 700; font-size: 12.5px; letter-spacing: 1.2px;
+    text-transform: uppercase; color: var(--mr-slate);
+  }
+  .mrs-role { margin-top: 4px; font-weight: 600; font-size: 13.5px; line-height: 1.25; color: var(--mr-red); }
+
+  .mrs-skel .mrs-photo { background: linear-gradient(90deg, #e6ecf4 25%, #f1f4f9 50%, #e6ecf4 75%); background-size: 200% 100%; animation: mrsShimmer 1.3s linear infinite; }
+  .mrs-skel .mrs-line { height: 12px; border-radius: 3px; background: #e6ecf4; margin-top: 8px; }
+  .mrs-skel .mrs-line.s { width: 55%; }
+  @keyframes mrsShimmer { to { background-position: -200% 0; } }
+
+  .mrs-more { max-width: 1100px; margin: 22px auto 0; text-align: center; }
+  .mrs-more[hidden] { display: none; }
+  .mrs-more button {
+    font-family: 'Barlow Condensed', Arial, sans-serif; font-weight: 600; font-size: 16px;
+    letter-spacing: 1.1px; text-transform: uppercase;
+    background: var(--mr-navy); color: var(--mr-white);
+    border: none; border-radius: 3px; padding: 13px 28px; cursor: pointer;
+    transition: background 0.15s ease;
+  }
+  .mrs-more button:hover { background: var(--mr-navy-deep); }
+  .mrs-msg { max-width: 1100px; margin: 0 auto; text-align: center; padding: 40px 10px; color: var(--mr-slate); font-size: 16px; line-height: 1.5; }
+  .mrs-msg[hidden] { display: none; }
+  .mrs-msg button {
+    margin-top: 12px;
+    font-family: 'Barlow Condensed', Arial, sans-serif; font-weight: 600; font-size: 15px;
+    letter-spacing: 1px; text-transform: uppercase;
+    background: var(--mr-red); color: var(--mr-white);
+    border: none; border-radius: 3px; padding: 11px 22px; cursor: pointer;
+  }
+
+  /* ---------- "My Roster Photo" (signed-in members only) ---------- */
+  .mrs-myphoto {
+    flex: none;
+    background: var(--mr-white);
+    border-bottom: 1px solid var(--mr-border);
+    padding: 16px 20px;
+  }
+  .mrs-myphoto[hidden] { display: none; }
+  .mrs-myphoto-in { max-width: 1100px; margin: 0 auto; display: flex; gap: 18px; flex-wrap: wrap; align-items: flex-start; }
+  .mrs-myphoto h2 {
+    font-family: 'Barlow Condensed', Arial, sans-serif; font-weight: 700; font-size: 15px;
+    letter-spacing: 1.4px; text-transform: uppercase; color: var(--mr-navy); margin-bottom: 4px;
+  }
+  .mrs-myphoto p.mrs-mp-lead { font-size: 14px; line-height: 1.5; color: var(--mr-slate); max-width: 52ch; margin-bottom: 10px; }
+  .mrs-mp-cur { width: 84px; aspect-ratio: 4/5; border-radius: 4px; overflow: hidden; flex: none; background: #e6ecf4; }
+  .mrs-mp-cur img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 22%; display: block; }
+  .mrs-mp-cur.mrs-mp-none { display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--mr-slate); text-align: center; padding: 4px; }
+  .mrs-mp-body { flex: 1 1 260px; min-width: 0; }
+  .mrs-mp-file { font-size: 14px; }
+  .mrs-mp-crop { margin-top: 10px; display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start; }
+  .mrs-mp-crop[hidden] { display: none; }
+  #mrsPhotoCanvas { display: block; width: 240px; height: 300px; border-radius: 4px; border: 2px solid var(--mr-border); background: #e6ecf4; touch-action: none; cursor: grab; }
+  .mrs-mp-ctrl { flex: 1 1 160px; min-width: 160px; }
+  .mrs-mp-ctrl label { display: block; font-size: 13px; font-weight: 600; color: var(--mr-navy); margin-bottom: 4px; }
+  .mrs-mp-ctrl input[type=range] { width: 100%; }
+  .mrs-mp-ctrl .row { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+  .mrs-mp-ctrl button {
+    font-family: 'Barlow Condensed', Arial, sans-serif; font-weight: 600; font-size: 15px;
+    letter-spacing: 1px; text-transform: uppercase; border-radius: 3px; padding: 11px 18px; cursor: pointer; border: none;
+  }
+  .mrs-mp-save { background: var(--mr-navy); color: var(--mr-white); }
+  .mrs-mp-save:hover { background: var(--mr-navy-deep); }
+  .mrs-mp-save:disabled { opacity: 0.6; cursor: default; }
+  .mrs-mp-cancel { background: var(--mr-white); color: var(--mr-navy); border: 1px solid var(--mr-field) !important; }
+  .mrs-mp-status { margin-top: 10px; padding: 9px 12px; border-radius: 6px; font-weight: 600; font-size: 14px; max-width: 52ch; }
+  .mrs-mp-status[hidden] { display: none; }
+  .mrs-mp-status.info { background: #eef3fa; color: #1f3864; border: 1px solid #c9d6ea; }
+  .mrs-mp-status.no { background: #fdecea; color: #8a1a10; border: 1px solid #f3b9b3; }
+  .mrs-mp-msg { margin-top: 8px; font-size: 13.5px; color: var(--mr-red); }
+  .mrs-mp-msg[hidden] { display: none; }
+
+  @container (max-width: 479px) { .mrs-sub { display: none; } .mrs-head { padding-bottom: 18px; } }
+  @container (min-width: 480px) { .mrs-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px 14px; } }
+  @container (min-width: 700px) {
+    .mrs-head { padding: 32px 28px 26px; }
+    .mrs-bar { padding: 14px 28px 12px; }
+    .mrs-chips { flex-wrap: wrap; overflow: visible; -webkit-mask-image: none; mask-image: none; }
+    .mrs-list { padding: 24px 28px 32px; }
+    .mrs-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px 16px; }
+  }
+  @container (min-width: 980px) { .mrs-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mtfoa-roster * { transition: none !important; animation: none !important; }
+  }
+</style>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700&display=swap">
+
+<div class="mrs-head" id="mrsHead">
+  <div class="mrs-head-in">
+    <p class="mrs-eyebrow">Middle Tennessee Football Officials Association</p>
+    <h1 class="mrs-title">Member Roster</h1>
+    <p class="mrs-sub">The officials of the MTFOA, by position. Use the buttons to filter, or search for a name.</p>
+  </div>
+</div>
+
+<div class="mrs-bar" id="mrsBar">
+  <div class="mrs-bar-in">
+    <div class="mrs-chips" id="mrsChips" role="group" aria-label="Filter by position"></div>
+    <div class="mrs-tools">
+      <div class="mrs-search">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.5" y2="16.5"></line></svg>
+        <input id="mrsSearch" type="search" placeholder="Search by name" aria-label="Search by name" autocomplete="off" maxlength="60">
+      </div>
+      <p class="mrs-count" id="mrsCount" role="status" aria-live="polite"></p>
+    </div>
+  </div>
+</div>
+
+<div class="mrs-myphoto" id="mrsMyPhoto" hidden>
+  <div class="mrs-myphoto-in">
+    <div class="mrs-mp-cur mrs-mp-none" id="mrsPhotoCur">No photo yet</div>
+    <div class="mrs-mp-body">
+      <h2>My Roster Photo</h2>
+      <p class="mrs-mp-lead">Choose a clear, recent photo of yourself. You can drag it to reposition and use the slider to zoom, then submit it for approval &mdash; once approved it replaces your photo above.</p>
+      <input type="file" class="mrs-mp-file" id="mrsPhotoFile" accept="image/jpeg,image/png,image/*" aria-label="Choose a photo">
+      <div class="mrs-mp-crop" id="mrsPhotoCrop" hidden>
+        <canvas id="mrsPhotoCanvas" width="240" height="300"></canvas>
+        <div class="mrs-mp-ctrl">
+          <label for="mrsPhotoZoom">Zoom</label>
+          <input type="range" id="mrsPhotoZoom" min="100" max="300" value="100">
+          <div class="row">
+            <button type="button" class="mrs-mp-save" id="mrsPhotoSave">Submit for approval</button>
+            <button type="button" class="mrs-mp-cancel" id="mrsPhotoCancel">Cancel</button>
+          </div>
+        </div>
+      </div>
+      <div class="mrs-mp-status" id="mrsPhotoStatus" hidden></div>
+      <div class="mrs-mp-msg" id="mrsPhotoMsg" hidden role="alert"></div>
+    </div>
+  </div>
+</div>
+
+<div class="mrs-list" id="mrsList">
+  <ul class="mrs-grid" id="mrsGrid"></ul>
+  <div class="mrs-msg" id="mrsMsg" hidden></div>
+  <div class="mrs-more" id="mrsMore" hidden><button type="button" id="mrsMoreBtn"></button></div>
+</div>
+
+<script>
+(function () {
+  // Paste the Web app URL from your deployed "Roster Script" here.
+  var ROSTER_URL = "https://script.google.com/macros/s/AKfycbzrUU5NYuD3X_3ljgA92e_hnMJNs8efwNYwTzttqO7-dy7v2uvZnG4Iu5NjPcr36nkw/exec";
+  // Keep this false. The box has a fixed height and the photo grid scrolls
+  // inside it. (true asks WebsiteBuilder to resize the box, which can break
+  // the box in the page editor.)
+  var AUTO_HEIGHT = false;
+
+  var ORDER = ['Referee', 'Umpire', 'Head Linesman', 'Line Judge', 'Back Judge', 'Reserve', 'Special List'];
+  var LABELS = { 'Referee': 'Referees', 'Umpire': 'Umpires', 'Head Linesman': 'Head Linesmen',
+                 'Line Judge': 'Line Judges', 'Back Judge': 'Back Judges', 'Reserve': 'Reserves', 'Special List': 'Special List' };
+  var CACHE_KEY = 'mtfoa-roster-v1';
+
+  var root = document.getElementById('mrsRoot');
+  var head = document.getElementById('mrsHead');
+  var bar = document.getElementById('mrsBar');
+  var chipsEl = document.getElementById('mrsChips');
+  var searchEl = document.getElementById('mrsSearch');
+  var countEl = document.getElementById('mrsCount');
+  var listEl = document.getElementById('mrsList');
+  var gridEl = document.getElementById('mrsGrid');
+  var msgEl = document.getElementById('mrsMsg');
+  var moreEl = document.getElementById('mrsMore');
+  var moreBtn = document.getElementById('mrsMoreBtn');
+  var PAGE = 40;
+  var shown = PAGE;
+
+  var people = [];
+  var filter = 'all';
+  var query = '';
+  var loaded = false;
+
+  /* ---------------- helpers ---------------- */
+  function norm(s) {
+    s = String(s || '').toLowerCase();
+    try { s = s.normalize('NFD').replace(/[\u0300-\u036f]/g, ''); } catch (e) {}
+    return s.replace(/[^a-z0-9 ]/g, '').replace(/\s+/g, ' ').trim();
+  }
+  function sortKey(name) {
+    var t = String(name).replace(/[.,]/g, '').split(/\s+/).filter(Boolean);
+    while (t.length > 1 && /^(jr|sr|ii|iii|iv|v)$/i.test(t[t.length - 1])) t.pop();
+    return (t[t.length - 1] || '').toLowerCase() + ' ' + String(name).toLowerCase();
+  }
+  function initials(name) {
+    var t = String(name).replace(/[.,]/g, '').split(/\s+/).filter(Boolean);
+    if (!t.length) return '?';
+    var a = t[0].charAt(0), b = t.length > 1 ? t[t.length - 1].charAt(0) : '';
+    if (t.length > 2 && /^(jr|sr|ii|iii|iv|v)$/i.test(t[t.length - 1])) b = t[t.length - 2].charAt(0);
+    return (a + b).toUpperCase();
+  }
+  function cleanPerson(p) {
+    return {
+      n: String(p.n || '').trim(),
+      p: String(p.p || '').trim(),
+      r: String(p.r || '').trim(),
+      o: (p.o === '' || p.o == null || isNaN(Number(p.o))) ? 9999 : Number(p.o),
+      i: /^https:\/\/[^\s"'<>]+$/i.test(String(p.i || '').trim()) ? String(p.i).trim() : '',
+      k: sortKey(p.n || ''),
+      s: norm(p.n)
+    };
+  }
+  function label(pos) { return LABELS[pos] || pos; }
+
+  /* ---------------- chips ---------------- */
+  function buildChips() {
+    var counts = { all: people.length, board: 0 };
+    people.forEach(function (p) { if (p.r) counts.board++; counts[p.p] = (counts[p.p] || 0) + 1; });
+    var defs = [['all', 'All']];
+    if (counts.board) defs.push(['board', 'Board & Officers']);
+    var seen = {};
+    ORDER.forEach(function (pos) { if (counts[pos]) { defs.push([pos, label(pos)]); seen[pos] = 1; } });
+    Object.keys(counts).forEach(function (k) { if (k !== 'all' && k !== 'board' && k && !seen[k]) defs.push([k, label(k)]); });
+    if (!counts[filter] && filter !== 'all') filter = 'all';
+
+    chipsEl.innerHTML = '';
+    defs.forEach(function (d) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'mrs-chip';
+      b.setAttribute('data-f', d[0]);
+      b.setAttribute('aria-pressed', d[0] === filter ? 'true' : 'false');
+      b.appendChild(document.createTextNode(d[1]));
+      var n = document.createElement('span');
+      n.className = 'mrs-n';
+      n.textContent = counts[d[0]];
+      b.appendChild(n);
+      chipsEl.appendChild(b);
+    });
+  }
+  chipsEl.addEventListener('click', function (e) {
+    var b = e.target.closest ? e.target.closest('.mrs-chip') : null;
+    if (!b) return;
+    setFilter(b.getAttribute('data-f'));
+  });
+  function setFilter(f) {
+    filter = f;
+    Array.prototype.forEach.call(chipsEl.children, function (c) {
+      c.setAttribute('aria-pressed', c.getAttribute('data-f') === filter ? 'true' : 'false');
+    });
+    render(true);
+  }
+
+  /* ---------------- rendering ---------------- */
+  function visible() {
+    var q = norm(query);
+    var list = people.filter(function (p) {
+      if (filter === 'board') { if (!p.r) return false; }
+      else if (filter !== 'all' && p.p !== filter) return false;
+      return !q || p.s.indexOf(q) !== -1;
+    });
+    list.sort(function (a, b) {
+      if (filter === 'board' && a.o !== b.o) return a.o - b.o;
+      return a.k < b.k ? -1 : a.k > b.k ? 1 : 0;
+    });
+    return list;
+  }
+
+  function photoNode(p) {
+    var box = document.createElement('div');
+    if (p.i) {
+      box.className = 'mrs-photo';
+      var img = document.createElement('img');
+      img.alt = '';
+      img.loading = 'lazy';
+      img.decoding = 'async';
+      img.referrerPolicy = 'no-referrer';
+      img.onerror = function () { box.className = 'mrs-photo mrs-none'; box.textContent = initials(p.n); };
+      img.src = p.i;
+      box.appendChild(img);
+    } else {
+      box.className = 'mrs-photo mrs-none';
+      box.textContent = initials(p.n);
+    }
+    return box;
+  }
+  function cardNode(p) {
+    var li = document.createElement('li');
+    li.className = 'mrs-card';
+    li.appendChild(photoNode(p));
+    var info = document.createElement('div');
+    info.className = 'mrs-info';
+    var nm = document.createElement('div');
+    nm.className = 'mrs-name';
+    nm.textContent = p.n;
+    info.appendChild(nm);
+    if (p.p) {
+      var ps = document.createElement('div');
+      ps.className = 'mrs-pos';
+      ps.textContent = p.p;
+      info.appendChild(ps);
+    }
+    if (p.r) {
+      var rl = document.createElement('div');
+      rl.className = 'mrs-role';
+      rl.textContent = p.r;
+      info.appendChild(rl);
+    }
+    li.appendChild(info);
+    return li;
+  }
+
+  function render(reset) {
+    if (reset) shown = PAGE;
+    var list = visible();
+    var part = list.slice(0, shown);
+    var frag = document.createDocumentFragment();
+    part.forEach(function (p) { frag.appendChild(cardNode(p)); });
+    gridEl.innerHTML = '';
+    gridEl.appendChild(frag);
+
+    var total = people.length;
+    countEl.innerHTML = '';
+    if (list.length === total) {
+      var s0 = document.createElement('strong');
+      s0.textContent = total;
+      countEl.appendChild(s0);
+      countEl.appendChild(document.createTextNode(' people'));
+    } else {
+      var s1 = document.createElement('strong');
+      s1.textContent = list.length;
+      countEl.appendChild(s1);
+      countEl.appendChild(document.createTextNode(' of ' + total + ' people'));
+    }
+
+    if (list.length > shown) {
+      var left = list.length - shown;
+      moreBtn.textContent = 'Show ' + Math.min(PAGE, left) + ' more (' + left + ' remaining)';
+      moreEl.hidden = false;
+    } else {
+      moreEl.hidden = true;
+    }
+
+    if (!list.length) {
+      msgEl.hidden = false;
+      msgEl.innerHTML = '';
+      msgEl.appendChild(document.createTextNode('No one matches that search here.'));
+      if (filter !== 'all') {
+        var br = document.createElement('div');
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = 'Search everyone';
+        btn.onclick = function () { setFilter('all'); };
+        br.appendChild(btn);
+        msgEl.appendChild(br);
+      }
+    } else {
+      msgEl.hidden = true;
+    }
+    if (reset) listEl.scrollTop = 0;
+    syncHeight();
+  }
+  moreBtn.addEventListener('click', function () { shown += PAGE; render(false); });
+
+  function showSkeleton() {
+    gridEl.innerHTML = '';
+    for (var i = 0; i < 10; i++) {
+      var li = document.createElement('li');
+      li.className = 'mrs-card mrs-skel';
+      li.innerHTML = '<div class="mrs-photo"></div><div class="mrs-info"><div class="mrs-line"></div><div class="mrs-line s"></div></div>';
+      gridEl.appendChild(li);
+    }
+    countEl.textContent = 'Loading the roster...';
+    moreEl.hidden = true;
+  }
+  function showError(text, canRetry) {
+    gridEl.innerHTML = '';
+    countEl.textContent = '';
+    moreEl.hidden = true;
+    msgEl.hidden = false;
+    msgEl.innerHTML = '';
+    msgEl.appendChild(document.createTextNode(text));
+    if (canRetry) {
+      var br = document.createElement('div');
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.textContent = 'Try again';
+      btn.onclick = function () { msgEl.hidden = true; showSkeleton(); load(); };
+      br.appendChild(btn);
+      msgEl.appendChild(br);
+    }
+    syncHeight();
+  }
+
+  function setData(list) {
+    people = list.map(cleanPerson).filter(function (p) { return p.n; });
+    loaded = true;
+    buildChips();
+    render(false);
+  }
+
+  /* ---------------- loading ---------------- */
+  function readCache() {
+    try { var c = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null'); return c && c.people ? c.people : null; } catch (e) { return null; }
+  }
+  function writeCache(list) {
+    try { localStorage.setItem(CACHE_KEY, JSON.stringify({ t: Date.now(), people: list })); } catch (e) {}
+  }
+  function load() {
+    if (ROSTER_URL.indexOf('PASTE_YOUR') === 0) {
+      if (!loaded) showError('The roster is not connected yet. Please check back soon.', false);
+      return;
+    }
+    fetch(ROSTER_URL)
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        if (!data || data.status !== 'ok' || !data.people) throw new Error('bad data');
+        var fresh = JSON.stringify(data.people);
+        var had = loaded;
+        var old = had ? JSON.stringify(readCache() || []) : '';
+        writeCache(data.people);
+        if (!had || fresh !== old) setData(data.people);
+      })
+      .catch(function () {
+        if (!loaded) showError('We could not load the roster right now. Please check your connection and try again.', true);
+      });
+  }
+
+  /* ---------------- search ---------------- */
+  var t = null;
+  searchEl.addEventListener('input', function () {
+    clearTimeout(t);
+    t = setTimeout(function () { query = searchEl.value; render(true); }, 120);
+  });
+
+  /* ---------------- box height ----------------
+     Tries to make the WebsiteBuilder box exactly as tall as the roster.
+     If WebsiteBuilder does not honor the request, the grid simply scrolls
+     inside the box instead. Nothing breaks either way. */
+  var lastAsked = 0, autoOn = false, lastW = window.innerWidth, verifyTimer = null;
+  function setMode(auto) {
+    autoOn = auto;
+    root.className = 'mtfoa-roster' + (auto ? ' mrs-auto' : '');
+  }
+  function naturalHeight() {
+    return Math.ceil(head.offsetHeight + bar.offsetHeight + listEl.scrollHeight);
+  }
+  function ask(h) {
+    try {
+      if (window.AppsApi && typeof AppsApi.setAppSize === 'function') { AppsApi.setAppSize({ height: h }); return true; }
+    } catch (e) {}
+    return false;
+  }
+  /* PHONE (live site only): no scrolling area inside the box at all. The box grows to fit the whole roster and the
+     page itself scrolls, so a thumb on the list can always scroll back to the top of the page. (A list that scrolls
+     inside a box as tall as the screen traps the finger; only turning the phone sideways got out.) The computer view
+     keeps its scrolling grid. The mode is decided once, so a narrow moment never changes it. */
+  var fitMode = '', phoneLast = 0;
+  function viewMode() { try { return !!(window.AppsApi && AppsApi.getViewMode && AppsApi.getViewMode() === 'view'); } catch (e) { return false; } }
+  function phoneFit() {
+    var w = window.innerWidth || 0;
+    if (!fitMode) { if (w < 300 || !viewMode()) return false; fitMode = w < 720 ? 'phone' : 'desktop'; }
+    if (fitMode !== 'phone') return false;
+    setMode(true);
+    var cs = getComputedStyle(document.body);
+    var h = Math.ceil(root.getBoundingClientRect().height + (parseFloat(cs.marginTop) || 0) + (parseFloat(cs.marginBottom) || 0)) + 2;
+    if (w >= 300 && h >= 300 && Math.abs(h - phoneLast) >= 3) {
+      try { if (AppsApi.setAppSize) { AppsApi.setAppSize({ width: w, height: h }); phoneLast = h; } } catch (e) {}
+    }
+    return true;
+  }
+  function syncHeight() {
+    if (phoneFit()) return;
+    if (!AUTO_HEIGHT || !loaded) return;
+    var h = naturalHeight();
+    if (Math.abs(h - lastAsked) < 3) return;
+    lastAsked = h;
+    if (!ask(h)) return;
+    // Only drop the inner scroll once the frame has really followed the request.
+    clearTimeout(verifyTimer);
+    verifyTimer = setTimeout(function () {
+      setMode(Math.abs(window.innerHeight - h) <= 6);
+    }, 900);
+  }
+  window.addEventListener('resize', function () {
+    if (window.innerWidth !== lastW) { lastW = window.innerWidth; lastAsked = 0; syncHeight(); }
+  });
+
+  /* ---------------- "My Roster Photo" (signed-in members only) ----------------
+     Shown only when a still-valid member sign-in ("mtfoa_pass") is found in this browser: the Member Portal and this
+     page are on the same site, so the same sign-in that page saves is read here too. If nothing is signed in, or the
+     server says this browser's session is not valid, the whole panel simply stays hidden. */
+  var mpBox = document.getElementById('mrsMyPhoto');
+  var mpCur = document.getElementById('mrsPhotoCur');
+  var mpFile = document.getElementById('mrsPhotoFile');
+  var mpCropWrap = document.getElementById('mrsPhotoCrop');
+  var mpCanvas = document.getElementById('mrsPhotoCanvas');
+  var mpZoom = document.getElementById('mrsPhotoZoom');
+  var mpSave = document.getElementById('mrsPhotoSave');
+  var mpCancel = document.getElementById('mrsPhotoCancel');
+  var mpStatus = document.getElementById('mrsPhotoStatus');
+  var mpMsgEl = document.getElementById('mrsPhotoMsg');
+
+  function mpLoadPass() {
+    var raw = null;
+    try { raw = localStorage.getItem('mtfoa_pass') || sessionStorage.getItem('mtfoa_pass'); } catch (e) {}
+    if (!raw) return null;
+    try { var o = JSON.parse(raw); return o && o.t && o.x > Date.now() ? o : null; } catch (e) { return null; }
+  }
+  function mpCall(body) {
+    return fetch(ROSTER_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) })
+      .then(function (r) { return r.json(); })
+      .catch(function () { return { status: 'error', code: 'net', message: 'We could not reach the server. Please check your internet connection and try again.' }; });
+  }
+  function mpMsg(text) { mpMsgEl.textContent = text || ''; mpMsgEl.hidden = !text; }
+
+  var mpMe = null;
+  function mpRender() {
+    var ph = mpMe && mpMe.photo;
+    mpBox.hidden = !ph;
+    if (!ph) return;
+    if (ph.live) { mpCur.className = 'mrs-mp-cur'; mpCur.innerHTML = '<img src="' + String(ph.live).replace(/"/g, '&quot;') + '" alt="">'; }
+    else { mpCur.className = 'mrs-mp-cur mrs-mp-none'; mpCur.textContent = 'No photo yet'; }
+    if (!ph.onRoster) {
+      mpStatus.hidden = false; mpStatus.className = 'mrs-mp-status no';
+      mpStatus.textContent = 'We could not find your name on the public roster, so a photo cannot be placed there yet. Please email Alec Calvert.';
+      mpFile.disabled = true;
+    } else {
+      mpFile.disabled = false;
+      if (ph.status === 'pending') { mpStatus.hidden = false; mpStatus.className = 'mrs-mp-status info'; mpStatus.textContent = 'Your new photo is waiting for approval.'; }
+      else if (ph.status === 'rejected') { mpStatus.hidden = false; mpStatus.className = 'mrs-mp-status no'; mpStatus.textContent = 'Your last submitted photo was not approved. You are welcome to try again with a different photo.'; }
+      else mpStatus.hidden = true;
+    }
+  }
+  function initMyPhoto() {
+    var pass = mpLoadPass();
+    if (!pass) return;
+    mpCall({ action: 'me', token: pass.t }).then(function (r) {
+      if (r.status !== 'ok' || !r.photo) return;
+      mpMe = r; mpRender();
+    });
+  }
+
+  // Canvas-based crop/reposition tool -- same design as the Member Portal's version.
+  var MPW = 240, MPH = 300, MPOW = 480, MPOH = 600;
+  var mpImg = null, mpZoomVal = 1, mpOffX = 0, mpOffY = 0;
+  function mpBaseScale() { return mpImg ? Math.max(MPW / mpImg.width, MPH / mpImg.height) : 1; }
+  function mpClamp() {
+    if (!mpImg) return;
+    var scale = mpBaseScale() * mpZoomVal, w = mpImg.width * scale, h = mpImg.height * scale;
+    mpOffX = Math.min(0, Math.max(MPW - w, mpOffX));
+    mpOffY = Math.min(0, Math.max(MPH - h, mpOffY));
+  }
+  function mpDraw() {
+    var ctx = mpCanvas.getContext('2d');
+    ctx.clearRect(0, 0, MPW, MPH);
+    if (!mpImg) return;
+    var scale = mpBaseScale() * mpZoomVal;
+    ctx.drawImage(mpImg, mpOffX, mpOffY, mpImg.width * scale, mpImg.height * scale);
+  }
+  function mpLoadImg(file) {
+    var url = URL.createObjectURL(file), img = new Image();
+    img.onload = function () {
+      URL.revokeObjectURL(url);
+      mpImg = img; mpZoomVal = 1; mpZoom.value = 100;
+      mpOffX = (MPW - img.width * mpBaseScale()) / 2; mpOffY = (MPH - img.height * mpBaseScale()) / 2;
+      mpClamp(); mpDraw(); mpCropWrap.hidden = false;
+    };
+    img.onerror = function () { URL.revokeObjectURL(url); mpMsg('That image could not be opened. Please try a different photo.'); };
+    img.src = url;
+  }
+  function mpResetCrop() { mpImg = null; mpZoomVal = 1; mpOffX = 0; mpOffY = 0; mpFile.value = ''; mpCropWrap.hidden = true; mpMsg(''); }
+  mpFile.addEventListener('change', function () {
+    mpMsg('');
+    var f = this.files[0]; if (!f) return;
+    if (!/^image\/(jpeg|png)$/.test(f.type)) { mpMsg('Please choose a JPEG or PNG photo.'); this.value = ''; return; }
+    if (f.size > 8 * 1024 * 1024) { mpMsg('That photo is too large. Please choose one under 8 MB.'); this.value = ''; return; }
+    mpLoadImg(f);
+  });
+  mpZoom.addEventListener('input', function () {
+    if (!mpImg) return;
+    var newZoom = Math.max(1, Number(this.value) / 100), oldScale = mpBaseScale() * mpZoomVal, newScale = mpBaseScale() * newZoom;
+    var cx = MPW / 2, cy = MPH / 2, ix = (cx - mpOffX) / oldScale, iy = (cy - mpOffY) / oldScale;    // keep the crop centered on the same spot while zooming
+    mpZoomVal = newZoom; mpOffX = cx - ix * newScale; mpOffY = cy - iy * newScale;
+    mpClamp(); mpDraw();
+  });
+  (function () {
+    var dragging = false, sx = 0, sy = 0, sox = 0, soy = 0;
+    mpCanvas.addEventListener('pointerdown', function (ev) {
+      if (!mpImg) return;
+      dragging = true; sx = ev.clientX; sy = ev.clientY; sox = mpOffX; soy = mpOffY;
+      mpCanvas.setPointerCapture(ev.pointerId); mpCanvas.style.cursor = 'grabbing';
+    });
+    mpCanvas.addEventListener('pointermove', function (ev) {
+      if (!dragging) return;
+      mpOffX = sox + (ev.clientX - sx); mpOffY = soy + (ev.clientY - sy);
+      mpClamp(); mpDraw();
+    });
+    function stop(ev) { if (!dragging) return; dragging = false; try { mpCanvas.releasePointerCapture(ev.pointerId); } catch (e) {} mpCanvas.style.cursor = 'grab'; }
+    mpCanvas.addEventListener('pointerup', stop); mpCanvas.addEventListener('pointercancel', stop);
+  })();
+  mpCancel.addEventListener('click', mpResetCrop);
+  var mpSaving = false;
+  mpSave.addEventListener('click', function () {
+    if (mpSaving || !mpImg) return;
+    var pass = mpLoadPass(); if (!pass) { mpMsg('Your sign-in has expired. Please sign in again on the Member Portal.'); return; }
+    mpSaving = true; mpSave.disabled = true; mpSave.textContent = 'One moment...'; mpMsg('');
+    var out = document.createElement('canvas'), ratio = MPOW / MPW;
+    out.width = MPOW; out.height = MPOH;
+    out.getContext('2d').drawImage(mpImg, mpOffX * ratio, mpOffY * ratio, mpImg.width * mpBaseScale() * mpZoomVal * ratio, mpImg.height * mpBaseScale() * mpZoomVal * ratio);
+    var b64 = out.toDataURL('image/jpeg', 0.85).replace(/^data:image\/jpeg;base64,/, '');
+    mpCall({ action: 'photoupload', token: pass.t, data: b64, mime: 'image/jpeg' }).then(function (r) {
+      mpSaving = false; mpSave.disabled = false; mpSave.textContent = 'Submit for approval';
+      if (r.status !== 'ok') { mpMsg(r.message || 'That did not work. Please try again.'); return; }
+      mpResetCrop();
+      if (mpMe) { mpMe.photo = mpMe.photo || {}; mpMe.photo.status = 'pending'; mpRender(); }
+    });
+  });
+
+  /* ---------------- start ---------------- */
+  var cached = readCache();
+  if (cached && cached.length) setData(cached); else showSkeleton();
+  load();
+  initMyPhoto();
+  phoneFit(); window.addEventListener('load', phoneFit);
+  setTimeout(phoneFit, 600); setTimeout(phoneFit, 1800); setTimeout(phoneFit, 4500);
+  try { new ResizeObserver(phoneFit).observe(root); } catch (e) {}
+})();
+</script>
+</div>

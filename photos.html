@@ -1,0 +1,403 @@
+---
+title: Photo Albums
+description: >-
+  Photo albums from MTFOA games and events, newest first.
+permalink: /photos
+---
+<!-- ============================================================
+     MTFOA Photo Albums page (page name PHOTO ALBUMS, address /photos)
+     Replaces the Event Photos page's 20 separate album embeds with
+     one designed page: a card for each photo album, in newest-first
+     order. Each card is the album's title (no photo), and opens that
+     album in a new tab.
+
+     The 2018 State Crew card also carries a link to the TSSAA's additional
+     images for that album (the "ep-extra" link under the card).
+
+     To add an album: copy one of the <div class="ep-item ..."> blocks
+     below, paste it at the top of the grid, and change the link and
+     the title. Use class "crew", "banq", "golf" or "award" to set the
+     card color, set data-cat to "crew", "banq" or "other" (which filter
+     button it belongs to), and change the small label above the title.
+
+     Buttons at the top filter the cards (All, Banquets, State crews, Other).
+     The box height is set for "All"; the shorter filtered views leave empty
+     space below the cards.
+
+     This block has no data feed.
+
+     WHERE IT GOES: one WebsiteBuilder HTML embed on the Photo Albums
+     page, dragged out to full page width. Set the box height to about
+     1560px on desktop and 3360px on a phone (a
+     little extra is fine).
+   ============================================================ -->
+<div class="mtfoa-ep" id="epRoot">
+<style>
+  .mtfoa-ep {
+    --ep-navy: #1f3864;
+    --ep-navy-deep: #142a4d;
+    --ep-columbia: #6f90b5;
+    --ep-red: #d6291a;
+    --ep-red-deep: #a51f14;
+    --ep-white: #ffffff;
+    --ep-tint: #c9d6e8;
+    --ep-chalk: #f4f6fa;
+    --ep-slate: #5b6879;
+    --ep-ink: #1c2530;
+    --ep-border: #dbe1ea;
+
+    container-type: inline-size;
+    font-family: 'Barlow', Arial, Helvetica, sans-serif;
+    background: var(--ep-chalk);
+    -webkit-font-smoothing: antialiased;
+  }
+  .mtfoa-ep, .mtfoa-ep * { box-sizing: border-box; }
+  .mtfoa-ep :where(p, h1, h2, h3, ul) { margin: 0; }
+  .mtfoa-ep :where(a) { text-decoration: none; color: inherit; }
+  .mtfoa-ep a:focus-visible { outline: 3px solid var(--ep-red); outline-offset: 3px; }
+
+  .ep-in { max-width: 1000px; margin: 0 auto; }
+
+  /* ---------- Header band ---------- */
+  .ep-head {
+    position: relative; overflow: hidden;
+    background:
+      radial-gradient(120% 160% at 88% 0%, #2c4d86 0%, rgba(44,77,134,0) 55%),
+      linear-gradient(160deg, var(--ep-navy) 0%, var(--ep-navy-deep) 100%);
+    border-bottom: 4px solid var(--ep-red);
+    padding: 22px 16px 20px;
+  }
+  .ep-head::before {
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    background-image:
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.10) 0 3px, transparent 3px 160px),
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.05) 0 2px, transparent 2px 32px);
+  }
+  .ep-head .ep-in { position: relative; }
+  .ep-eyebrow {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-family: 'Barlow Condensed', Arial, sans-serif;
+    font-weight: 700; font-size: 13px; letter-spacing: 2.4px;
+    text-transform: uppercase; color: var(--ep-tint); margin-bottom: 8px;
+  }
+  .ep-eyebrow::before { content: ''; width: 26px; height: 4px; background: var(--ep-red); }
+  .ep-title {
+    font-family: 'Anton', Impact, 'Arial Narrow', sans-serif;
+    font-weight: 400; font-size: clamp(32px, 8.5vw, 44px);
+    line-height: 1.02; letter-spacing: 0.5px; text-transform: uppercase; color: var(--ep-white);
+  }
+  .ep-sub { margin-top: 8px; font-size: 15.5px; line-height: 1.5; color: var(--ep-tint); max-width: 58ch; }
+
+  .ep-body { padding: 18px 12px 30px; }
+
+  /* ---------- Filter buttons ---------- */
+  .ep-filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  .ep-chip {
+    cursor: pointer;
+    font-family: 'Barlow Condensed', Arial, sans-serif; font-weight: 600; font-size: 15px;
+    letter-spacing: 1px; text-transform: uppercase;
+    background: var(--ep-white); color: var(--ep-navy);
+    border: 1px solid var(--ep-border); border-radius: 999px; padding: 8px 16px;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+  .ep-chip:hover { border-color: var(--ep-navy); }
+  .ep-chip[aria-pressed="true"] { background: var(--ep-navy); color: var(--ep-white); border-color: var(--ep-navy); }
+  .ep-chip .n { margin-left: 6px; font-weight: 700; opacity: 0.6; }
+  .ep-chip:focus-visible { outline: 3px solid var(--ep-red); outline-offset: 2px; }
+
+  /* ---------- Album cards ---------- */
+  .ep-item { display: flex; flex-direction: column; min-width: 0; }
+  .ep-item > .ep-card { flex: 1 1 auto; }
+  .ep-item[hidden] { display: none !important; }
+  .ep-item.has-extra > .ep-card { border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+  .ep-extra {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    padding: 10px 14px;
+    background: var(--ep-white); color: var(--ep-navy);
+    border: 1px solid var(--ep-border); border-top: none;
+    border-radius: 0 0 6px 6px;
+    font-family: 'Barlow Condensed', Arial, sans-serif; font-weight: 700;
+    font-size: 13px; letter-spacing: 1.2px; text-transform: uppercase;
+    box-shadow: 0 8px 20px rgba(20,42,77,0.10);
+  }
+  .ep-extra:hover { background: var(--ep-chalk); color: var(--ep-red); }
+  .ep-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .ep-card {
+    position: relative; display: flex; flex-direction: column; justify-content: space-between;
+    min-height: 132px; padding: 16px 18px 14px;
+    color: var(--ep-white); border-radius: 6px; overflow: hidden;
+    background: linear-gradient(155deg, var(--ep-navy) 0%, var(--ep-navy-deep) 100%);
+    border-bottom: 4px solid var(--ep-red);
+    box-shadow: 0 8px 20px rgba(20,42,77,0.14);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .ep-card::before {
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    background-image: repeating-linear-gradient(90deg, rgba(255,255,255,0.07) 0 2px, transparent 2px 40px);
+  }
+  .ep-card > * { position: relative; }
+  .ep-card:hover { transform: translateY(-3px); box-shadow: 0 14px 28px rgba(20,42,77,0.22); }
+  .ep-card.banq {
+    background: linear-gradient(155deg, #b3281c 0%, #7e1a12 100%);
+    border-bottom-color: var(--ep-navy);
+  }
+  .ep-card.golf, .ep-card.award {
+    background: linear-gradient(155deg, #4a72a0 0%, #2f5583 100%);
+    border-bottom-color: var(--ep-navy);
+  }
+  .ep-kind {
+    font-family: 'Barlow Condensed', Arial, sans-serif; font-weight: 700;
+    font-size: 12.5px; letter-spacing: 2px; text-transform: uppercase;
+    color: rgba(255,255,255,0.78);
+  }
+  .ep-name {
+    display: block; margin-top: 6px;
+    font-family: 'Anton', Impact, 'Arial Narrow', sans-serif; font-weight: 400;
+    font-size: clamp(24px, 6.5vw, 30px); line-height: 1.08; letter-spacing: 0.4px;
+    text-transform: uppercase;
+  }
+  .ep-go {
+    margin-top: 12px; display: inline-flex; align-items: center; gap: 6px;
+    font-family: 'Barlow Condensed', Arial, sans-serif; font-weight: 700;
+    font-size: 13px; letter-spacing: 1.8px; text-transform: uppercase; color: var(--ep-white);
+  }
+  .ep-arr { transition: transform 0.15s ease; }
+  .ep-card:hover .ep-arr { transform: translate(2px, -2px); }
+
+
+  @container (min-width: 620px) {
+    .ep-head { padding: 30px 28px 26px; }
+    .ep-body { padding: 26px 28px 40px; }
+    .ep-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+    .ep-card { min-height: 148px; }
+  }
+</style>
+
+<header class="ep-head">
+  <div class="ep-in">
+    <div class="ep-eyebrow">Event Photos</div>
+    <h1 class="ep-title">Photo Albums</h1>
+    <p class="ep-sub">Photos from the state championship crews, banquets and other MTFOA events. Choose an album to open it in a new tab.</p>
+  </div>
+</header>
+
+<div class="ep-body">
+  <div class="ep-in">
+    <div class="ep-filters" id="epFilters" role="group" aria-label="Filter albums">
+      <button type="button" class="ep-chip" data-f="all" aria-pressed="true">All<span class="n"></span></button>
+      <button type="button" class="ep-chip" data-f="banq" aria-pressed="false">Banquets<span class="n"></span></button>
+      <button type="button" class="ep-chip" data-f="crew" aria-pressed="false">State crews<span class="n"></span></button>
+      <button type="button" class="ep-chip" data-f="other" aria-pressed="false">Other<span class="n"></span></button>
+    </div>
+
+    <div class="ep-grid" id="epGrid">
+        <div class="ep-item" data-cat="crew">
+          <a class="ep-card crew" href="https://www.flickr.com/photos/11281885@N05/albums/72177720330822644" target="_blank" rel="noopener">
+          <span class="ep-kind">State championship crew</span>
+          <span class="ep-name">2025 State Crew</span>
+          <span class="ep-go">View album <svg class="ep-arr" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+        </a>
+        </div>
+        <div class="ep-item" data-cat="banq">
+          <a class="ep-card banq" href="https://www.flickr.com/photos/11281885@N05/albums/72177720330803265" target="_blank" rel="noopener">
+          <span class="ep-kind">MTFOA banquet</span>
+          <span class="ep-name">2025 MTFOA Banquet</span>
+          <span class="ep-go">View album <svg class="ep-arr" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+        </a>
+        </div>
+        <div class="ep-item" data-cat="crew">
+          <a class="ep-card crew" href="https://www.flickr.com/photos/11281885@N05/albums/72177720323768988" target="_blank" rel="noopener">
+          <span class="ep-kind">State championship crew</span>
+          <span class="ep-name">2024 State Crew 2</span>
+          <span class="ep-go">View album <svg class="ep-arr" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+        </a>
+        </div>
+        <div class="ep-item" data-cat="crew">
+          <a class="ep-card crew" href="https://www.flickr.com/photos/11281885@N05/albums/72177720323755156" target="_blank" rel="noopener">
+          <span class="ep-kind">State championship crew</span>
+          <span class="ep-name">2024 State Crew 1</span>
+          <span class="ep-go">View album <svg class="ep-arr" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+        </a>
+        </div>
+        <div class="ep-item" data-cat="banq">
+          <a class="ep-card banq" href="https://www.flickr.com/photos/11281885@N05/albums/72177720321626287" target="_blank" rel="noopener">
+          <span class="ep-kind">MTFOA banquet</span>
+          <span class="ep-name">2024 MTFOA Banquet</span>
+          <span class="ep-go">View album <svg class="ep-arr" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+        </a>
+        </div>
+        <div class="ep-item" data-cat="crew">
+          <a class="ep-card crew" href="https://www.flickr.com/photos/11281885@N05/albums/72177720313515706" target="_blank" rel="noopener">
+          <span class="ep-kind">State championship crew</span>
+          <span class="ep-name">2023 State Crew</span>
+          <span class="ep-go">View album <svg class="ep-arr" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+        </a>
+        </div>
+        <div class="ep-item" data-cat="banq">
+          <a class="ep-card banq" href="https://www.flickr.com/photos/11281885@N05/albums/72177720312554942" target="_blank" rel="noopener">
+          <span class="ep-kind">MTFOA banquet</span>
+          <span class="ep-name">2023 MTFOA Banquet</span>
+          <span class="ep-go">View album <svg class="ep-arr" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+        </a>
+        </div>
+        <div class="ep-item" data-cat="crew">
+          <a class="ep-card crew" href="https://www.flickr.com/photos/11281885@N05/albums/72177720304340893" target="_blank" rel="noopener">
+          <span class="ep-kind">State championship crew</span>
+          <span class="ep-name">2022 State Crew</span>
+          <span class="ep-go">View album <svg class="ep-arr" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+        </a>
+        </div>
+        <div class="ep-item" data-cat="banq">
+          <a class="ep-card banq" href="https://www.flickr.com/photos/11281885@N05/albums/72177720303579381" target="_blank" rel="noopener">
+          <span class="ep-kind">MTFOA banquet</span>
+          <span class="ep-name">2022 MTFOA Banquet</span>
+          <span class="ep-go">View album <svg class="ep-arr" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+        </a>
+        </div>
+        <div class="ep-item" data-cat="banq">
+          <a class="ep-card banq" href="https://www.flickr.com/photos/11281885@N05/albums/72157720145924138" target="_blank" rel="noopener">
+          <span class="ep-kind">MTFOA banquet</span>
+          <span class="ep-name">2021 MTFOA Banquet</span>
+          <span class="ep-go">View album <svg class="ep-arr" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+        </a>
+        </div>
+        <div class="ep-item" data-cat="crew">
+          <a class="ep-card crew" href="https://www.flickr.com/photos/11281885@N05/albums/72157717455325476" target="_blank" rel="noopener">
+          <span class="ep-kind">State championship crew</span>
+          <span class="ep-name">2020 State Crew</span>
+          <span class="ep-go">View album <svg class="ep-arr" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+        </a>
+        </div>
+        <div class="ep-item" data-cat="crew">
+          <a class="ep-card crew" href="https://www.flickr.com/photos/11281885@N05/albums/72157712548661843" target="_blank" rel="noopener">
+          <span class="ep-kind">State championship crew</span>
+          <span class="ep-name">2019 State Crew</span>
+          <span class="ep-go">View album <svg class="ep-arr" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+        </a>
+        </div>
+        <div class="ep-item" data-cat="banq">
+          <a class="ep-card banq" href="https://www.flickr.com/photos/11281885@N05/albums/72157711643774062" target="_blank" rel="noopener">
+          <span class="ep-kind">MTFOA banquet</span>
+          <span class="ep-name">2019 MTFOA Banquet</span>
+          <span class="ep-go">View album <svg class="ep-arr" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+        </a>
+        </div>
+        <div class="ep-item" data-cat="other">
+          <a class="ep-card golf" href="https://www.flickr.com/photos/11281885@N05/albums/72157710825724186" target="_blank" rel="noopener">
+          <span class="ep-kind">Golf tournament</span>
+          <span class="ep-name">2019 MTFOA Golf Tournament</span>
+          <span class="ep-go">View album <svg class="ep-arr" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+        </a>
+        </div>
+        <div class="ep-item" data-cat="other">
+          <a class="ep-card award" href="https://www.flickr.com/photos/11281885@N05/albums/72157707813859654" target="_blank" rel="noopener">
+          <span class="ep-kind">Award ceremony</span>
+          <span class="ep-name">Ray &ldquo;Hoss&rdquo; Fuller Award Ceremony</span>
+          <span class="ep-go">View album <svg class="ep-arr" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+        </a>
+        </div>
+        <div class="ep-item has-extra" data-cat="crew">
+          <a class="ep-card crew" href="https://www.flickr.com/photos/11281885@N05/albums/72157704521868824" target="_blank" rel="noopener">
+          <span class="ep-kind">State championship crew</span>
+          <span class="ep-name">2018 State Crew</span>
+          <span class="ep-go">View album <svg class="ep-arr" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+        </a>
+          <a class="ep-extra" href="https://vando.imagequix.com/g1000688942#images" target="_blank" rel="noopener">Additional images from the TSSAA <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a>
+        </div>
+        <div class="ep-item" data-cat="banq">
+          <a class="ep-card banq" href="https://www.flickr.com/photos/11281885@N05/albums/72157704522074684" target="_blank" rel="noopener">
+          <span class="ep-kind">MTFOA banquet</span>
+          <span class="ep-name">2018 MTFOA Banquet</span>
+          <span class="ep-go">View album <svg class="ep-arr" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+        </a>
+        </div>
+        <div class="ep-item" data-cat="banq">
+          <a class="ep-card banq" href="https://www.flickr.com/photos/11281885@N05/albums/72157689313076591" target="_blank" rel="noopener">
+          <span class="ep-kind">MTFOA banquet</span>
+          <span class="ep-name">2017 MTFOA Banquet</span>
+          <span class="ep-go">View album <svg class="ep-arr" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+        </a>
+        </div>
+        <div class="ep-item" data-cat="crew">
+          <a class="ep-card crew" href="https://www.flickr.com/photos/11281885@N05/albums/72157691877339555" target="_blank" rel="noopener">
+          <span class="ep-kind">State championship crew</span>
+          <span class="ep-name">2017 State Crew</span>
+          <span class="ep-go">View album <svg class="ep-arr" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+        </a>
+        </div>
+        <div class="ep-item" data-cat="banq">
+          <a class="ep-card banq" href="https://www.flickr.com/photos/11281885@N05/albums/72157659940940595" target="_blank" rel="noopener">
+          <span class="ep-kind">MTFOA banquet</span>
+          <span class="ep-name">2015 MTFOA Banquet</span>
+          <span class="ep-go">View album <svg class="ep-arr" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+        </a>
+        </div>
+    </div>
+  </div>
+</div>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700&display=swap">
+<script>
+(function () {
+  var root = document.getElementById('epRoot');
+  if (!root) return;
+  var chips = root.querySelectorAll('.ep-chip');
+  var cards = root.querySelectorAll('.ep-item[data-cat]');
+
+  function count(f) {
+    if (f === 'all') return cards.length;
+    var n = 0;
+    for (var i = 0; i < cards.length; i++) if (cards[i].getAttribute('data-cat') === f) n++;
+    return n;
+  }
+  for (var i = 0; i < chips.length; i++) {
+    var span = chips[i].querySelector('.n');
+    if (span) span.textContent = count(chips[i].getAttribute('data-f'));
+  }
+
+  function apply(f) {
+    for (var i = 0; i < cards.length; i++) {
+      var show = f === 'all' || cards[i].getAttribute('data-cat') === f;
+      if (show) cards[i].removeAttribute('hidden'); else cards[i].setAttribute('hidden', '');
+    }
+    for (var j = 0; j < chips.length; j++) {
+      chips[j].setAttribute('aria-pressed', chips[j].getAttribute('data-f') === f ? 'true' : 'false');
+    }
+  }
+  root.addEventListener('click', function (ev) {
+    var b = ev.target.closest ? ev.target.closest('.ep-chip') : null;
+    if (b && root.contains(b)) apply(b.getAttribute('data-f'));
+  });
+})();
+</script>
+</div>
+
+<script>
+/* AUTO HEIGHT: the box (and, on a computer, the whole page) fits itself to what is being shown, so there is no blank
+   gap above the footer when a tab, filter or sign-in changes the content. Only runs on the live site (never in the
+   editor or Preview, where it would change the saved layout).
+     phone (box under 720px wide): AppsApi.setAppSize - the box follows the content, but never gets shorter than the
+                                   phone height set in the editor, so keep that below the shortest state of the page.
+     computer:                     AppsApi.setDocumentSize - the page itself follows the content. */
+(function () {
+  var root = document.querySelector('[class^="mtfoa-"]') || document.body;
+  var last = 0, mode = '';
+  function fit() {
+    var extra = 0;
+    if (root === document.body) { var cs = getComputedStyle(document.body); extra = (parseFloat(cs.marginTop) || 0) + (parseFloat(cs.marginBottom) || 0); }
+    var h = Math.ceil(root.getBoundingClientRect().height + extra) + 2;
+    if (h < 300 || Math.abs(h - last) < 3) return;
+    try {
+      if (!(window.AppsApi && AppsApi.getViewMode && AppsApi.getViewMode() === 'view')) return;
+      var w = window.innerWidth || 0;
+      if (w < 300) return;                               // frame not laid out yet: measure again later
+      if (!mode) mode = w < 720 ? 'phone' : 'desktop';    // decide once, so a narrow moment never resizes the box
+      if (mode === 'phone') { if (AppsApi.setAppSize) AppsApi.setAppSize({ width: w, height: h }); }
+      else if (AppsApi.setDocumentSize) AppsApi.setDocumentSize({ width: w, height: h });
+      last = h;                                          // only remembered once the size was really sent
+    } catch (e) {}
+  }
+  fit(); window.addEventListener('load', fit); setTimeout(fit, 600); setTimeout(fit, 1800); setTimeout(fit, 4500);
+  try { new ResizeObserver(fit).observe(root); } catch (e) {}
+})();
+</script>
