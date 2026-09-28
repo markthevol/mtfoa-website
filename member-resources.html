@@ -383,6 +383,22 @@ robots: noindex
     this.setAttribute('aria-expanded', opening ? 'true' : 'false');
     fit();
   });
+  // The News page's RSVP link on the banquet's schedule row sends people here with #attendance (the same hash
+  // that already opens the Attendance tab below) so the RSVP choices are visible immediately instead of behind
+  // one more click on the collapsed summary line. Only ever opens it, never closes it, and only once per load.
+  var bqAutoOpened = false;
+  function wantsBanquet() {
+    var url = ''; try { url = (window.AppsApi && AppsApi.getCurrentUrl && AppsApi.getCurrentUrl()) || ''; } catch (e) {}
+    if (!url) { try { url = location.href; } catch (e) {} }
+    return /attend|banquet|rsvp/.test(String(url).toLowerCase().split('#').slice(1).join('#'));
+  }
+  function autoOpenBq() {
+    if (bqAutoOpened || !wantsBanquet() || $('eoBqBanner').hidden || !$('eoBqBody').hidden) return;
+    bqAutoOpened = true;
+    $('eoBqBody').hidden = false;
+    $('eoBqToggle').setAttribute('aria-expanded', 'true');
+    fit();
+  }
 
   /* ---------- what is shown ---------- */
   function showOut() {
@@ -529,6 +545,7 @@ robots: noindex
     }
     $('mpLoad').hidden = true;
     renderBq(r.banquet);
+    autoOpenBq();
     showIn(allowed());
     runCheckin();
   }
