@@ -209,19 +209,35 @@ permalink: /members
     flex: none;
     background: var(--mr-white);
     border-bottom: 1px solid var(--mr-border);
-    padding: 16px 20px;
   }
   .mrs-myphoto[hidden] { display: none; }
-  .mrs-myphoto-in { max-width: 1100px; margin: 0 auto; display: flex; gap: 18px; flex-wrap: wrap; align-items: flex-start; }
-  .mrs-myphoto h2 {
-    font-family: 'Barlow Condensed', Arial, sans-serif; font-weight: 700; font-size: 15px;
-    letter-spacing: 1.4px; text-transform: uppercase; color: var(--mr-navy); margin-bottom: 4px;
+  .mrs-myphoto-in { max-width: 1100px; margin: 0 auto; }
+  .mrs-mp-head {
+    width: 100%; display: flex; align-items: center; gap: 12px;
+    padding: 14px 20px; background: none; border: none; cursor: pointer; text-align: left; font: inherit; color: inherit;
   }
-  .mrs-myphoto p.mrs-mp-lead { font-size: 14px; line-height: 1.5; color: var(--mr-slate); max-width: 52ch; margin-bottom: 10px; }
+  .mrs-mp-head:hover { background: #f4f6fa; }
+  .mrs-mp-ic {
+    flex: none; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center;
+    background: var(--mr-navy); color: var(--mr-white);
+  }
+  .mrs-mp-line { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+  .mrs-mp-title {
+    font-family: 'Barlow Condensed', Arial, sans-serif; font-weight: 700; font-size: 15px;
+    letter-spacing: 1.4px; text-transform: uppercase; color: var(--mr-navy);
+  }
+  .mrs-mp-sum { font-size: 13.5px; color: var(--mr-slate); }
+  .mrs-mp-sum.info { color: #1f3864; font-weight: 600; }
+  .mrs-mp-sum.no { color: #8a1a10; font-weight: 600; }
+  .mrs-mp-chev { flex: none; color: var(--mr-navy); transition: transform 0.15s ease; }
+  .mrs-mp-head[aria-expanded="true"] .mrs-mp-chev { transform: rotate(180deg); }
+  .mrs-mp-body { padding: 0 20px 18px; display: flex; gap: 18px; flex-wrap: wrap; align-items: flex-start; }
+  .mrs-mp-body[hidden] { display: none; }
+  .mrs-mp-body-in { flex: 1 1 260px; min-width: 0; }
+  .mrs-mp-body p.mrs-mp-lead { font-size: 14px; line-height: 1.5; color: var(--mr-slate); max-width: 52ch; margin-bottom: 10px; }
   .mrs-mp-cur { width: 84px; aspect-ratio: 4/5; border-radius: 4px; overflow: hidden; flex: none; background: #e6ecf4; }
   .mrs-mp-cur img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 22%; display: block; }
   .mrs-mp-cur.mrs-mp-none { display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--mr-slate); text-align: center; padding: 4px; }
-  .mrs-mp-body { flex: 1 1 260px; min-width: 0; }
   .mrs-mp-file { font-size: 14px; }
   .mrs-mp-crop { margin-top: 10px; display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start; }
   .mrs-mp-crop[hidden] { display: none; }
@@ -286,24 +302,33 @@ permalink: /members
 
 <div class="mrs-myphoto" id="mrsMyPhoto" hidden>
   <div class="mrs-myphoto-in">
-    <div class="mrs-mp-cur mrs-mp-none" id="mrsPhotoCur">No photo yet</div>
-    <div class="mrs-mp-body">
-      <h2>My Roster Photo</h2>
-      <p class="mrs-mp-lead">Choose a clear, recent photo of yourself. You can drag it to reposition and use the slider to zoom, then submit it for approval &mdash; once approved it replaces your photo above.</p>
-      <input type="file" class="mrs-mp-file" id="mrsPhotoFile" accept="image/jpeg,image/png,image/*" aria-label="Choose a photo">
-      <div class="mrs-mp-crop" id="mrsPhotoCrop" hidden>
-        <canvas id="mrsPhotoCanvas" width="240" height="300"></canvas>
-        <div class="mrs-mp-ctrl">
-          <label for="mrsPhotoZoom">Zoom</label>
-          <input type="range" id="mrsPhotoZoom" min="100" max="300" value="100">
-          <div class="row">
-            <button type="button" class="mrs-mp-save" id="mrsPhotoSave">Submit for approval</button>
-            <button type="button" class="mrs-mp-cancel" id="mrsPhotoCancel">Cancel</button>
+    <button type="button" class="mrs-mp-head" id="mrsMpToggle" aria-expanded="false" aria-controls="mrsMpBody">
+      <span class="mrs-mp-ic" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="12" cy="12" r="3.5"></circle><path d="M8 5l1.2-2h5.6L16 5"></path></svg></span>
+      <span class="mrs-mp-line">
+        <span class="mrs-mp-title">My Roster Photo</span>
+        <span class="mrs-mp-sum" id="mrsMpSum">Add or update your photo</span>
+      </span>
+      <svg class="mrs-mp-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+    <div class="mrs-mp-body" id="mrsMpBody" hidden>
+      <div class="mrs-mp-cur mrs-mp-none" id="mrsPhotoCur">No photo yet</div>
+      <div class="mrs-mp-body-in">
+        <p class="mrs-mp-lead">Choose a clear, recent photo of yourself. You can drag it to reposition and use the slider to zoom, then submit it for approval &mdash; once approved it replaces your photo above.</p>
+        <input type="file" class="mrs-mp-file" id="mrsPhotoFile" accept="image/jpeg,image/png,image/*" aria-label="Choose a photo">
+        <div class="mrs-mp-crop" id="mrsPhotoCrop" hidden>
+          <canvas id="mrsPhotoCanvas" width="240" height="300"></canvas>
+          <div class="mrs-mp-ctrl">
+            <label for="mrsPhotoZoom">Zoom</label>
+            <input type="range" id="mrsPhotoZoom" min="100" max="300" value="100">
+            <div class="row">
+              <button type="button" class="mrs-mp-save" id="mrsPhotoSave">Submit for approval</button>
+              <button type="button" class="mrs-mp-cancel" id="mrsPhotoCancel">Cancel</button>
+            </div>
           </div>
         </div>
+        <div class="mrs-mp-status" id="mrsPhotoStatus" hidden></div>
+        <div class="mrs-mp-msg" id="mrsPhotoMsg" hidden role="alert"></div>
       </div>
-      <div class="mrs-mp-status" id="mrsPhotoStatus" hidden></div>
-      <div class="mrs-mp-msg" id="mrsPhotoMsg" hidden role="alert"></div>
     </div>
   </div>
 </div>
@@ -657,6 +682,9 @@ permalink: /members
      page are on the same site, so the same sign-in that page saves is read here too. If nothing is signed in, or the
      server says this browser's session is not valid, the whole panel simply stays hidden. */
   var mpBox = document.getElementById('mrsMyPhoto');
+  var mpToggle = document.getElementById('mrsMpToggle');
+  var mpBody = document.getElementById('mrsMpBody');
+  var mpSum = document.getElementById('mrsMpSum');
   var mpCur = document.getElementById('mrsPhotoCur');
   var mpFile = document.getElementById('mrsPhotoFile');
   var mpCropWrap = document.getElementById('mrsPhotoCrop');
@@ -666,6 +694,13 @@ permalink: /members
   var mpCancel = document.getElementById('mrsPhotoCancel');
   var mpStatus = document.getElementById('mrsPhotoStatus');
   var mpMsgEl = document.getElementById('mrsPhotoMsg');
+
+  /* Collapsed by default so it stays out of the way; the summary line still shows status at a glance. */
+  mpToggle.addEventListener('click', function () {
+    var opening = mpBody.hidden;
+    mpBody.hidden = !opening;
+    mpToggle.setAttribute('aria-expanded', opening ? 'true' : 'false');
+  });
 
   function mpLoadPass() {
     var raw = null;
@@ -691,11 +726,20 @@ permalink: /members
       mpStatus.hidden = false; mpStatus.className = 'mrs-mp-status no';
       mpStatus.textContent = 'We could not find your name on the public roster, so a photo cannot be placed there yet. Please email Alec Calvert.';
       mpFile.disabled = true;
+      mpSum.textContent = 'Not available for your account'; mpSum.className = 'mrs-mp-sum no';
     } else {
       mpFile.disabled = false;
-      if (ph.status === 'pending') { mpStatus.hidden = false; mpStatus.className = 'mrs-mp-status info'; mpStatus.textContent = 'Your new photo is waiting for approval.'; }
-      else if (ph.status === 'rejected') { mpStatus.hidden = false; mpStatus.className = 'mrs-mp-status no'; mpStatus.textContent = 'Your last submitted photo was not approved. You are welcome to try again with a different photo.'; }
-      else mpStatus.hidden = true;
+      if (ph.status === 'pending') {
+        mpStatus.hidden = false; mpStatus.className = 'mrs-mp-status info'; mpStatus.textContent = 'Your new photo is waiting for approval.';
+        mpSum.textContent = 'Pending approval'; mpSum.className = 'mrs-mp-sum info';
+      } else if (ph.status === 'rejected') {
+        mpStatus.hidden = false; mpStatus.className = 'mrs-mp-status no'; mpStatus.textContent = 'Your last submitted photo was not approved. You are welcome to try again with a different photo.';
+        mpSum.textContent = 'Not approved — try again'; mpSum.className = 'mrs-mp-sum no';
+      } else {
+        mpStatus.hidden = true;
+        mpSum.textContent = ph.live ? 'Photo on file — click to update' : 'No photo yet — click to add one';
+        mpSum.className = 'mrs-mp-sum';
+      }
     }
   }
   function initMyPhoto() {
