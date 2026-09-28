@@ -207,6 +207,18 @@
 
   if (!MOBILE) buildDesktop(); else buildPhone();
 
+  /* The desktop/phone choice above is made once, from the width at load. If the window is later
+     resized past the breakpoint (dragging a desktop window narrow, rotating a tablet) the menu
+     would otherwise stay stuck in the wrong layout, since nothing here rebuilds it. Reload once,
+     right when that boundary is actually crossed, rather than trying to rebuild this menu in place
+     (its hover dropdowns and animated box-height make that fragile). */
+  try {
+    var mnBreakpoint = window.matchMedia('(max-width: 719px)');
+    var mnReloadOnCross = function () { location.reload(); };
+    if (mnBreakpoint.addEventListener) mnBreakpoint.addEventListener('change', mnReloadOnCross);
+    else if (mnBreakpoint.addListener) mnBreakpoint.addListener(mnReloadOnCross);
+  } catch (e) {}
+
   /* fade the contents in once the built-in font is ready */
   function ready() { root.classList.add('ready'); }
   try { document.fonts.load("600 16px 'MN Barlow Condensed'").then(ready, ready); } catch (e) { ready(); }
