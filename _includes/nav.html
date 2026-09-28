@@ -166,13 +166,10 @@
 
   var root = document.getElementById('mnRoot');
   var inner = document.getElementById('mnIn');
-  /* The 720px guess below picks a layout fast, before anything is measured. If desktop turns out to
-     actually crowd the logo or run off the edge once it's built (see fit() below), that's corrected
-     by reloading into the phone menu instead — real fit, not a fixed number, decides the switch. This
-     flag carries that correction across the reload. */
-  var mnForcedPhone = false;
-  try { mnForcedPhone = sessionStorage.getItem('mtfoa_nav_force') === 'phone'; } catch (e) {}
-  var MOBILE = mnForcedPhone || (window.innerWidth || 960) < 720;
+  /* 720px is just a fast first guess, before anything is actually measured. If desktop turns out to
+     really crowd the logo or run off the edge once it's built (see fit() below), that's corrected by
+     swapping to the phone menu in place — real fit, not a fixed number, decides the switch. */
+  var MOBILE = (window.innerWidth || 960) < 720;
   var BAR_H = MOBILE ? 64 : 68;
   var isTouch = false;
   try { isTouch = window.matchMedia('(hover: none)').matches; } catch (e) {}
@@ -213,21 +210,6 @@
 
   if (!MOBILE) buildDesktop(); else buildPhone();
 
-  /* If we guessed phone but the window is actually wide, or the window is later resized back up,
-     try desktop again — fit() inside buildDesktop() below will immediately bounce back to phone
-     (via mnForcePhoneReload) if the items still do not really fit, so this can never get stuck
-     showing a crowded desktop menu. Rebuilding this menu in place isn't attempted (its hover
-     dropdowns and animated box-height make that fragile) — a reload is simple and always correct. */
-  if (MOBILE) {
-    try {
-      var mnWide = window.matchMedia('(min-width: 720px)');
-      var mnTryDesktop = function (e) { if (e.matches) { try { sessionStorage.removeItem('mtfoa_nav_force'); } catch (e2) {} location.reload(); } };
-      if (mnWide.addEventListener) mnWide.addEventListener('change', mnTryDesktop);
-      else if (mnWide.addListener) mnWide.addListener(mnTryDesktop);
-      if (mnWide.matches && mnForcedPhone) mnTryDesktop(mnWide);
-    } catch (e) {}
-  }
-
   /* fade the contents in once the built-in font is ready */
   function ready() { root.classList.add('ready'); }
   try { document.fonts.load("600 16px 'MN Barlow Condensed'").then(ready, ready); } catch (e) { ready(); }
@@ -264,20 +246,28 @@
       while (need() > ul.clientWidth - 24 && pad > 3) { pad -= 1; ul.style.setProperty('--mn-pad', pad + 'px'); }
       return need() > ul.clientWidth - 24;
     }
+    // If it still does not fit even at minimum spacing, swap to the phone menu in this same spot — done at
+    // most once; after that this whole desktop build is torn down, so there is nothing left here to re-check.
+    var demoted = false;
     function checkFit() {
-      if (fit()) {
-        try { sessionStorage.setItem('mtfoa_nav_force', 'phone'); } catch (e) {}
-        location.reload();
-      }
+      if (demoted || fit() === false) return;
+      demoted = true;
+      window.removeEventListener('resize', onFitResize);
+      ul.remove();
+      MOBILE = true;
+      root.classList.add('m');
+      BAR_H = 64;
+      buildPhone();
     }
     checkFit();
     try { document.fonts.ready.then(checkFit); } catch (e) {}
     setTimeout(checkFit, 500);
     var mnFitResizeTimer;
-    window.addEventListener('resize', function () {
+    function onFitResize() {
       clearTimeout(mnFitResizeTimer);
       mnFitResizeTimer = setTimeout(checkFit, 150);
-    });
+    }
+    window.addEventListener('resize', onFitResize);
 
     // Grow once to fit the tallest dropdown and stay that size until every dropdown is closed,
     // so opening and closing the dropdown never resizes the box (that caused flicker).
