@@ -25,7 +25,7 @@ permalink: /news
      dragged out to full page width. Set the box height to about 2500px on
      desktop and 4000px on a phone (a little extra is fine).
    ============================================================ -->
-<div class="mtfoa-news" id="mnRoot">
+<div class="mtfoa-news" id="mnNewsRoot">
 <style>
   .mtfoa-news {
     --mn-navy: #1f3864;
@@ -51,7 +51,7 @@ permalink: /news
   .mtfoa-news a:focus-visible { outline: 3px solid var(--mn-red); outline-offset: 2px; }
   .mtfoa-news [hidden] { display: none !important; }
 
-  .mn-in { max-width: 1000px; margin: 0 auto; }
+  .mn-wrap { max-width: 1000px; margin: 0 auto; }
 
   /* ---------- Header band ---------- */
   .mn-head {
@@ -68,7 +68,7 @@ permalink: /news
       repeating-linear-gradient(90deg, rgba(255,255,255,0.10) 0 3px, transparent 3px 160px),
       repeating-linear-gradient(90deg, rgba(255,255,255,0.05) 0 2px, transparent 2px 32px);
   }
-  .mn-head .mn-in { position: relative; }
+  .mn-head .mn-wrap { position: relative; }
   .mn-eyebrow {
     display: inline-flex; align-items: center; gap: 10px;
     font-family: 'Barlow Condensed', Arial, sans-serif;
@@ -186,7 +186,7 @@ permalink: /news
   .mn-reg .mn-btn { margin-top: 16px; align-self: flex-start; }
 
   /* ---------- Schedule ---------- */
-  .mn-list { background: var(--mn-white); border: 1px solid var(--mn-border); border-radius: 6px; overflow: hidden; }
+  .mn-sched-list { background: var(--mn-white); border: 1px solid var(--mn-border); border-radius: 6px; overflow: hidden; }
   .mn-row {
     display: grid; grid-template-columns: 62px minmax(0, 1fr); gap: 4px 14px; align-items: center;
     padding: 12px 14px; border-bottom: 1px solid var(--mn-border);
@@ -281,7 +281,7 @@ permalink: /news
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700&display=swap">
 
 <div class="mn-head">
-  <div class="mn-in">
+  <div class="mn-wrap">
     <p class="mn-eyebrow">News &amp; Info</p>
     <h1 class="mn-title">Meetings &amp; News</h1>
     <p class="mn-sub">When and where we meet, how to join the association and register for the season, and the latest word from the MTFOA.</p>
@@ -289,7 +289,7 @@ permalink: /news
 </div>
 
 <div class="mn-body">
-  <div class="mn-in">
+  <div class="mn-wrap">
 
     <section class="mn-section" aria-labelledby="mnNextH">
       <h2 class="mn-h2" id="mnNextH">Next meeting</h2>
@@ -332,9 +332,9 @@ permalink: /news
 
     <section class="mn-section" aria-labelledby="mnSchedH">
       <h2 class="mn-h2" id="mnSchedH"><span id="mnYear">2026</span> meeting schedule</h2>
-      <ul class="mn-list" id="mnSchedList"></ul>
+      <ul class="mn-sched-list" id="mnSchedList"></ul>
       <h3 class="mn-h3" id="mnPastH" hidden>Earlier this season</h3>
-      <ul class="mn-list mn-pastlist" id="mnPast" hidden></ul>
+      <ul class="mn-sched-list mn-pastlist" id="mnPast" hidden></ul>
       <p class="mn-fine">All dates, times and locations are subject to change, including because of activities at the host school. Local meetings are held at Goodpasture Christian School, 619 W. Due West Ave., Madison, TN 37115, unless noted.</p>
     </section>
 
