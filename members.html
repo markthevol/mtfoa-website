@@ -650,6 +650,11 @@ permalink: /members
   function viewMode() { try { return !!(window.AppsApi && AppsApi.getViewMode && AppsApi.getViewMode() === 'view'); } catch (e) { return false; } }
   function phoneFit() {
     var w = window.innerWidth || 0;
+    // Plain static hosting (no WebsiteBuilder AppsApi at all, so no editor/preview mode to protect against
+    // either): there is no iframe box for AppsApi.setAppSize to resize in the first place, so the box staying
+    // pinned at 100vh forever (the desktop behavior) just cramps the photo tool and the grid against whatever
+    // follows on the page, on every width. Use the same "page itself scrolls" mode phones use, always.
+    if (!window.AppsApi) { if (!fitMode) { fitMode = 'auto'; setMode(true); } return true; }
     if (!fitMode) { if (w < 300 || !viewMode()) return false; fitMode = w < 720 ? 'phone' : 'desktop'; }
     if (fitMode !== 'phone') return false;
     setMode(true);
