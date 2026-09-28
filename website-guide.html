@@ -5,18 +5,21 @@ description: >-
 permalink: /website-guide
 ---
 <!-- ============================================================
-     MTFOA "How Member Login Is Changing" guide page
-     A plain-language page the association can be pointed to before the new
-     individual sign-in goes live. It does not need the sign-in to exist.
+     MTFOA "Website Guide" page: sign-in, RSVP for the banquet, uploading your own
+     roster photo, and checking in at meetings (QR code or the 6-digit number).
+     A plain-language page members can be pointed to any time, by email or otherwise.
 
-     THE SWITCH: the line  var STARTED = true;  in the script at the bottom.
-       false  = "coming soon" wording, no sign-in button.
-       true   = "it is here" wording and a "Go to Member Login" button.
-     Optionally set  LAUNCH_TEXT  (for example "Starting Monday, Oct. 5") to show a start date.
+     THE SWITCH: the line  var STARTED = true;  in the script at the bottom used to
+     toggle "coming soon" vs "it is here" wording for the sign-in rollout. The
+     rollout is done, so this stays true; LAUNCH_TEXT is now unused. OVERLAP_END
+     still fills in the "shared password stops working on ..." line further down
+     the page, in the "What you need to do" section.
 
-     WHERE IT GOES: one WebsiteBuilder HTML embed on its own page (for example
-     /sign-in-guide), dragged out to full page width. Box height about 2200px on
-     desktop and 3400px on a phone (the page resizes itself once live).
+     WHERE IT GOES: this is its own GitHub Pages page (/website-guide), built from
+     this file the same way the other page-blocks are (see build scripts in
+     "sources for ..." folders elsewhere in this Website Blocks folder) -- not an
+     embed inside another page. It was originally a WebsiteBuilder embed; that
+     platform is retired, so there is no WSB box-height to manage anymore.
    ============================================================ -->
 <div class="mtfoa-sg" id="sgRoot">
 <style>
@@ -154,9 +157,6 @@ permalink: /website-guide
 </header>
 
 <div class="sg-body"><div class="sg-in">
-
-  <div class="sg-notice" id="sgNow" hidden></div>
-  <div class="sg-notice" id="sgSoon">The new sign-in is <b>not turned on yet</b>. Keep using the member password you use today until you hear from us. <span id="sgWhen">We will email you the start date.</span></div>
 
   <section class="sg-sec">
     <h2 class="sg-h2">What is changing</h2>
@@ -316,10 +316,9 @@ var LAUNCH_TEXT = '';      /* for example: 'Starting Monday, October 5.'  Leave 
 (function () {
   var $ = function (id) { return document.getElementById(id); };
   if (STARTED) {
-    $('sgSoon').hidden = true; $('sgGo').hidden = false;
-    $('sgNow').hidden = false; $('sgNow').innerHTML = '<b>You can set up your own password now.</b> The old way of signing in will keep working until <b>Thursday, October 15</b>, so you have time to switch before the next meeting. Follow the three steps below.';
+    $('sgGo').hidden = false;
     $('sgSub').textContent = 'How to sign in, RSVP for the banquet, update your roster photo, and check in at meetings.';
-  } else if (LAUNCH_TEXT) { $('sgWhen').textContent = LAUNCH_TEXT; }
+  }
   if (OVERLAP_END) $('sgEnd').innerHTML = 'The shared password stops working on <b>' + OVERLAP_END + '</b>.';
 
   var root = $('sgRoot'), last = 0, mode = '';
