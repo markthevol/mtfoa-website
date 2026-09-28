@@ -166,7 +166,13 @@
 
   var root = document.getElementById('mnRoot');
   var inner = document.getElementById('mnIn');
-  var MOBILE = (window.innerWidth || 960) < 720;
+  /* The 720px guess below picks a layout fast, before anything is measured. If desktop turns out to
+     actually crowd the logo or run off the edge once it's built (see fit() below), that's corrected
+     by reloading into the phone menu instead — real fit, not a fixed number, decides the switch. This
+     flag carries that correction across the reload. */
+  var mnForcedPhone = false;
+  try { mnForcedPhone = sessionStorage.getItem('mtfoa_nav_force') === 'phone'; } catch (e) {}
+  var MOBILE = mnForcedPhone || (window.innerWidth || 960) < 720;
   var BAR_H = MOBILE ? 64 : 68;
   var isTouch = false;
   try { isTouch = window.matchMedia('(hover: none)').matches; } catch (e) {}
@@ -207,17 +213,20 @@
 
   if (!MOBILE) buildDesktop(); else buildPhone();
 
-  /* The desktop/phone choice above is made once, from the width at load. If the window is later
-     resized past the breakpoint (dragging a desktop window narrow, rotating a tablet) the menu
-     would otherwise stay stuck in the wrong layout, since nothing here rebuilds it. Reload once,
-     right when that boundary is actually crossed, rather than trying to rebuild this menu in place
-     (its hover dropdowns and animated box-height make that fragile). */
-  try {
-    var mnBreakpoint = window.matchMedia('(max-width: 719px)');
-    var mnReloadOnCross = function () { location.reload(); };
-    if (mnBreakpoint.addEventListener) mnBreakpoint.addEventListener('change', mnReloadOnCross);
-    else if (mnBreakpoint.addListener) mnBreakpoint.addListener(mnReloadOnCross);
-  } catch (e) {}
+  /* If we guessed phone but the window is actually wide, or the window is later resized back up,
+     try desktop again — fit() inside buildDesktop() below will immediately bounce back to phone
+     (via mnForcePhoneReload) if the items still do not really fit, so this can never get stuck
+     showing a crowded desktop menu. Rebuilding this menu in place isn't attempted (its hover
+     dropdowns and animated box-height make that fragile) — a reload is simple and always correct. */
+  if (MOBILE) {
+    try {
+      var mnWide = window.matchMedia('(min-width: 720px)');
+      var mnTryDesktop = function (e) { if (e.matches) { try { sessionStorage.removeItem('mtfoa_nav_force'); } catch (e2) {} location.reload(); } };
+      if (mnWide.addEventListener) mnWide.addEventListener('change', mnTryDesktop);
+      else if (mnWide.addListener) mnWide.addListener(mnTryDesktop);
+      if (mnWide.matches && mnForcedPhone) mnTryDesktop(mnWide);
+    } catch (e) {}
+  }
 
   /* fade the contents in once the built-in font is ready */
   function ready() { root.classList.add('ready'); }
@@ -245,15 +254,30 @@
     inner.appendChild(ul);
 
     // Never let the items touch the logo or the Facebook icon: if they do not fit, tighten the spacing a little.
+    // If they still do not fit once the spacing is as tight as it goes, this is not really a desktop-width
+    // window (a narrow one, a shrunk one, a tall phone in landscape) — switch to the phone menu instead of
+    // letting "MEMBER ROSTER" or "MEMBER PORTAL" crowd the logo or run off the edge.
     function fit() {
       var pad = 7;
       ul.style.setProperty('--mn-pad', pad + 'px');
       function need() { var n = 0; for (var i = 0; i < ul.children.length; i++) n += ul.children[i].offsetWidth; return n; }
       while (need() > ul.clientWidth - 24 && pad > 3) { pad -= 1; ul.style.setProperty('--mn-pad', pad + 'px'); }
+      return need() > ul.clientWidth - 24;
     }
-    fit();
-    try { document.fonts.ready.then(fit); } catch (e) {}
-    setTimeout(fit, 500);
+    function checkFit() {
+      if (fit()) {
+        try { sessionStorage.setItem('mtfoa_nav_force', 'phone'); } catch (e) {}
+        location.reload();
+      }
+    }
+    checkFit();
+    try { document.fonts.ready.then(checkFit); } catch (e) {}
+    setTimeout(checkFit, 500);
+    var mnFitResizeTimer;
+    window.addEventListener('resize', function () {
+      clearTimeout(mnFitResizeTimer);
+      mnFitResizeTimer = setTimeout(checkFit, 150);
+    });
 
     // Grow once to fit the tallest dropdown and stay that size until every dropdown is closed,
     // so opening and closing the dropdown never resizes the box (that caused flicker).
