@@ -435,6 +435,36 @@ permalink: /news
       + (info.place ? '&location=' + encodeURIComponent(info.place) : '');
   }
 
+  // A downloadable .ics file: the one link that works for Outlook and Apple Calendar (Google has its own
+  // web link above instead, since calendar.google.com does not accept a plain .ics link as an "add" action).
+  function icsEscape(s) { return String(s).replace(/[\\,;]/g, '\\$&').replace(/\n/g, '\\n'); }
+  function icsStamp() {
+    var d = new Date();
+    return d.getUTCFullYear() + pad(d.getUTCMonth() + 1) + pad(d.getUTCDate()) + 'T' + pad(d.getUTCHours()) + pad(d.getUTCMinutes()) + pad(d.getUTCSeconds()) + 'Z';
+  }
+  function icsLink(m, info) {
+    var ymd = m.d.replace(/-/g, '');
+    var lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//MTFOA//Meeting//EN', 'CALSCALE:GREGORIAN', 'BEGIN:VEVENT',
+      'UID:' + ymd + '-mtfoa@mtfoa.org', 'DTSTAMP:' + icsStamp()];
+    var t = /(\d{1,2})(?::(\d{2}))?\s*(am|pm)/i.exec(m.t || '');
+    if (t) {
+      var h = (+t[1]) % 12 + (/pm/i.test(t[3]) ? 12 : 0), mi = +(t[2] || 0);
+      var end = h * 60 + mi + 90;
+      lines.push('DTSTART;TZID=' + TZ + ':' + ymd + 'T' + pad(h) + pad(mi) + '00');
+      lines.push('DTEND;TZID=' + TZ + ':' + ymd + 'T' + pad(Math.floor(end / 60) % 24) + pad(end % 60) + '00');
+    } else {
+      var d2 = parseISO(m.d); d2.setDate(d2.getDate() + 1);
+      lines.push('DTSTART;VALUE=DATE:' + ymd);
+      lines.push('DTEND;VALUE=DATE:' + d2.getFullYear() + pad(d2.getMonth() + 1) + pad(d2.getDate()));
+    }
+    var details = (info.note ? info.note + '\n\n' : '') + 'Details: https://mtfoa.org/news';
+    lines.push('SUMMARY:' + icsEscape('MTFOA ' + info.kind));
+    lines.push('DESCRIPTION:' + icsEscape(details));
+    if (info.place) lines.push('LOCATION:' + icsEscape(info.place));
+    lines.push('END:VEVENT', 'END:VCALENDAR');
+    return 'data:text/calendar;charset=utf-8,' + encodeURIComponent(lines.join('\r\n'));
+  }
+
   /* ---------- little DOM helpers ---------- */
   function el(tag, cls, text) {
     var e = document.createElement(tag);
@@ -488,6 +518,9 @@ permalink: /news
     var cl = el('a', 'mn-btn', 'Add to Google Calendar');
     cl.href = calendarLink(m, info); cl.target = '_blank'; cl.rel = 'noopener';
     acts.appendChild(cl);
+    var ics = el('a', 'mn-btn alt', 'Add to Outlook / Apple Calendar');
+    ics.href = icsLink(m, info); ics.download = 'mtfoa-meeting-' + m.d + '.ics';
+    acts.appendChild(ics);
     var rec = el('a', 'mn-btn alt', 'Meeting recordings');
     rec.href = 'https://mtfoa.org/member-resources'; rec.target = '_top';
     acts.appendChild(rec);
