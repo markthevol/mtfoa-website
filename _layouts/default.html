@@ -13,6 +13,10 @@
   html, body { margin: 0; padding: 0; background: #f4f6fa; }
   body { font-family: 'Barlow', Arial, Helvetica, sans-serif; }
   main { display: block; }
+  /* The footer embed's own root is deliberately transparent (see footer.html's
+     header comment) — on WebsiteBuilder the navy fill came from the page
+     section it sat in. This reproduces that section here. */
+  .site-footer-section { background: #142a4d; border-top: 4px solid #d6291a; }
 </style>
 </head>
 <body>
@@ -20,6 +24,8 @@
 <main>
 {{ content }}
 </main>
+<div class="site-footer-section">
 {% include footer.html %}
+</div>
 </body>
 </html>
