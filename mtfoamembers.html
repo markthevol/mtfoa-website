@@ -457,18 +457,23 @@ sitemap: false
     var still = items.some(function (t) { return t.k === active; });
     openTab(still ? active : pickFirst(items));
   }
+  // On the narrow (single-column) layout, the stage sits right under the open button, instead of always
+  // showing after the whole button list -- so the change is not hidden below the other buttons. On the
+  // wider grid it stays put after the list, where "under this button" would not read as clearly. Re-run any
+  // time the layout might have changed (not just on click) since a resize or orientation change can move the
+  // breakpoint out from under an already-open tab without a click to re-trigger this.
+  function placeStage() {
+    var picked = active && tabsEl.querySelector('button.eo-tab[data-k="' + active + '"]');
+    var anchor = picked && tabsEl.getBoundingClientRect().width < 600 ? picked : tabsEl;
+    if (stage.previousElementSibling !== anchor) anchor.insertAdjacentElement('afterend', stage);
+  }
   function openTab(k) {
     if (!k) return;
     active = k;
-    var picked = null;
     Array.prototype.forEach.call(tabsEl.querySelectorAll('button.eo-tab'), function (b) {
-      var on = b.getAttribute('data-k') === k; b.setAttribute('aria-selected', on ? 'true' : 'false'); if (on) picked = b;
+      b.setAttribute('aria-selected', b.getAttribute('data-k') === k ? 'true' : 'false');
     });
-    // On the narrow (single-column) layout, the stage moves to sit right under the button you just tapped,
-    // instead of always showing after the whole button list -- so the change is not hidden below the other
-    // buttons. On the wider grid it stays put after the list, where "under this button" would not read as clearly.
-    if (picked && tabsEl.getBoundingClientRect().width < 600) picked.insertAdjacentElement('afterend', stage);
-    else tabsEl.insertAdjacentElement('afterend', stage);
+    placeStage();
     var def = TABS.filter(function (t) { return t.k === k; })[0];
     if (!frames[k]) {
       var f = document.createElement('iframe');
@@ -484,7 +489,7 @@ sitemap: false
     active = '';
     Array.prototype.forEach.call(tabsEl.querySelectorAll('button.eo-tab'), function (b) { b.setAttribute('aria-selected', 'false'); });
     Object.keys(frames).forEach(function (x) { frames[x].hidden = true; });
-    tabsEl.insertAdjacentElement('afterend', stage);
+    placeStage();
     syncFrame(); fit();
   }
   tabsEl.addEventListener('click', function (ev) {
@@ -612,6 +617,7 @@ sitemap: false
 
   /* ---------- sizing: the frames grow to fit their page, and the whole box fits itself on the live site ---------- */
   function syncFrame() {
+    if (!boxIn.hidden) placeStage();   // self-corrects if a resize/rotation moved the narrow/wide breakpoint since the tab opened
     var f = active ? frames[active] : (boxOut.hidden ? null : signF);
     if (!f) return;
     var h = bodyHeight(f);
