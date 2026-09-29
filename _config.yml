@@ -4,6 +4,10 @@ description: >-
   from middle school through varsity.
 url: "https://mtfoa.org"
 
+# Auto-generates /sitemap.xml at build time from every page (skips any page marked sitemap: false).
+plugins:
+  - jekyll-sitemap
+
 # Serve every page through _layouts/default.html unless it says otherwise
 defaults:
   - scope:
