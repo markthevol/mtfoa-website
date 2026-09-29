@@ -64,6 +64,10 @@
   .mn-logo img { display: block; height: 54px; width: auto; }
 
   /* ---------------- desktop ---------------- */
+  /* On the wide bar the logo sits right next to News & Info, not off alone with a big gap; the
+     "logo in its own corner" look is a phone/hamburger thing only (see the phone section below). */
+  .mtfoa-menu:not(.m) .mn-bar { justify-content: flex-start; }
+  .mtfoa-menu:not(.m) .mn-list { flex: 0 0 auto; }
   .mn-list { flex: 1 1 auto; display: flex; justify-content: center; align-items: stretch; height: 65px; gap: 0; min-width: 0; }
   .mn-item { position: relative; display: flex; align-items: stretch; flex: none; }
   .mn-link {
