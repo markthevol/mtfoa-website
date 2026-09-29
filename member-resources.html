@@ -455,7 +455,15 @@ sitemap: false
   function openTab(k) {
     if (!k) return;
     active = k;
-    Array.prototype.forEach.call(tabsEl.querySelectorAll('button.eo-tab'), function (b) { b.setAttribute('aria-selected', b.getAttribute('data-k') === k ? 'true' : 'false'); });
+    var picked = null;
+    Array.prototype.forEach.call(tabsEl.querySelectorAll('button.eo-tab'), function (b) {
+      var on = b.getAttribute('data-k') === k; b.setAttribute('aria-selected', on ? 'true' : 'false'); if (on) picked = b;
+    });
+    // On the narrow (single-column) layout, the stage moves to sit right under the button you just tapped,
+    // instead of always showing after the whole button list -- so the change is not hidden below the other
+    // buttons. On the wider grid it stays put after the list, where "under this button" would not read as clearly.
+    if (picked && tabsEl.getBoundingClientRect().width < 600) picked.insertAdjacentElement('afterend', stage);
+    else tabsEl.insertAdjacentElement('afterend', stage);
     var def = TABS.filter(function (t) { return t.k === k; })[0];
     if (!frames[k]) {
       var f = document.createElement('iframe');
