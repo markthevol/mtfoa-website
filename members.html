@@ -178,6 +178,8 @@ permalink: /members
     text-transform: uppercase; color: var(--mr-slate);
   }
   .mrs-role { margin-top: 4px; font-weight: 600; font-size: 13.5px; line-height: 1.25; color: var(--mr-red); }
+  /* A crew chief title -- distinct from Board Role (red): navy, so it never reads as a board/officer position. */
+  .mrs-crew { margin-top: 4px; font-weight: 600; font-size: 13.5px; line-height: 1.25; color: var(--mr-navy); }
 
   .mrs-skel .mrs-photo { background: linear-gradient(90deg, #e6ecf4 25%, #f1f4f9 50%, #e6ecf4 75%); background-size: 200% 100%; animation: mrsShimmer 1.3s linear infinite; }
   .mrs-skel .mrs-line { height: 12px; border-radius: 3px; background: #e6ecf4; margin-top: 8px; }
@@ -395,6 +397,7 @@ permalink: /members
       n: String(p.n || '').trim(),
       p: String(p.p || '').trim(),
       r: String(p.r || '').trim(),
+      c: String(p.c || '').trim(),
       o: (p.o === '' || p.o == null || isNaN(Number(p.o))) ? 9999 : Number(p.o),
       i: /^https:\/\/[^\s"'<>]+$/i.test(String(p.i || '').trim()) ? String(p.i).trim() : '',
       k: sortKey(p.n || ''),
@@ -496,6 +499,12 @@ permalink: /members
       rl.className = 'mrs-role';
       rl.textContent = p.r;
       info.appendChild(rl);
+    }
+    if (p.c) {
+      var cw = document.createElement('div');
+      cw.className = 'mrs-crew';
+      cw.textContent = p.c;
+      info.appendChild(cw);
     }
     li.appendChild(info);
     return li;
