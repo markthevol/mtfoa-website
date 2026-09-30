@@ -136,8 +136,8 @@ og_image: /assets/images/tssaa-officials-logo.png
   }
   .fa-join-btn {
     font-family: 'Barlow Condensed', Arial, sans-serif; font-weight: 700; font-size: 13px;
-    letter-spacing: 1px; text-transform: uppercase; color: var(--fa-white); background: var(--fa-red);
-    border-radius: 999px; padding: 7px 16px; margin-left: auto; white-space: nowrap;
+    letter-spacing: 1.2px; text-transform: uppercase; color: #fff; background: var(--fa-red);
+    border-radius: 6px; padding: 7px 14px; white-space: nowrap;
     transition: background 0.12s ease;
   }
   .fa-join-btn:hover { background: #b81f12; }
@@ -395,12 +395,13 @@ og_image: /assets/images/tssaa-officials-logo.png
         var flag = '<div class="n">' + esc(a.flag.n) + '</div><a href="mailto:' + esc(a.flag.e) + '">' + esc(a.flag.e) + '</a>';
         var site = a.w ? '<div class="fa-site"><a href="' + esc(a.w) + '" target="_blank" rel="noopener">Visit website →</a></div>' : '';
         var tag = isAssigned ? '<span class="fa-mine-tag assigned">Your Association</span>' : '';
-        var right = a.mine ? '<a class="fa-join-btn" href="/news">Join the MTFOA</a>' : '<span class="fa-dist">' + Math.round(r.d) + ' mi away</span>';
+        var dist = '<span class="fa-dist">' + Math.round(r.d) + ' mi away</span>';
+        var joinBtn = a.mine ? '<a class="fa-join-btn" href="/news">Join the MTFOA</a>' : '';
         return '<div class="fa-card' + (a.mine ? ' mine' : '') + '">' +
           '<div class="fa-card-top"><span class="fa-rank">' + (i + 1) + '</span>' +
           '<span class="fa-card-name">' + esc(a.n) + (a.mine ? ' (MTFOA)' : '') + '</span>' +
           tag +
-          right + '</div>' +
+          dist + joinBtn + '</div>' +
           '<div class="fa-contacts">' +
             '<div class="fa-contact"><h4>Football recruiter</h4>' + fb + '</div>' +
             '<div class="fa-contact"><h4>Girls’ flag football</h4>' + flag + '</div>' +
