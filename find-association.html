@@ -134,6 +134,13 @@ og_image: /assets/images/tssaa-officials-logo.png
     font-family: 'Barlow Condensed', Arial, sans-serif; font-weight: 700; font-size: 13.5px;
     letter-spacing: 1px; text-transform: uppercase; color: var(--fa-red); margin-left: auto;
   }
+  .fa-join-btn {
+    font-family: 'Barlow Condensed', Arial, sans-serif; font-weight: 700; font-size: 13px;
+    letter-spacing: 1px; text-transform: uppercase; color: var(--fa-white); background: var(--fa-red);
+    border-radius: 999px; padding: 7px 16px; margin-left: auto; white-space: nowrap;
+    transition: background 0.12s ease;
+  }
+  .fa-join-btn:hover { background: #b81f12; }
   .fa-mine-tag.assigned {
     background: var(--fa-red);
   }
@@ -159,7 +166,7 @@ og_image: /assets/images/tssaa-officials-logo.png
 
   @container (max-width: 560px) {
     .fa-contacts { grid-template-columns: minmax(0,1fr); }
-    .fa-dist { margin-left: 0; }
+    .fa-dist, .fa-join-btn { margin-left: 0; }
   }
 </style>
 
@@ -387,12 +394,13 @@ og_image: /assets/images/tssaa-officials-logo.png
         var fb = a.fb.map(function (p) { return '<div class="n">' + esc(p.n) + '</div><a href="mailto:' + esc(p.e) + '">' + esc(p.e) + '</a>'; }).join('<div style="height:8px"></div>');
         var flag = '<div class="n">' + esc(a.flag.n) + '</div><a href="mailto:' + esc(a.flag.e) + '">' + esc(a.flag.e) + '</a>';
         var site = a.w ? '<div class="fa-site"><a href="' + esc(a.w) + '" target="_blank" rel="noopener">Visit website →</a></div>' : '';
-        var tag = isAssigned ? '<span class="fa-mine-tag assigned">Your Association</span>' : (a.mine ? '<span class="fa-mine-tag">This is MTFOA</span>' : '');
+        var tag = isAssigned ? '<span class="fa-mine-tag assigned">Your Association</span>' : '';
+        var right = a.mine ? '<a class="fa-join-btn" href="/news">Join the MTFOA</a>' : '<span class="fa-dist">' + Math.round(r.d) + ' mi away</span>';
         return '<div class="fa-card' + (a.mine ? ' mine' : '') + '">' +
           '<div class="fa-card-top"><span class="fa-rank">' + (i + 1) + '</span>' +
-          '<span class="fa-card-name">' + esc(a.n) + ' (' + esc(a.letter) + ')</span>' +
+          '<span class="fa-card-name">' + esc(a.n) + (a.mine ? ' (MTFOA)' : '') + '</span>' +
           tag +
-          '<span class="fa-dist">' + Math.round(r.d) + ' mi away</span></div>' +
+          right + '</div>' +
           '<div class="fa-contacts">' +
             '<div class="fa-contact"><h4>Football recruiter</h4>' + fb + '</div>' +
             '<div class="fa-contact"><h4>Girls’ flag football</h4>' + flag + '</div>' +
