@@ -134,6 +134,9 @@ og_image: /assets/images/tssaa-officials-logo.png
     font-family: 'Barlow Condensed', Arial, sans-serif; font-weight: 700; font-size: 13.5px;
     letter-spacing: 1px; text-transform: uppercase; color: var(--fa-red); margin-left: auto;
   }
+  .fa-mine-tag.assigned {
+    background: var(--fa-red);
+  }
   .fa-mine-tag {
     font-family: 'Barlow Condensed', Arial, sans-serif; font-weight: 700; font-size: 12.5px;
     letter-spacing: 1px; text-transform: uppercase; color: var(--fa-white); background: var(--fa-navy);
@@ -190,47 +193,46 @@ og_image: /assets/images/tssaa-officials-logo.png
       resultsFor = $('faResultsFor'), cardsEl = $('faCards');
 
   var ASSOCIATIONS = [
-    { n: 'Region I', lat: 36.5156, lon: -82.5114,
+    { n: 'Region I', letter: 'A', lat: 36.2931, lon: -82.6530,
       fb: [{ n: 'George Jordan', e: 'gwjordan@chartertn.net' }],
-      flag: { n: 'George Jordan', e: 'gwjordan@chartertn.net' }, w: '' },
-    { n: 'Knoxville', lat: 35.9380, lon: -83.9990,
+      flag: { n: 'George Jordan', e: 'gwjordan@chartertn.net' }, w: 'https://www.region1footballofficials.com/' },
+    { n: 'Knoxville', letter: 'B', lat: 36.0038, lon: -83.8701,
       fb: [{ n: 'Tracy Wheeler', e: 'twheelercr24@cs.com' }],
-      flag: { n: 'Phillips Freels', e: 'pfreels105@aol.com' }, w: '' },
-    { n: 'Clinch Valley', lat: 36.0887, lon: -84.6112,
+      flag: { n: 'Phillips Freels', e: 'pfreels105@aol.com' }, w: 'https://kfoanet.wixsite.com/kfoa' },
+    { n: 'Clinch Valley', letter: 'C', lat: 36.1245, lon: -84.4201,
       fb: [{ n: 'Wes Barger', e: 'cvfoatn.barger@gmail.com' }],
-      flag: { n: 'Wes Barger', e: 'cvfoatn.barger@gmail.com' }, w: '' },
-    { n: 'Blount County', lat: 35.7565, lon: -83.9705,
+      flag: { n: 'Wes Barger', e: 'cvfoatn.barger@gmail.com' }, w: 'https://cvfoatn.org/' },
+    { n: 'Blount County', letter: 'D', lat: 35.7543, lon: -84.0755,
       fb: [{ n: 'Ken Coulter', e: 'eacoulter@charter.net' }],
-      flag: { n: 'Steve Hodson', e: 'hodboy46@gmail.com' }, w: '' },
-    { n: 'Athens/Tri-County', lat: 35.2920, lon: -84.6820,
+      flag: { n: 'Steve Hodson', e: 'hodboy46@gmail.com' }, w: 'https://bcfoa-tn.com/' },
+    { n: 'Athens/Tri-County', letter: 'E', lat: 35.3716, lon: -84.6051,
       fb: [{ n: 'Robert Casteel', e: 'casteelrobert@yahoo.com' }],
-      flag: { n: 'Gregory Geren', e: 'glgeren@gmail.com' }, w: '' },
-    { n: 'Southeast', lat: 35.1408, lon: -85.2501,
+      flag: { n: 'Gregory Geren', e: 'glgeren@gmail.com' }, w: 'https://www.facebook.com/groups/254364728255880/members' },
+    { n: 'Southeast', letter: 'F', lat: 35.1151, lon: -85.2626,
       fb: [{ n: 'Randy Shuford', e: 'shufordgr@aol.com' }],
-      flag: { n: 'Scott Flerl', e: 'utkman@gmail.com' }, w: '' },
-    { n: 'Central', lat: 35.4887, lon: -86.6219,
+      flag: { n: 'Scott Flerl', e: 'utkman@gmail.com' }, w: 'https://setfoa.org/' },
+    { n: 'Central', letter: 'G', lat: 35.4532, lon: -86.8920,
       fb: [{ n: 'Bill Marbet', e: 'bill@buffaloholdingsinc.com' }],
-      flag: { n: 'Mike Hollowell', e: 'Hollowell13@gmail.com' }, w: '' },
-    { n: 'North Central', lat: 36.1206, lon: -86.2844,
+      flag: { n: 'Mike Hollowell', e: 'Hollowell13@gmail.com' }, w: 'https://www.facebook.com/groups/555073035407891/' },
+    { n: 'North Central', letter: 'H', lat: 36.0937, lon: -85.9958,
       fb: [{ n: 'Fred McCollum', e: 'mccollumfred34@gmail.com' }],
-      flag: { n: 'Bill Ramos', e: 'williampramos3@yahoo.com' }, w: '' },
-    { n: 'North Middle', lat: 36.5278, lon: -87.3589,
+      flag: { n: 'Bill Ramos', e: 'williampramos3@yahoo.com' }, w: 'https://northcentralrefs.com/' },
+    { n: 'North Middle', letter: 'I', lat: 36.3795, lon: -87.2588,
       fb: [{ n: 'Don Barry', e: 'deb37@bellsouth.net' }],
       flag: { n: 'Sean Wilson', e: 'sean.wilson1339@gmail.com' }, w: '' },
-    { n: 'Middle Tennessee', lat: 36.0411, lon: -86.6511, mine: true,
+    { n: 'Middle Tennessee', letter: 'J', lat: 36.1125, lon: -86.7303, mine: true,
       fb: [{ n: 'Steve Swift', e: 'theswift1@comcast.net' }, { n: 'Tim Beard', e: 'tim@nolensvilletownlife.com' }, { n: 'Wayne Clendenen', e: 'wclen1@comcast.net' }],
       flag: { n: 'Cole Womack', e: 'cole.womack@comcast.net' }, w: 'https://mtfoa.org' },
-    { n: 'Northwest', lat: 35.8263, lon: -88.5311,
+    { n: 'Northwest', letter: 'K', lat: 36.1493, lon: -88.9983,
       fb: [{ n: 'Gene Dearmitt', e: 'dearmitt16@gmail.com' }],
       flag: { n: 'Brad Hurley', e: 'cchamber@earthlink.net' }, w: '' },
-    { n: 'Southwest', lat: 35.7086, lon: -88.7963,
+    { n: 'Southwest', letter: 'L', lat: 35.5986, lon: -88.6703,
       fb: [{ n: 'Chris Gilley', e: 'cgilley14@gmail.com' }],
       flag: { n: 'Larry Lewis', e: 'larrylewis5422@gmail.com' }, w: '' },
-    { n: 'Mid-South', lat: 35.1554, lon: -89.7763,
+    { n: 'Mid-South', letter: 'M', lat: 35.1509, lon: -89.8883,
       fb: [{ n: 'Paul Holt', e: 'paholt1@att.net' }, { n: 'Stanley Greene', e: 'stnly.greene@gmail.com' }, { n: 'Jack Davis', e: 'jack@ssc-steel.com' }],
-      flag: { n: 'Don Williams', e: 'msfoa@att.net' }, w: '' }
+      flag: { n: 'Don Williams', e: 'msfoa@att.net' }, w: 'https://www.facebook.com/groups/130714726952056/' }
   ];
-
   var schools = null, zips = null, dataReady = null;
   function loadData() {
     if (dataReady) return dataReady;
@@ -266,7 +268,7 @@ og_image: /assets/images/tssaa-officials-logo.png
     suggIndex = -1;
     if (!list.length) { hideSugg(); return; }
     suggEl.innerHTML = list.map(function (s, i) {
-      return '<li><button type="button" data-i="' + i + '">' + esc(s.n) + '<br><span class="c">' + esc(s.c) + '</span></button></li>';
+      return '<li><button type="button" data-i="' + i + '">' + esc(s.n) + '<br><span class="c">' + esc(s.a) + ' Association</span></button></li>';
     }).join('');
     suggEl.hidden = false;
   }
@@ -339,19 +341,19 @@ og_image: /assets/images/tssaa-officials-logo.png
     if (!q) { showMsg('Please enter a high school name or a 5-digit Tennessee zip code.'); return; }
 
     loadData().then(function () {
-      var loc = null, label = '';
+      var loc = null, label = '', assignedName = null;
 
       if (/^\d{5}$/.test(q)) {
         if (zips[q]) { loc = zips[q]; label = 'zip code ' + q; }
         else { showMsg('We don’t recognize "' + q + '" as a Tennessee zip code. Double check it, or search by high school name instead.'); return; }
       } else if (activeSchool && activeSchool.n.toLowerCase() === q.toLowerCase()) {
-        loc = [activeSchool.lat, activeSchool.lon]; label = activeSchool.n + ' (' + activeSchool.c + ')';
+        loc = [activeSchool.lat, activeSchool.lon]; label = activeSchool.n; assignedName = activeSchool.a;
       } else {
         var ql = q.toLowerCase();
         var exact = schools.filter(function (s) { return s.n.toLowerCase() === ql; });
         var partial = exact.length ? exact : schools.filter(function (s) { return s.n.toLowerCase().indexOf(ql) !== -1; });
         if (partial.length === 1) {
-          var s = partial[0]; loc = [s.lat, s.lon]; label = s.n + ' (' + s.c + ')';
+          var s = partial[0]; loc = [s.lat, s.lon]; label = s.n; assignedName = s.a;
         } else if (partial.length > 1) {
           showSugg(partial.slice(0, 8));
           showMsg('That matches more than one school — pick yours from the list below.');
@@ -362,21 +364,34 @@ og_image: /assets/images/tssaa-officials-logo.png
         }
       }
 
-      var ranked = ASSOCIATIONS.map(function (a) {
+      var scored = ASSOCIATIONS.map(function (a) {
         return { a: a, d: haversineMiles(loc[0], loc[1], a.lat, a.lon) };
-      }).sort(function (x, y) { return x.d - y.d; }).slice(0, 3);
+      }).sort(function (x, y) { return x.d - y.d; });
 
-      resultsFor.innerHTML = 'Closest associations to <b>' + esc(label) + '</b>:';
+      var ranked;
+      if (assignedName) {
+        var assigned = scored.filter(function (r) { return r.a.n === assignedName; })[0];
+        var others = scored.filter(function (r) { return r.a.n !== assignedName; }).slice(0, 2);
+        ranked = assigned ? [assigned].concat(others) : scored.slice(0, 3);
+      } else {
+        ranked = scored.slice(0, 3);
+      }
+
+      resultsFor.innerHTML = assignedName
+        ? '<b>' + esc(label) + '</b> is TSSAA-assigned to the association below. The next two closest are shown for reference:'
+        : 'Closest associations to <b>' + esc(label) + '</b>:';
       resultsFor.hidden = false;
       cardsEl.innerHTML = ranked.map(function (r, i) {
         var a = r.a;
+        var isAssigned = assignedName && a.n === assignedName;
         var fb = a.fb.map(function (p) { return '<div class="n">' + esc(p.n) + '</div><a href="mailto:' + esc(p.e) + '">' + esc(p.e) + '</a>'; }).join('<div style="height:8px"></div>');
         var flag = '<div class="n">' + esc(a.flag.n) + '</div><a href="mailto:' + esc(a.flag.e) + '">' + esc(a.flag.e) + '</a>';
         var site = a.w ? '<div class="fa-site"><a href="' + esc(a.w) + '" target="_blank" rel="noopener">Visit website →</a></div>' : '';
+        var tag = isAssigned ? '<span class="fa-mine-tag assigned">Your Association</span>' : (a.mine ? '<span class="fa-mine-tag">This is MTFOA</span>' : '');
         return '<div class="fa-card' + (a.mine ? ' mine' : '') + '">' +
           '<div class="fa-card-top"><span class="fa-rank">' + (i + 1) + '</span>' +
-          '<span class="fa-card-name">' + esc(a.n) + '</span>' +
-          (a.mine ? '<span class="fa-mine-tag">This is MTFOA</span>' : '') +
+          '<span class="fa-card-name">' + esc(a.n) + ' (' + esc(a.letter) + ')</span>' +
+          tag +
           '<span class="fa-dist">' + Math.round(r.d) + ' mi away</span></div>' +
           '<div class="fa-contacts">' +
             '<div class="fa-contact"><h4>Football recruiter</h4>' + fb + '</div>' +
