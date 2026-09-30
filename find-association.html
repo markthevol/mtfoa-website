@@ -386,7 +386,7 @@ og_image: /assets/images/tssaa-officials-logo.png
       }
 
       resultsFor.innerHTML = assignedName
-        ? '<b>' + esc(label) + '</b> is TSSAA-assigned to the association below. The next two closest are shown for reference:'
+        ? '<b>' + esc(label) + '</b> is TSSAA-assigned to the <b>' + esc(assignedName) + '</b> association.'
         : 'Closest associations to <b>' + esc(label) + '</b>:';
       resultsFor.hidden = false;
       cardsEl.innerHTML = ranked.map(function (r, i) {
@@ -395,7 +395,7 @@ og_image: /assets/images/tssaa-officials-logo.png
         var fb = a.fb.map(function (p) { return '<div class="n">' + esc(p.n) + '</div><a href="mailto:' + esc(p.e) + '">' + esc(p.e) + '</a>'; }).join('<div style="height:8px"></div>');
         var flag = '<div class="n">' + esc(a.flag.n) + '</div><a href="mailto:' + esc(a.flag.e) + '">' + esc(a.flag.e) + '</a>';
         var site = a.w ? '<div class="fa-site"><a href="' + esc(a.w) + '" target="_blank" rel="noopener">Visit website →</a></div>' : '';
-        var tag = isAssigned ? '<span class="fa-mine-tag assigned">Your Association</span>' : '';
+        var tag = isAssigned ? '<span class="fa-mine-tag assigned">Assigned</span>' : '';
         var dist = '<span class="fa-dist">' + Math.round(r.d) + ' mi away</span>';
         var joinBtn = a.mine ? '<a class="fa-join-btn" href="/news">Join the MTFOA</a>' : '';
         return '<div class="fa-card' + (a.mine ? ' mine' : '') + '">' +
