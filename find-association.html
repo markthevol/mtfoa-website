@@ -130,9 +130,10 @@ og_image: /assets/images/tssaa-officials-logo.png
     font-family: 'Anton', Impact, 'Arial Narrow', sans-serif; font-weight: 400; font-size: 22px;
     letter-spacing: 0.3px; text-transform: uppercase; color: var(--fa-navy);
   }
+  .fa-card-right { display: flex; align-items: center; gap: 10px; margin-left: auto; }
   .fa-dist {
     font-family: 'Barlow Condensed', Arial, sans-serif; font-weight: 700; font-size: 13.5px;
-    letter-spacing: 1px; text-transform: uppercase; color: var(--fa-red); margin-left: auto;
+    letter-spacing: 1px; text-transform: uppercase; color: var(--fa-red);
   }
   .fa-join-btn {
     font-family: 'Barlow Condensed', Arial, sans-serif; font-weight: 700; font-size: 13px;
@@ -166,7 +167,7 @@ og_image: /assets/images/tssaa-officials-logo.png
 
   @container (max-width: 560px) {
     .fa-contacts { grid-template-columns: minmax(0,1fr); }
-    .fa-dist, .fa-join-btn { margin-left: 0; }
+    .fa-card-right { margin-left: 0; }
   }
 </style>
 
@@ -401,7 +402,7 @@ og_image: /assets/images/tssaa-officials-logo.png
           '<div class="fa-card-top"><span class="fa-rank">' + (i + 1) + '</span>' +
           '<span class="fa-card-name">' + esc(a.n) + (a.mine ? ' (MTFOA)' : '') + '</span>' +
           tag +
-          dist + joinBtn + '</div>' +
+          '<span class="fa-card-right">' + joinBtn + dist + '</span></div>' +
           '<div class="fa-contacts">' +
             '<div class="fa-contact"><h4>Football recruiter</h4>' + fb + '</div>' +
             '<div class="fa-contact"><h4>Girls’ flag football</h4>' + flag + '</div>' +
