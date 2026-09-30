@@ -1,0 +1,392 @@
+---
+title: Find Your Officiating Association
+description: >-
+  Enter your home high school or a Tennessee zip code to find the three closest TSSAA-affiliated football officiating associations, with tackle and girls' flag football contacts for each.
+permalink: /find-association
+og_image: /assets/images/tssaa-officials-logo.png
+---
+<!-- ============================================================
+     MTFOA Association Finder
+     For prospective officials (often from out of state) who don't know Tennessee
+     geography: enter a home high school or a TN zip code, and see the three
+     closest TSSAA football officiating associations with a recruiter to contact.
+
+     Data:
+       - Schools: /assets/data/officials-schools.json (from the TSSAA classification
+         map's KML export -- name, city, exact lat/lon. Football-classified schools,
+         used purely as a location reference, not a football-only restriction.)
+       - TN zip centroids: /assets/data/officials-zips.json (US Census 2023 ZCTA
+         gazetteer, filtered to TN zip codes 37010-38589.)
+       - Associations: hardcoded below. Each has an approximate anchor point
+         (the average location of that association's listed supervisors/recruiters
+         from TSSAA's own association and recruiter pages -- there is no official
+         published boundary, so "closest" is by distance to this anchor, same
+         approach TSSAA's own pages point to), a Football contact and a Girls'
+         Flag Football contact, and an optional "w" (website) which is blank
+         until MTFOA gathers those links -- the card simply omits the link until
+         one is set.
+
+     ONLY reachable via the small TSSAA Officials logo in the site footer
+     (not in the main nav or footer link lists).
+   ============================================================ -->
+<div class="mtfoa-finder" id="finderRoot">
+<style>
+  .mtfoa-finder {
+    --fa-navy: #1f3864;
+    --fa-navy-deep: #142a4d;
+    --fa-red: #d6291a;
+    --fa-white: #ffffff;
+    --fa-tint: #c9d6e8;
+    --fa-chalk: #f4f6fa;
+    --fa-slate: #5b6879;
+    --fa-border: #dbe1ea;
+
+    container-type: inline-size;
+    font-family: 'Barlow', Arial, Helvetica, sans-serif;
+    background: var(--fa-chalk);
+    -webkit-font-smoothing: antialiased;
+    padding-bottom: 40px;
+  }
+  .mtfoa-finder, .mtfoa-finder * { box-sizing: border-box; }
+  .mtfoa-finder :where(p, h1, h2, h3) { margin: 0; }
+  .mtfoa-finder button { font: inherit; color: inherit; cursor: pointer; }
+  .mtfoa-finder [hidden] { display: none !important; }
+
+  .fa-in { max-width: 900px; margin: 0 auto; padding: 0 16px; }
+
+  .fa-head {
+    position: relative; overflow: hidden;
+    background: linear-gradient(160deg, var(--fa-navy) 0%, var(--fa-navy-deep) 100%);
+    border-bottom: 4px solid var(--fa-red);
+    padding: 30px 16px 26px;
+  }
+  .fa-head .fa-in { position: relative; }
+  .fa-eyebrow {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-family: 'Barlow Condensed', Arial, sans-serif; font-weight: 700; font-size: 13px;
+    letter-spacing: 2.4px; text-transform: uppercase; color: var(--fa-tint); margin-bottom: 8px;
+  }
+  .fa-eyebrow::before { content: ''; width: 26px; height: 4px; background: var(--fa-red); }
+  .fa-title {
+    font-family: 'Anton', Impact, 'Arial Narrow', sans-serif; font-weight: 400;
+    font-size: clamp(28px, 6vw, 40px); line-height: 1.05; letter-spacing: 0.4px;
+    text-transform: uppercase; color: var(--fa-white);
+  }
+  .fa-sub { margin-top: 10px; font-size: 15.5px; line-height: 1.55; color: var(--fa-tint); max-width: 62ch; }
+
+  .fa-body { padding: 26px 0 10px; }
+  .fa-search { max-width: 640px; margin: 0 auto 30px; padding: 0 16px; position: relative; }
+  .fa-label {
+    display: block; font-family: 'Barlow Condensed', Arial, sans-serif; font-weight: 700;
+    font-size: 13px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--fa-slate);
+    margin-bottom: 8px;
+  }
+  .fa-searchrow { display: flex; gap: 10px; flex-wrap: wrap; }
+  #faInput {
+    flex: 1 1 260px; min-width: 0; font: inherit; font-size: 17px; padding: 12px 14px;
+    border: 2px solid var(--fa-border); border-radius: 6px; background: #fff; color: var(--fa-navy);
+  }
+  #faInput:focus { outline: none; border-color: var(--fa-navy); }
+  #faGo {
+    flex: none; font-family: 'Barlow Condensed', Arial, sans-serif; font-weight: 700; font-size: 16px;
+    letter-spacing: 1.2px; text-transform: uppercase; color: #fff; background: var(--fa-red);
+    border: 0; border-radius: 6px; padding: 12px 22px;
+  }
+  #faGo:hover { background: #b81f12; }
+  .fa-sugg {
+    position: absolute; left: 16px; right: 16px; top: 100%; z-index: 5; margin: 4px 0 0; padding: 6px 0;
+    list-style: none; background: #fff; border: 1px solid var(--fa-border); border-radius: 8px;
+    box-shadow: 0 14px 28px rgba(20,42,77,0.16); max-height: 260px; overflow-y: auto;
+  }
+  .fa-sugg li { padding: 0; }
+  .fa-sugg button {
+    display: block; width: 100%; text-align: left; padding: 9px 14px; border: 0; background: none;
+    font-size: 15.5px; color: var(--fa-navy);
+  }
+  .fa-sugg button:hover, .fa-sugg button.on { background: var(--fa-chalk); }
+  .fa-sugg .c { color: var(--fa-slate); font-size: 13.5px; }
+  .fa-msg {
+    margin-top: 12px; padding: 10px 12px; border-radius: 6px; font-size: 15px; line-height: 1.5;
+    background: #fdecea; border: 1px solid #f3b9b3; color: #8a1a10;
+  }
+
+  .fa-resultsFor {
+    max-width: 900px; margin: 0 auto 16px; padding: 0 16px; font-size: 15.5px; color: var(--fa-slate);
+  }
+  .fa-resultsFor b { color: var(--fa-navy); }
+  .fa-cards { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; padding: 0 16px; max-width: 900px; margin: 0 auto; }
+  .fa-card {
+    background: #fff; border: 1px solid var(--fa-border); border-top: 5px solid var(--fa-red);
+    border-radius: 8px; padding: 20px 22px 22px;
+  }
+  .fa-card.mine { border-top-color: var(--fa-navy); }
+  .fa-rank {
+    display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px;
+    border-radius: 50%; background: var(--fa-navy); color: #fff; font-family: 'Barlow Condensed', Arial, sans-serif;
+    font-weight: 700; font-size: 15px; margin-right: 10px; flex: none;
+  }
+  .fa-card-top { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 14px; }
+  .fa-card-name {
+    font-family: 'Anton', Impact, 'Arial Narrow', sans-serif; font-weight: 400; font-size: 22px;
+    letter-spacing: 0.3px; text-transform: uppercase; color: var(--fa-navy);
+  }
+  .fa-dist {
+    font-family: 'Barlow Condensed', Arial, sans-serif; font-weight: 700; font-size: 13.5px;
+    letter-spacing: 1px; text-transform: uppercase; color: var(--fa-red); margin-left: auto;
+  }
+  .fa-mine-tag {
+    font-family: 'Barlow Condensed', Arial, sans-serif; font-weight: 700; font-size: 12.5px;
+    letter-spacing: 1px; text-transform: uppercase; color: var(--fa-white); background: var(--fa-navy);
+    border-radius: 999px; padding: 3px 10px;
+  }
+  .fa-contacts { margin-top: 14px; display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 14px; }
+  .fa-contact { background: var(--fa-chalk); border: 1px solid var(--fa-border); border-radius: 6px; padding: 12px 14px; }
+  .fa-contact h4 {
+    font-family: 'Barlow Condensed', Arial, sans-serif; font-weight: 700; font-size: 12.5px;
+    letter-spacing: 1.2px; text-transform: uppercase; color: var(--fa-slate); margin: 0 0 6px;
+  }
+  .fa-contact .n { font-weight: 600; color: var(--fa-navy); font-size: 15.5px; }
+  .fa-contact a { color: var(--fa-navy); text-decoration: underline; font-size: 14.5px; word-break: break-word; }
+  .fa-site { margin-top: 12px; }
+  .fa-site a {
+    display: inline-flex; align-items: center; gap: 6px; font-family: 'Barlow Condensed', Arial, sans-serif;
+    font-weight: 700; font-size: 14px; letter-spacing: 1px; text-transform: uppercase; color: var(--fa-navy);
+    text-decoration: underline;
+  }
+
+  @container (max-width: 560px) {
+    .fa-contacts { grid-template-columns: minmax(0,1fr); }
+    .fa-dist { margin-left: 0; }
+  }
+</style>
+
+<header class="fa-head">
+  <div class="fa-in">
+    <div class="fa-eyebrow">Prospective TSSAA Officials</div>
+    <h1 class="fa-title">Find Your Closest Officiating Association</h1>
+    <p class="fa-sub">New to Tennessee, or not sure who covers your area? Enter your home high school or your zip code and we&rsquo;ll show the three closest TSSAA-affiliated football officiating associations, with tackle and girls&rsquo; flag football contacts for each, so you know who to reach out to about joining.</p>
+  </div>
+</header>
+
+<section class="fa-body">
+  <div class="fa-search">
+    <label class="fa-label" for="faInput">High school name or TN zip code</label>
+    <div class="fa-searchrow">
+      <input type="text" id="faInput" autocomplete="off" placeholder="e.g. Brentwood High School or 37027">
+      <button type="button" id="faGo">Find my association</button>
+    </div>
+    <ul class="fa-sugg" id="faSugg" hidden></ul>
+    <p class="fa-msg" id="faMsg" hidden></p>
+  </div>
+
+  <p class="fa-resultsFor" id="faResultsFor" hidden></p>
+  <div class="fa-cards" id="faCards"></div>
+</section>
+
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var input = $('faInput'), go = $('faGo'), suggEl = $('faSugg'), msgEl = $('faMsg'),
+      resultsFor = $('faResultsFor'), cardsEl = $('faCards');
+
+  var ASSOCIATIONS = [
+    { n: 'Region I', lat: 36.5156, lon: -82.5114,
+      fb: [{ n: 'George Jordan', e: 'gwjordan@chartertn.net' }],
+      flag: { n: 'George Jordan', e: 'gwjordan@chartertn.net' }, w: '' },
+    { n: 'Knoxville', lat: 35.9380, lon: -83.9990,
+      fb: [{ n: 'Tracy Wheeler', e: 'twheelercr24@cs.com' }],
+      flag: { n: 'Phillips Freels', e: 'pfreels105@aol.com' }, w: '' },
+    { n: 'Clinch Valley', lat: 36.0887, lon: -84.6112,
+      fb: [{ n: 'Wes Barger', e: 'cvfoatn.barger@gmail.com' }],
+      flag: { n: 'Wes Barger', e: 'cvfoatn.barger@gmail.com' }, w: '' },
+    { n: 'Blount County', lat: 35.7565, lon: -83.9705,
+      fb: [{ n: 'Ken Coulter', e: 'eacoulter@charter.net' }],
+      flag: { n: 'Steve Hodson', e: 'hodboy46@gmail.com' }, w: '' },
+    { n: 'Athens/Tri-County', lat: 35.2920, lon: -84.6820,
+      fb: [{ n: 'Robert Casteel', e: 'casteelrobert@yahoo.com' }],
+      flag: { n: 'Gregory Geren', e: 'glgeren@gmail.com' }, w: '' },
+    { n: 'Southeast', lat: 35.1408, lon: -85.2501,
+      fb: [{ n: 'Randy Shuford', e: 'shufordgr@aol.com' }],
+      flag: { n: 'Scott Flerl', e: 'utkman@gmail.com' }, w: '' },
+    { n: 'Central', lat: 35.4887, lon: -86.6219,
+      fb: [{ n: 'Bill Marbet', e: 'bill@buffaloholdingsinc.com' }],
+      flag: { n: 'Mike Hollowell', e: 'Hollowell13@gmail.com' }, w: '' },
+    { n: 'North Central', lat: 36.1206, lon: -86.2844,
+      fb: [{ n: 'Fred McCollum', e: 'mccollumfred34@gmail.com' }],
+      flag: { n: 'Bill Ramos', e: 'williampramos3@yahoo.com' }, w: '' },
+    { n: 'North Middle', lat: 36.5278, lon: -87.3589,
+      fb: [{ n: 'Don Barry', e: 'deb37@bellsouth.net' }],
+      flag: { n: 'Sean Wilson', e: 'sean.wilson1339@gmail.com' }, w: '' },
+    { n: 'Middle Tennessee', lat: 36.0411, lon: -86.6511, mine: true,
+      fb: [{ n: 'Steve Swift', e: 'theswift1@comcast.net' }, { n: 'Tim Beard', e: 'tim@nolensvilletownlife.com' }, { n: 'Wayne Clendenen', e: 'wclen1@comcast.net' }],
+      flag: { n: 'Cole Womack', e: 'cole.womack@comcast.net' }, w: 'https://mtfoa.org' },
+    { n: 'Northwest', lat: 35.8263, lon: -88.5311,
+      fb: [{ n: 'Gene Dearmitt', e: 'dearmitt16@gmail.com' }],
+      flag: { n: 'Brad Hurley', e: 'cchamber@earthlink.net' }, w: '' },
+    { n: 'Southwest', lat: 35.7086, lon: -88.7963,
+      fb: [{ n: 'Chris Gilley', e: 'cgilley14@gmail.com' }],
+      flag: { n: 'Larry Lewis', e: 'larrylewis5422@gmail.com' }, w: '' },
+    { n: 'Mid-South', lat: 35.1554, lon: -89.7763,
+      fb: [{ n: 'Paul Holt', e: 'paholt1@att.net' }, { n: 'Stanley Greene', e: 'stnly.greene@gmail.com' }, { n: 'Jack Davis', e: 'jack@ssc-steel.com' }],
+      flag: { n: 'Don Williams', e: 'msfoa@att.net' }, w: '' }
+  ];
+
+  var schools = null, zips = null, dataReady = null;
+  function loadData() {
+    if (dataReady) return dataReady;
+    dataReady = Promise.all([
+      fetch('/assets/data/officials-schools.json').then(function (r) { return r.json(); }),
+      fetch('/assets/data/officials-zips.json').then(function (r) { return r.json(); })
+    ]).then(function (r) { schools = r[0]; zips = r[1]; });
+    return dataReady;
+  }
+  loadData();
+
+  function haversineMiles(lat1, lon1, lat2, lon2) {
+    var R = 3958.8, toRad = function (d) { return d * Math.PI / 180; };
+    var dLat = toRad(lat2 - lat1), dLon = toRad(lon2 - lon1);
+    var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+  /* ---- suggestions (live smart-fill against the school list) ---- */
+  var activeSchool = null, suggItems = [], suggIndex = -1;
+  function hideSugg() { suggEl.hidden = true; suggEl.innerHTML = ''; suggItems = []; suggIndex = -1; }
+  function highlightSugg() {
+    var btns = suggEl.querySelectorAll('button[data-i]');
+    btns.forEach(function (b, i) {
+      if (i === suggIndex) { b.classList.add('on'); b.scrollIntoView({ block: 'nearest' }); }
+      else b.classList.remove('on');
+    });
+  }
+  function showSugg(list) {
+    suggItems = list;
+    suggIndex = -1;
+    if (!list.length) { hideSugg(); return; }
+    suggEl.innerHTML = list.map(function (s, i) {
+      return '<li><button type="button" data-i="' + i + '">' + esc(s.n) + '<br><span class="c">' + esc(s.c) + '</span></button></li>';
+    }).join('');
+    suggEl.hidden = false;
+  }
+  function pickSugg(s) {
+    activeSchool = s;
+    input.value = s.n;
+    hideSugg();
+    runSearch();
+  }
+  function filterSchools(q) {
+    if (!schools) return [];
+    if (!q) return schools.slice().sort(function (a, b) { return a.n.localeCompare(b.n); }).slice(0, 8);
+    var ql = q.toLowerCase();
+    var starts = [], contains = [];
+    schools.forEach(function (s) {
+      var nl = s.n.toLowerCase();
+      if (nl.indexOf(ql) === 0) starts.push(s);
+      else if (nl.indexOf(ql) !== -1) contains.push(s);
+    });
+    return starts.concat(contains).slice(0, 8);
+  }
+  suggEl.addEventListener('click', function (ev) {
+    var b = ev.target.closest && ev.target.closest('button[data-i]');
+    if (!b) return;
+    pickSugg(suggItems[Number(b.getAttribute('data-i'))]);
+  });
+  input.addEventListener('focus', function () {
+    activeSchool = null;
+    var q = input.value.trim();
+    if (/^\d+$/.test(q)) { hideSugg(); return; }
+    if (!schools) { hideSugg(); return; }
+    showSugg(filterSchools(q));
+  });
+  input.addEventListener('input', function () {
+    activeSchool = null;
+    var q = input.value.trim();
+    if (/^\d+$/.test(q)) { hideSugg(); return; }
+    if (!schools) { hideSugg(); return; }
+    showSugg(filterSchools(q));
+  });
+  document.addEventListener('click', function (ev) {
+    if (!suggEl.contains(ev.target) && ev.target !== input) hideSugg();
+  });
+  input.addEventListener('keydown', function (ev) {
+    if (!suggEl.hidden && suggItems.length && (ev.key === 'ArrowDown' || ev.key === 'ArrowUp')) {
+      ev.preventDefault();
+      suggIndex = ev.key === 'ArrowDown'
+        ? (suggIndex + 1) % suggItems.length
+        : (suggIndex - 1 + suggItems.length) % suggItems.length;
+      highlightSugg();
+      return;
+    }
+    if (ev.key === 'Enter') {
+      ev.preventDefault();
+      if (!suggEl.hidden && suggIndex > -1 && suggItems[suggIndex]) { pickSugg(suggItems[suggIndex]); return; }
+      hideSugg();
+      runSearch();
+      return;
+    }
+    if (ev.key === 'Escape') { hideSugg(); }
+  });
+  go.addEventListener('click', function () { hideSugg(); runSearch(); });
+
+  function showMsg(text) { msgEl.textContent = text; msgEl.hidden = false; }
+  function hideMsg() { msgEl.hidden = true; }
+
+  function runSearch() {
+    hideMsg();
+    var q = input.value.trim();
+    if (!q) { showMsg('Please enter a high school name or a 5-digit Tennessee zip code.'); return; }
+
+    loadData().then(function () {
+      var loc = null, label = '';
+
+      if (/^\d{5}$/.test(q)) {
+        if (zips[q]) { loc = zips[q]; label = 'zip code ' + q; }
+        else { showMsg('We don’t recognize "' + q + '" as a Tennessee zip code. Double check it, or search by high school name instead.'); return; }
+      } else if (activeSchool && activeSchool.n.toLowerCase() === q.toLowerCase()) {
+        loc = [activeSchool.lat, activeSchool.lon]; label = activeSchool.n + ' (' + activeSchool.c + ')';
+      } else {
+        var ql = q.toLowerCase();
+        var exact = schools.filter(function (s) { return s.n.toLowerCase() === ql; });
+        var partial = exact.length ? exact : schools.filter(function (s) { return s.n.toLowerCase().indexOf(ql) !== -1; });
+        if (partial.length === 1) {
+          var s = partial[0]; loc = [s.lat, s.lon]; label = s.n + ' (' + s.c + ')';
+        } else if (partial.length > 1) {
+          showSugg(partial.slice(0, 8));
+          showMsg('That matches more than one school — pick yours from the list below.');
+          return;
+        } else {
+          showMsg('We couldn’t find a school matching "' + q + '." Try typing a bit less, or enter a 5-digit Tennessee zip code instead.');
+          return;
+        }
+      }
+
+      var ranked = ASSOCIATIONS.map(function (a) {
+        return { a: a, d: haversineMiles(loc[0], loc[1], a.lat, a.lon) };
+      }).sort(function (x, y) { return x.d - y.d; }).slice(0, 3);
+
+      resultsFor.innerHTML = 'Closest associations to <b>' + esc(label) + '</b>:';
+      resultsFor.hidden = false;
+      cardsEl.innerHTML = ranked.map(function (r, i) {
+        var a = r.a;
+        var fb = a.fb.map(function (p) { return '<div class="n">' + esc(p.n) + '</div><a href="mailto:' + esc(p.e) + '">' + esc(p.e) + '</a>'; }).join('<div style="height:8px"></div>');
+        var flag = '<div class="n">' + esc(a.flag.n) + '</div><a href="mailto:' + esc(a.flag.e) + '">' + esc(a.flag.e) + '</a>';
+        var site = a.w ? '<div class="fa-site"><a href="' + esc(a.w) + '" target="_blank" rel="noopener">Visit website →</a></div>' : '';
+        return '<div class="fa-card' + (a.mine ? ' mine' : '') + '">' +
+          '<div class="fa-card-top"><span class="fa-rank">' + (i + 1) + '</span>' +
+          '<span class="fa-card-name">' + esc(a.n) + '</span>' +
+          (a.mine ? '<span class="fa-mine-tag">This is MTFOA</span>' : '') +
+          '<span class="fa-dist">' + Math.round(r.d) + ' mi away</span></div>' +
+          '<div class="fa-contacts">' +
+            '<div class="fa-contact"><h4>Football recruiter</h4>' + fb + '</div>' +
+            '<div class="fa-contact"><h4>Girls’ flag football</h4>' + flag + '</div>' +
+          '</div>' + site +
+        '</div>';
+      }).join('');
+    });
+  }
+})();
+</script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700&display=swap">
+</div>

@@ -87,9 +87,12 @@
   .ft-base {
     max-width: 960px; margin: 0 auto; padding: 14px 24px 16px;
     border-top: 1px solid rgba(201, 214, 232, 0.18);
-    display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 20px;
+    display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 6px 20px;
     font-size: 13.5px; line-height: 1.4; color: var(--ft-tint);
   }
+  .mtfoa-ft a.ft-tssaa { display: inline-flex; align-items: center; opacity: 0.9; transition: opacity 0.12s ease; }
+  .mtfoa-ft a.ft-tssaa:hover { opacity: 1; }
+  .ft-tssaa img { display: block; height: 26px; width: auto; }
 
   /* phone: one column, link lists side by side */
   .fm .ft-grid { grid-template-columns: 1fr 1fr; gap: 26px 18px; padding: 26px 18px 20px; }
@@ -157,7 +160,8 @@
       '<a class="ft-join" href="' + SITE + '/news" target="_top">Join the MTFOA ' + ARROW + '</a></nav>';
 
   document.getElementById('ftBase').innerHTML =
-    '<span>' + new Date().getFullYear() + ' Middle Tennessee Football Officials Association, Inc.</span>';
+    '<span>' + new Date().getFullYear() + ' Middle Tennessee Football Officials Association, Inc.</span>' +
+    '<a class="ft-tssaa" href="' + SITE + '/find-association" target="_top" aria-label="Prospective officials: find your TSSAA association"><img alt="TSSAA Officials - Stay in the Game" src="/assets/images/tssaa-officials-logo.png"></a>';
 })();
 </script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600&display=swap">
