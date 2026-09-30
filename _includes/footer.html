@@ -87,17 +87,18 @@
   .ft-base {
     max-width: 960px; margin: 0 auto; padding: 14px 24px 16px;
     border-top: 1px solid rgba(201, 214, 232, 0.18);
-    display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 6px 20px;
+    display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 20px;
     font-size: 13.5px; line-height: 1.4; color: var(--ft-tint);
   }
-  .mtfoa-ft a.ft-tssaa { display: inline-flex; align-items: center; opacity: 0.9; transition: opacity 0.12s ease; }
+  .mtfoa-ft a.ft-tssaa { display: inline-flex; align-items: center; margin-top: 16px; opacity: 0.92; transition: opacity 0.12s ease; }
   .mtfoa-ft a.ft-tssaa:hover { opacity: 1; }
-  .ft-tssaa img { display: block; height: 26px; width: auto; }
+  .ft-tssaa img { display: block; height: 62px; width: auto; filter: brightness(0) invert(1); }
 
   /* phone: one column, link lists side by side */
   .fm .ft-grid { grid-template-columns: 1fr 1fr; gap: 26px 18px; padding: 26px 18px 20px; }
   .fm .ft-brand { grid-column: 1 / -1; }
   .fm .ft-logo img { height: 56px; }
+  .fm .ft-tssaa img { height: 56px; }
   .fm .ft-links a { font-size: 15.5px; padding: 6px 0 6px 12px; }
   .fm .ft-h { letter-spacing: 1.6px; }
   .fm a.ft-join { padding: 11px 12px; letter-spacing: 1px; font-size: 14px; }
@@ -157,11 +158,11 @@
     '</div>' +
     '<nav aria-label="Explore"><h2 class="ft-h">Explore</h2>' + list(EXPLORE) + '</nav>' +
     '<nav aria-label="Members"><h2 class="ft-h">Members</h2>' + list(MEMBERS) +
-      '<a class="ft-join" href="' + SITE + '/news" target="_top">Join the MTFOA ' + ARROW + '</a></nav>';
+      '<a class="ft-join" href="' + SITE + '/news" target="_top">Join the MTFOA ' + ARROW + '</a>' +
+      '<a class="ft-tssaa" href="' + SITE + '/find-association" target="_top" aria-label="Prospective officials: find your TSSAA association"><img alt="TSSAA Officials - Stay in the Game" src="/assets/images/tssaa-officials-logo.png"></a></nav>';
 
   document.getElementById('ftBase').innerHTML =
-    '<span>' + new Date().getFullYear() + ' Middle Tennessee Football Officials Association, Inc.</span>' +
-    '<a class="ft-tssaa" href="' + SITE + '/find-association" target="_top" aria-label="Prospective officials: find your TSSAA association"><img alt="TSSAA Officials - Stay in the Game" src="/assets/images/tssaa-officials-logo.png"></a>';
+    '<span>' + new Date().getFullYear() + ' Middle Tennessee Football Officials Association, Inc.</span>';
 })();
 </script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600&display=swap">
