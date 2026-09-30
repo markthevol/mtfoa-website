@@ -91,15 +91,15 @@
     font-size: 13.5px; line-height: 1.4; color: var(--ft-tint);
   }
   .mtfoa-ft nav[aria-label="Members"] { display: flex; flex-direction: column; align-items: flex-start; }
-  .mtfoa-ft a.ft-tssaa { display: inline-flex; align-items: center; margin-top: auto; margin-bottom: auto; opacity: 0.92; transition: opacity 0.12s ease; }
+  .mtfoa-ft a.ft-tssaa { display: inline-flex; align-items: center; max-width: 100%; margin-top: auto; margin-bottom: auto; opacity: 0.92; transition: opacity 0.12s ease; }
   .mtfoa-ft a.ft-tssaa:hover { opacity: 1; }
-  .ft-tssaa img { display: block; height: 62px; width: auto; filter: brightness(0) invert(1); }
+  .ft-tssaa img { display: block; height: auto; width: auto; max-height: 62px; max-width: 100%; filter: brightness(0) invert(1); }
 
   /* phone: one column, link lists side by side */
   .fm .ft-grid { grid-template-columns: 1fr 1fr; gap: 26px 18px; padding: 26px 18px 20px; }
   .fm .ft-brand { grid-column: 1 / -1; }
   .fm .ft-logo img { height: 56px; }
-  .fm .ft-tssaa img { height: 56px; }
+  .fm .ft-tssaa img { max-height: 40px; }
   .fm .ft-links a { font-size: 15.5px; padding: 6px 0 6px 12px; }
   .fm .ft-h { letter-spacing: 1.6px; }
   .fm a.ft-join { padding: 11px 12px; letter-spacing: 1px; font-size: 14px; }
