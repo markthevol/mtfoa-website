@@ -321,7 +321,7 @@ permalink: /photos
     .then(function (data) { albumsIndex = data; renderAlbumGrid(); })
     .catch(function () { grid.innerHTML = '<p class="ep-empty">Could not load the photo albums right now. Please try again later.</p>'; });
 
-  var CARD_BADGE = { crew: '/assets/images/bluecross-bowl-logo.png', banq: '/assets/images/mtfoa-logo-white.png?v=3', other: '/assets/images/mtfoa-logo-white.png?v=3' };
+  var CARD_BADGE = { crew: '/assets/images/bluecross-bowl-logo.png', banq: '/assets/images/mtfoa-logo-white.png?v=4', other: '/assets/images/mtfoa-logo-white.png?v=4' };
   function renderAlbumGrid() {
     grid.innerHTML = albumsIndex.map(function (a) {
       var extra = EXTRA_LINKS[a.slug];
