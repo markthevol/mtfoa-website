@@ -455,8 +455,9 @@ sitemap: false
     var box = $('eoNomList');
     if (!people.length) { box.innerHTML = '<div class="eo-nom-none">No one found with that name.</div>'; fit(); return; }
     box.innerHTML = people.map(function (p) {
-      return '<div class="eo-nom-row">' + (p.nominated
-        ? '<b>' + esc(p.name) + '</b><span class="eo-nom-done">Already nominated</span>'
+      var tag = p.ineligible ? 'Not eligible for nomination' : p.nominated ? 'Already nominated' : '';
+      return '<div class="eo-nom-row">' + (tag
+        ? '<b>' + esc(p.name) + '</b><span class="eo-nom-done">' + tag + '</span>'
         : '<button type="button" class="eo-nom-pick" data-nom-pick="' + esc(p.email) + '" data-nom-name="' + esc(p.name) + '">' + esc(p.name) + '</button>') + '</div>';
     }).join('');
     fit();
