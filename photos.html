@@ -156,6 +156,7 @@ permalink: /photos
   }
   .ep-arr { transition: transform 0.15s ease; }
   .ep-card:hover .ep-arr { transform: translate(2px, -2px); }
+  .ep-badge { position: absolute; right: 10px; bottom: 10px; height: 34px; width: auto; opacity: 0.92; pointer-events: none; }
 
   /* ---------- Album detail view ---------- */
   .ep-back {
@@ -164,7 +165,10 @@ permalink: /photos
     letter-spacing: 1.2px; text-transform: uppercase; color: var(--ep-navy);
   }
   .ep-back:hover { color: var(--ep-red); }
-  .ep-albumhead { margin-bottom: 14px; }
+  .ep-albumhead { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 14px; }
+  .ep-albumlogos { display: flex; align-items: center; gap: 14px; flex: none; }
+  .ep-albumlogos[hidden] { display: none; }
+  .ep-albumlogo { height: clamp(44px, 8vw, 60px); width: auto; display: block; }
   .ep-albumkind {
     font-family: 'Barlow Condensed', Arial, sans-serif; font-weight: 700; font-size: 12.5px;
     letter-spacing: 2px; text-transform: uppercase; color: var(--ep-slate);
@@ -253,9 +257,15 @@ permalink: /photos
     <div id="epAlbumView" hidden>
       <button type="button" class="ep-back" id="epBack">&larr; Back to albums</button>
       <div class="ep-albumhead">
-        <div class="ep-albumkind" id="epAlbumKind"></div>
-        <h2 class="ep-albumtitle" id="epAlbumTitle"></h2>
-        <p class="ep-albumcount" id="epAlbumCount"></p>
+        <div>
+          <div class="ep-albumkind" id="epAlbumKind"></div>
+          <h2 class="ep-albumtitle" id="epAlbumTitle"></h2>
+          <p class="ep-albumcount" id="epAlbumCount"></p>
+        </div>
+        <div class="ep-albumlogos" id="epAlbumLogos" hidden>
+          <img class="ep-albumlogo" src="/assets/images/bluecross-bowl-logo.png" alt="BlueCross Bowl">
+          <img class="ep-albumlogo" src="/assets/images/tssaa-championships-logo.png" alt="TSSAA Championships">
+        </div>
       </div>
       <div class="ep-thumbgrid" id="epThumbGrid"></div>
       <button type="button" class="ep-loadmore" id="epLoadMore" hidden>Show more photos</button>
@@ -291,6 +301,7 @@ permalink: /photos
   var albumKindEl = document.getElementById('epAlbumKind');
   var albumTitleEl = document.getElementById('epAlbumTitle');
   var albumCountEl = document.getElementById('epAlbumCount');
+  var albumLogosEl = document.getElementById('epAlbumLogos');
   var thumbGrid = document.getElementById('epThumbGrid');
   var loadMoreBtn = document.getElementById('epLoadMore');
   var lightbox = document.getElementById('epLightbox');
@@ -310,6 +321,7 @@ permalink: /photos
     .then(function (data) { albumsIndex = data; renderAlbumGrid(); })
     .catch(function () { grid.innerHTML = '<p class="ep-empty">Could not load the photo albums right now. Please try again later.</p>'; });
 
+  var CARD_BADGE = { crew: '/assets/images/bluecross-bowl-logo.png', banq: '/assets/images/mtfoa-logo-white.png', other: '/assets/images/mtfoa-logo-white.png' };
   function renderAlbumGrid() {
     grid.innerHTML = albumsIndex.map(function (a) {
       var extra = EXTRA_LINKS[a.slug];
@@ -317,12 +329,15 @@ permalink: /photos
         ? '<a class="ep-extra" href="' + esc(extra.href) + '" target="_blank" rel="noopener">' + esc(extra.label) +
           ' <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a>'
         : '';
+      var badge = CARD_BADGE[a.category];
+      var badgeHtml = badge ? '<img class="ep-badge" src="' + badge + '" alt="" aria-hidden="true">' : '';
       return '<div class="ep-item' + (extra ? ' has-extra' : '') + '" data-cat="' + esc(a.category) + '">' +
         '<button type="button" class="ep-card ' + esc(a.category === 'crew' ? 'crew' : a.category === 'banq' ? 'banq' : (a.slug.indexOf('golf') !== -1 ? 'golf' : 'award')) +
           (a.cover ? ' has-cover" style="background-image:url(\'' + esc(a.cover) + '\')' : '') + '" data-slug="' + esc(a.slug) + '">' +
           '<span class="ep-name">' + a.name + '</span>' +
           '<span class="ep-count">' + a.count + ' photo' + (a.count === 1 ? '' : 's') + '</span>' +
           '<span class="ep-go">View album <svg class="ep-arr" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span>' +
+          badgeHtml +
         '</button>' + extraHtml +
       '</div>';
     }).join('');
@@ -384,6 +399,7 @@ permalink: /photos
         albumKindEl.textContent = data.kind || '';
         albumTitleEl.innerHTML = data.name || '';
         albumCountEl.textContent = currentPhotos.length + ' photo' + (currentPhotos.length === 1 ? '' : 's');
+        albumLogosEl.hidden = data.category !== 'crew';
         thumbGrid.innerHTML = '';
         renderMoreThumbs();
       })
