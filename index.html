@@ -194,16 +194,23 @@ permalink: /
   }
   .mtfoa-banquet, .mtfoa-banquet * { box-sizing: border-box; }
   .mtfoa-banquet :where(p, h2) { margin: 0; }
-  .bq-wrap { max-width: 1040px; margin: 0 auto; display: flex; align-items: center; gap: 30px; flex-wrap: wrap; }
+  .bq-items { max-width: 1040px; margin: 0 auto; display: flex; align-items: stretch; gap: 30px; flex-wrap: wrap; }
+  .bq-wrap { flex: 1 1 420px; min-width: 0; display: flex; align-items: center; gap: 30px; }
   .bq-badge { width: 128px; height: 128px; flex: none; }
-  .bq-copy { flex: 1 1 320px; min-width: 0; }
+  .bq-copy { flex: 1 1 220px; min-width: 0; }
   .bq-eyebrow { font-family: 'Barlow Condensed', Arial, sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: #ff8a7a; margin: 0 0 4px; }
   .bq-h { font-family: 'Anton', Impact, 'Arial Narrow', sans-serif; font-weight: 400; font-size: 28px; letter-spacing: .4px; text-transform: uppercase; color: #fff; line-height: 1.15; }
   .bq-when { margin-top: 6px; font-size: 16px; color: #d7e0ef; }
   .bq-cta { display: inline-flex; align-items: center; gap: 8px; margin-top: 16px; padding: 12px 22px; background: #d6291a; color: #fff; font-family: 'Barlow Condensed', Arial, sans-serif; font-weight: 700; font-size: 15px; letter-spacing: 1px; text-transform: uppercase; text-decoration: none; border-radius: 6px; transition: background .15s ease, transform .15s ease; }
   .bq-cta:hover { background: #b81f12; transform: translateY(-1px); }
+  /* flex-basis is an axis-relative size: the 320px on .bq-copy is meant as a preferred WIDTH for the
+     side-by-side row layout below. Once this switches to a column layout, that same flex-basis is read
+     against the vertical axis instead, forcing a 320px-tall box no matter how short the text actually is --
+     hence the explicit flex-basis: auto reset here. */
   @container (max-width: 520px) { .bq-wrap { flex-direction: column; align-items: stretch; text-align: center; justify-content: center; } .bq-copy { width: 100%; flex-basis: auto; } .bq-badge { width: 104px; height: 104px; align-self: center; } .bq-cta { justify-content: center; } }
+  @container (min-width: 521px) and (max-width: 900px) { .bq-items { flex-direction: column; } }
 </style>
+<div class="bq-items">
 <div class="bq-wrap">
       <svg class="bq-badge" viewBox="0 0 220 220" role="img" aria-label="MTFOA 80th Annual Banquet, 1946 to 2026">
         <defs><path id="bqStar" d="M0,-13 L3.6,-4.3 L13,-4.1 L5.6,1.9 L8,11 L0,5.8 L-8,11 L-5.6,1.9 L-13,-4.1 L-3.6,-4.3 Z"/></defs>
@@ -222,13 +229,31 @@ permalink: /
     <a class="bq-cta" href="https://mtfoa.org/mtfoamembers#attendance" target="_top">RSVP on your Member Portal</a>
   </div>
 </div>
+<div class="bq-wrap" id="nomTeaser">
+      <svg class="bq-badge" viewBox="0 0 220 220" role="img" aria-label="MTFOA Board Nominations">
+        <circle cx="110" cy="110" r="104" fill="#1f3864" stroke="#d6291a" stroke-width="7"/>
+        <circle cx="110" cy="110" r="90" fill="none" stroke="#ffffff" stroke-width="1.4" stroke-opacity=".45" stroke-dasharray="1.5 4.5"/>
+        <rect x="68" y="56" width="84" height="104" rx="7" fill="none" stroke="#ffffff" stroke-width="4"/>
+        <path d="M84 94 L102 112 L140 74" fill="none" stroke="#d6291a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="110" y="183" text-anchor="middle" font-family="'Barlow Condensed',Arial,sans-serif" font-weight="700" font-size="14" letter-spacing="2.4" fill="#d6291a">NOMINATE</text>
+      </svg>
+  <div class="bq-copy">
+    <p class="bq-eyebrow">Board nominations open</p>
+    <h2 class="bq-h">Nominate a Board Member</h2>
+    <p class="bq-when">Two Member-at-Large seats &middot; accepted through the Oct 14 meeting &middot; winners announced at the banquet</p>
+    <a class="bq-cta" href="https://mtfoa.org/mtfoamembers#nominate" target="_top">Nominate on your Member Portal</a>
+  </div>
+</div>
+</div>
 </div>
 
 <script>
 (function () {
   try {
-    var today = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Chicago', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
-    if (today > '2026-10-28') { var el = document.getElementById('bqTeaser'); if (el) el.remove(); }
+    var now = new Date();
+    var today = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Chicago', year: 'numeric', month: '2-digit', day: '2-digit' }).format(now);
+    if (today > '2026-10-28') { var el = document.getElementById('bqTeaser'); if (el) el.remove(); return; }
+    if (now.getTime() > new Date('2026-10-14T21:00:00-05:00').getTime()) { var nt = document.getElementById('nomTeaser'); if (nt) nt.remove(); }
   } catch (e) {}
 })();
 </script>
