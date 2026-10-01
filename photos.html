@@ -142,13 +142,8 @@ permalink: /photos
   .ep-card:not(.has-cover) { background-color: var(--ep-navy); }
   .ep-card.banq:not(.has-cover) { background-color: #7e1a12; }
   .ep-card.golf:not(.has-cover), .ep-card.award:not(.has-cover) { background-color: #2f5583; }
-  .ep-kind {
-    font-family: 'Barlow Condensed', Arial, sans-serif; font-weight: 700;
-    font-size: 12.5px; letter-spacing: 2px; text-transform: uppercase;
-    color: rgba(255,255,255,0.82);
-  }
   .ep-name {
-    display: block; margin-top: 6px;
+    display: block;
     font-family: 'Anton', Impact, 'Arial Narrow', sans-serif; font-weight: 400;
     font-size: clamp(22px, 6vw, 27px); line-height: 1.08; letter-spacing: 0.4px;
     text-transform: uppercase;
@@ -325,7 +320,6 @@ permalink: /photos
       return '<div class="ep-item' + (extra ? ' has-extra' : '') + '" data-cat="' + esc(a.category) + '">' +
         '<button type="button" class="ep-card ' + esc(a.category === 'crew' ? 'crew' : a.category === 'banq' ? 'banq' : (a.slug.indexOf('golf') !== -1 ? 'golf' : 'award')) +
           (a.cover ? ' has-cover" style="background-image:url(\'' + esc(a.cover) + '\')' : '') + '" data-slug="' + esc(a.slug) + '">' +
-          '<span class="ep-kind">' + esc(a.kind) + '</span>' +
           '<span class="ep-name">' + a.name + '</span>' +
           '<span class="ep-count">' + a.count + ' photo' + (a.count === 1 ? '' : 's') + '</span>' +
           '<span class="ep-go">View album <svg class="ep-arr" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span>' +
