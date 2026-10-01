@@ -130,10 +130,10 @@ permalink: /photos
   }
   .ep-card::before {
     content: ''; position: absolute; inset: 0; pointer-events: none;
-    background: linear-gradient(155deg, rgba(31,56,100,0.88) 0%, rgba(20,42,77,0.80) 100%);
+    background: linear-gradient(155deg, var(--ep-navy) 0%, var(--ep-navy-deep) 100%);
   }
-  .ep-card.banq::before { background: linear-gradient(155deg, rgba(179,40,28,0.88) 0%, rgba(126,26,18,0.80) 100%); }
-  .ep-card.golf::before, .ep-card.award::before { background: linear-gradient(155deg, rgba(74,114,160,0.88) 0%, rgba(47,85,131,0.80) 100%); }
+  .ep-card.banq::before { background: linear-gradient(155deg, #b3281c 0%, #7e1a12 100%); }
+  .ep-card.golf::before, .ep-card.award::before { background: linear-gradient(155deg, #4a72a0 0%, #2f5583 100%); }
   .ep-card:not(.has-cover) { background-image: none !important; }
   .ep-card > * { position: relative; }
   .ep-card:hover { transform: translateY(-3px); box-shadow: 0 14px 28px rgba(20,42,77,0.22); }
