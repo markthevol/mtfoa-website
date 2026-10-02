@@ -445,8 +445,9 @@ sitemap: false
     S.f.email = em;
     if (!em || !pw) { S.msg = 'Please type your email and your password.'; render(false); return; }
     S.busy = true; S.msg = ''; render(false);
+    var slow = setTimeout(function () { if (S.busy && S.step === 'signin') { S.banner = 'Still signing you in &mdash; this can take a little while the first time.'; S.bannerAt = 'signin'; render(false); } }, 9000);
     call({ action: 'signin', email: em, password: pw, remember: keep }).then(function (r) {
-      S.busy = false;
+      clearTimeout(slow); S.banner = ''; S.busy = false;
       if (r.status !== 'ok') { S.msg = r.message || 'That did not work. Please check your email and password.'; render(false); return; }
       savePass(r.token, r.hours || 12, keep); S.token = r.token; S.user = r.user || { email: em };
       loadPrefill();
@@ -482,8 +483,9 @@ sitemap: false
     var order = ['interest', 'you', 'address', 'exp', 'avail'];
     for (var i = 0; i < order.length; i++) { var e = check(order[i]); if (Object.keys(e).length) { S.errs = e; S.msg = 'One of your answers needs attention.'; go(order[i]); S.errs = e; S.msg = 'One of your answers needs attention.'; render(false); return; } }
     S.busy = true; S.msg = ''; render(false); saveDraft();
+    var slow = setTimeout(function () { if (S.busy && S.step === 'review') { S.banner = 'Still working &mdash; please do not close this page. This can take up to a minute.'; S.bannerAt = 'review'; S.bannerWarn = false; render(false); } }, 9000);
     call(payload()).then(function (r) {
-      S.busy = false;
+      clearTimeout(slow); S.banner = ''; S.busy = false;
       if (r.status === 'ok' && r.url) { window.location.href = r.url; S.busy = true; return; }
       if (r.code === 'already') { clearDraft(); S.step = 'already'; render(); return; }
       if (r.code === 'signin') { S.kind = 'returning'; S.msg = r.message; S.step = 'signin'; render(); return; }
