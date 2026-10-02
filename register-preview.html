@@ -310,9 +310,9 @@ sitemap: false
       if (!flagOnly()) h += '<h3>Positions you have worked</h3><p class="rg-note" style="margin:0 0 10px">Choose all that apply.</p>' + chips('worked', POS, 'Positions worked');
     } else {
       h += '<p class="rg-lead">Just a few quick questions.</p>' + fld('howHeard', 'How did you hear about MTFOA?', { ph: 'A friend, a school, the TSSAA website, ...' }) +
-        '<h3 style="margin-top:6px">Have you officiated football before with another association?</h3><div class="opts" style="margin-top:12px">' +
-        '<button type="button" class="opt-card" data-act="exp" data-v="no" aria-pressed="' + (S.experienced === false) + '"><span class="ic">' + ICON.newbie + '</span><span><b>No, I am brand new</b></span><span class="tick">' + ICON.tick + '</span></button>' +
-        '<button type="button" class="opt-card" data-act="exp" data-v="yes" aria-pressed="' + (S.experienced === true) + '"><span class="ic">' + ICON.back + '</span><span><b>Yes, I have experience</b></span><span class="tick">' + ICON.tick + '</span></button></div>' + errLine('experienced');
+        '<h3 style="margin-top:6px">Which best describes you?</h3><div class="opts" style="margin-top:12px">' +
+        '<button type="button" class="opt-card" data-act="exp" data-v="no" aria-pressed="' + (S.experienced === false) + '"><span class="ic">' + ICON.newbie + '</span><span><b>I&rsquo;m a first-time official</b><span class="sub">I haven&rsquo;t officiated football before</span></span><span class="tick">' + ICON.tick + '</span></button>' +
+        '<button type="button" class="opt-card" data-act="exp" data-v="yes" aria-pressed="' + (S.experienced === true) + '"><span class="ic">' + ICON.back + '</span><span><b>I&rsquo;ve officiated before</b><span class="sub">With another association or in another state</span></span><span class="tick">' + ICON.tick + '</span></button></div>' + errLine('experienced');
       if (S.experienced === true) {
         h += fld('priorAssoc', 'Which association(s) did you work for?') + fld('priorYears', 'How many years of experience?', { im: 'numeric', max: 30, ph: 'For example, 5' });
         if (!flagOnly()) h += '<h3>Positions you primarily worked</h3><p class="rg-note" style="margin:0 0 10px">Choose all that apply.</p>' + chips('worked', POS, 'Positions worked');
@@ -325,7 +325,7 @@ sitemap: false
     var phones = ['Mobile ' + f.mobile].concat(f.home ? ['Home ' + f.home] : [], f.work ? ['Work ' + f.work] : []).join(' &middot; ');
     function sec(t, to, rows) { return '<div class="sum"><div class="sum-h"><span>' + t + '</span><button type="button" class="rg-link" data-act="goto" data-v="' + to + '">Edit</button></div><dl>' + rows.map(function (r) { return r[1] ? '<dt>' + r[0] + '</dt><dd>' + r[1] + '</dd>' : ''; }).join('') + '</dl></div>'; }
     var expRows = S.kind === 'returning' ? [['Years with MTFOA', esc(f.yearsWith)], ['Positions worked', esc(f.worked.join(', '))]] :
-      [['How you heard about us', esc(f.howHeard)], ['Prior experience', S.experienced ? esc(f.priorYears + ' years with ' + f.priorAssoc) : 'New official'], ['Positions worked', esc(f.worked.join(', '))]];
+      [['How you heard about us', esc(f.howHeard)], ['Prior experience', S.experienced ? esc(f.priorYears + ' years with ' + f.priorAssoc) : 'First-time official'], ['Positions worked', esc(f.worked.join(', '))]];
     return '<h2 tabindex="-1">Review and pay</h2><p class="rg-lead">Check everything looks right, then continue to the secure payment page.</p>' + banner() +
       sec('Officiating', 'interest', [['Interested in', esc({ Tackle: 'Tackle football', Flag: 'Flag football', Both: 'Both tackle and flag' }[f.interest] || '')]]) +
       sec('About you', 'you', [['Name', esc(f.first + ' ' + f.last)], ['Email', esc(f.email)], ['Phone', esc(phones).replace(/&amp;middot;/g, '&middot;')]]) +
