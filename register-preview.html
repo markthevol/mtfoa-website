@@ -69,7 +69,6 @@ sitemap: false
   .mtfoa-reg .chip:hover { border-color: #9fb0cf; }
   .mtfoa-reg .chip[aria-pressed=true] { background: var(--navy); border-color: var(--navy); color: #fff; }
   .mtfoa-reg .chip small { font-weight: 400; opacity: .8; font-size: 13px; }
-  .mtfoa-reg .chip.nopref { margin-top: 4px; }
   .mtfoa-reg .quick { font-size: 14px; margin: 0 0 18px; color: var(--soft); }
   .mtfoa-reg .quick .rg-link { margin-left: 10px; }
   .mtfoa-reg .more { display: inline-block; margin: 0 0 16px; }
@@ -135,7 +134,7 @@ sitemap: false
 
   function blank() {
     return { interest: '', first: '', last: '', email: '', mobile: '', home: '', work: '', prefPhone: 'Mobile', more: false, street: '', city: '', state: 'TN', zip: '',
-      emName: '', emPhone: '', yearsWith: '', worked: [], prefPositions: [], noPref: false, days: [], time: '', postseason: '', finals: '', scratches: '',
+      emName: '', emPhone: '', yearsWith: '', worked: [], prefPositions: [], days: [], time: '', postseason: '', finals: '', scratches: '',
       howHeard: '', priorAssoc: '', priorYears: '' };
   }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
@@ -280,7 +279,7 @@ sitemap: false
       case 'exp': h = progress() + expView(); break;
       case 'avail':
         h = progress() + '<h2 tabindex="-1">When can you work?</h2><p class="rg-lead">Tell us your availability. You can always adjust it later with your assigner.</p>' + banner() +
-          (flagOnly() ? '' : '<h3>Positions you would like to work</h3><p class="rg-note" style="margin:0 0 10px">Choose all that apply.</p>' + chips('prefPositions', newNoExp() ? POS.slice(1) : POS, 'Preferred positions') + (newNoExp() ? '<button type="button" class="chip nopref" data-act="nopref" aria-pressed="' + !!S.f.noPref + '">I&rsquo;m a first-time official, not sure yet</button><p class="rg-note" style="margin:6px 0 0">Most first-time officials aren&rsquo;t sure yet, and that&rsquo;s okay.</p>' : '') + errLine('prefPositions')) +
+          (flagOnly() ? '' : '<h3>Positions you would like to work</h3><p class="rg-note" style="margin:0 0 10px">Choose all that apply.</p>' + chips('prefPositions', newNoExp() ? POS.slice(1) : POS, 'Preferred positions') + errLine('prefPositions')) +
           '<h3>Days you can work</h3><div class="chips" style="margin-top:10px" role="group" aria-label="Days available">' + DAYS.map(function (d) { return '<button type="button" class="chip" data-act="toggle" data-f="days" data-v="' + d + '" aria-pressed="' + (S.f.days.indexOf(d) >= 0) + '">' + d + '</button>'; }).join('') + '</div>' +
           '<p class="quick">Quick pick:<button type="button" class="rg-link" data-act="days" data-v="all">Every day</button><button type="button" class="rg-link" data-act="days" data-v="wk">Weekdays</button><button type="button" class="rg-link" data-act="days" data-v="none">Clear</button></p>' + errLine('days') +
           '<div class="fld' + (S.errs.time ? ' bad' : '') + '" style="margin-top:22px"><label for="f_time">Earliest time you can start on a weekday</label><select id="f_time" data-f="time"><option value="">Choose a time&hellip;</option>' +
@@ -332,7 +331,7 @@ sitemap: false
       sec('About you', 'you', [['Name', esc(f.first + ' ' + f.last)], ['Email', esc(f.email)], ['Phone', esc(phones).replace(/&amp;middot;/g, '&middot;')]]) +
       sec('Address and emergency contact', 'address', [['Address', esc(f.street + ', ' + f.city + ', ' + f.state + ' ' + f.zip)], ['Emergency contact', esc(f.emName + ' ' + f.emPhone)]]) +
       sec('Experience', 'exp', expRows) +
-      sec('Availability', 'avail', [['Preferred positions', newNoExp() && f.noPref && !flagOnly() ? 'Not sure yet (first-time official)' : esc(pos)], ['Days', esc(f.days.join(', '))], ['Earliest weekday time', esc(f.time)]]) +
+      sec('Availability', 'avail', [['Preferred positions', esc(pos)], ['Days', esc(f.days.join(', '))], ['Earliest weekday time', esc(f.time)]]) +
       '<div class="fee"><span>' + esc(S.season) + ' registration</span><b>' + money(S.fee) + '</b></div>' +
       '<p class="lock">' + ICON.lock + '<span>You will pay on Stripe&rsquo;s secure page by card or bank account. MTFOA never sees or stores your payment details.</span></p>' +
       nav(true, S.busy ? 'Opening secure payment&hellip;' : 'Continue to secure payment', 'pay');
@@ -377,11 +376,10 @@ sitemap: false
     var b = e.target.closest('[data-act]'); if (!b || !card.contains(b)) return;
     var act = b.getAttribute('data-act'), k = b.getAttribute('data-f'), v = b.getAttribute('data-v');
     if (act === 'pick') { S.f[k] = v; delete S.errs[k]; card.querySelectorAll('[data-act=pick][data-f=' + k + ']').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); }); var er = card.querySelector('.err'); if (er && k === 'interest') er.remove(); saveDraft(); }
-    else if (act === 'toggle') { var a = S.f[k], i = a.indexOf(v); if (i >= 0) a.splice(i, 1); else a.push(v); b.setAttribute('aria-pressed', i < 0 ? 'true' : 'false'); delete S.errs[k]; if (k === 'prefPositions' && i < 0 && S.f.noPref) { S.f.noPref = false; var np = card.querySelector('.nopref'); if (np) np.setAttribute('aria-pressed', 'false'); } saveDraft(); }
-    else if (act === 'nopref') { S.f.noPref = !S.f.noPref; if (S.f.noPref) S.f.prefPositions = []; delete S.errs.prefPositions; render(false); }
+    else if (act === 'toggle') { var a = S.f[k], i = a.indexOf(v); if (i >= 0) a.splice(i, 1); else a.push(v); b.setAttribute('aria-pressed', i < 0 ? 'true' : 'false'); delete S.errs[k]; saveDraft(); }
     else if (act === 'days') { S.f.days = v === 'all' ? DAYS.slice() : v === 'wk' ? DAYS.slice(0, 5) : []; delete S.errs.days; render(false); }
     else if (act === 'kind') { S.kind = v; card.querySelectorAll('[data-act=kind]').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); }); S.msg = ''; var m1 = card.querySelector('.rg-msg'); if (m1) m1.remove(); }
-    else if (act === 'exp') { S.experienced = v === 'yes'; if (S.experienced) S.f.noPref = false; delete S.errs.experienced; render(false); }
+    else if (act === 'exp') { S.experienced = v === 'yes'; delete S.errs.experienced; render(false); }
     else if (act === 'more') { S.f.more = true; render(false); }
     else if (act === 'goto') go(v);
     else if (act === 'back') goBack();
@@ -434,7 +432,7 @@ sitemap: false
       }
     }
     if (step === 'avail') {
-      if (!flagOnly() && !f.prefPositions.length && !(newNoExp() && f.noPref)) e.prefPositions = newNoExp() ? 'Please choose at least one position, or tell us you are not sure yet.' : 'Please choose at least one position.';
+      if (!flagOnly() && !f.prefPositions.length) e.prefPositions = 'Please choose at least one position.';
       if (!f.days.length) e.days = 'Please choose at least one day.';
       if (!f.time) e.time = 'Please choose a time.';
     }
@@ -477,8 +475,7 @@ sitemap: false
     var f = S.f, b = {};
     Object.keys(f).forEach(function (k) { b[k] = f[k]; });
     b.action = 'register'; b.experienced = S.kind === 'new' && S.experienced === true; b.page = location.pathname.replace(/\/+$/, '');
-    b.noPositionPref = newNoExp() && !flagOnly() && !!S.f.noPref;
-    if (flagOnly() || b.noPositionPref) b.prefPositions = [];
+    if (flagOnly()) b.prefPositions = [];
     if (S.kind === 'returning') b.token = S.token; else delete b.token;
     return b;
   }
