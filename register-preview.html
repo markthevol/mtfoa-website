@@ -256,7 +256,7 @@ sitemap: false
         break;
       case 'interest':
         h = progress() + signedInLine() + '<h2 tabindex="-1">What would you like to officiate?</h2><p class="rg-lead">Pick the one that fits.</p>' + banner() +
-          '<div class="opts">' + card1('interest', 'Tackle', ICON.football, 'Tackle football', '') + card1('interest', 'Flag', ICON.flag, 'Flag football', 'You will skip the position questions.') + card1('interest', 'Both', ICON.both, 'Both tackle and flag', '') + '</div>' + errLine('interest') + nav(S.kind === 'new' || !S.user, 'Continue');
+          '<div class="opts">' + card1('interest', 'Tackle', ICON.football, 'Tackle football', '') + card1('interest', 'Flag', ICON.flag, 'Flag football', '') + card1('interest', 'Both', ICON.both, 'Both tackle and flag', '') + '</div>' + errLine('interest') + nav(S.kind === 'new' || !S.user, 'Continue');
         break;
       case 'you':
         h = progress() + '<h2 tabindex="-1">A little about you</h2><p class="rg-lead">We use this to contact you about assignments and meetings.</p>' + banner() +
