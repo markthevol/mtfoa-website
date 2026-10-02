@@ -495,6 +495,8 @@ sitemap: false
   /* ---------- start up ---------- */
   function start() {
     var q = new URLSearchParams(location.search);
+    var tok0 = readPass();   // signed-in? ask for the prefill and the profile at the same time as the settings, not one after another
+    var pPre = tok0 ? call({ action: 'regprefill', token: tok0 }) : null, pMe = tok0 ? call({ action: 'me', token: tok0 }) : null;
     call({ action: 'reginfo' }).then(function (r) {
       if (r.status === 'ok') { S.season = r.season; S.fee = r.feeCents; S.open = r.open; }
       else { S.season = ''; }
@@ -509,10 +511,10 @@ sitemap: false
       if (S.token) {
         S.kind = 'returning';
         S.step = 'wait'; render(false);
-        call({ action: 'regprefill', token: S.token }).then(function (p) {
+        (pPre || call({ action: 'regprefill', token: S.token })).then(function (p) {
           if (p.status !== 'ok') { clearPass(); S.token = ''; S.user = null; S.kind = d && d.kind === 'new' ? 'new' : ''; S.step = S.kind ? (d.step || 'interest') : 'start'; return render(false); }
           S.user = { email: (S.f.email || ''), name: p.name || '' };
-          call({ action: 'me', token: S.token }).then(function (m) { if (m && m.status === 'ok' && m.user) { S.user.email = m.user.email; S.user.name = m.user.name; S.f.email = m.user.email; } finish(p, d); });
+          (pMe || call({ action: 'me', token: S.token })).then(function (m) { if (m && m.status === 'ok' && m.user) { S.user.email = m.user.email; S.user.name = m.user.name; S.f.email = m.user.email; } finish(p, d); });
         });
         return;
       }
