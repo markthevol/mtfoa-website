@@ -730,7 +730,7 @@ sitemap: false
     var def = TABS.filter(function (t) { return t.k === k; })[0];
     if (!frames[k]) {
       var f = document.createElement('iframe');
-      f.className = 'eo-frame'; f.title = def.name; f.setAttribute('scrolling', 'no'); f.hidden = true;
+      f.className = 'eo-frame'; f.title = def.name.replace(/&amp;/g, '&'); f.setAttribute('scrolling', 'no'); f.hidden = true;
       stage.appendChild(f); frames[k] = f; load(f, def.src);
     }
     Object.keys(frames).forEach(function (x) { frames[x].hidden = x !== k; });
