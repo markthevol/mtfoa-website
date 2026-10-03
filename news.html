@@ -311,7 +311,8 @@ permalink: /news
             <li>Your membership is not valid until you have paid.</li>
           </ul>
           <span class="mn-grow"></span>
-          <a class="mn-btn" href="https://mtfoa.org/register" target="_top">Register with the MTFOA</a>
+          <p class="mn-reg-closed" id="mnRegClosed" hidden style="margin:12px 0 0;font-weight:700;color:#b81f12;">Registration is closed for now. Returning officials will be notified when it opens. New officials can sign up on the registration page for an email reminder.</p>
+          <a class="mn-btn" id="mnRegBtn" href="https://mtfoa.org/register" target="_top">Register with the MTFOA</a>
         </div>
 
         <div class="mn-reg two">
@@ -618,6 +619,17 @@ permalink: /news
       try { localStorage.setItem(CACHE_KEY, JSON.stringify({ meetings: meetings, news: news })); } catch (e) {}
       render();
     })
+    .catch(function () {});
+})();
+</script>
+<script>
+/* Registration open/closed: asks the registration system (public "reginfo"), so this card follows the switch in Admin > Registrations. */
+(function () {
+  var btn = document.getElementById('mnRegBtn'), note = document.getElementById('mnRegClosed');
+  if (!btn || !note) return;
+  fetch('https://script.google.com/macros/s/AKfycbzrUU5NYuD3X_3ljgA92e_hnMJNs8efwNYwTzttqO7-dy7v2uvZnG4Iu5NjPcr36nkw/exec', { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'reginfo' }) })
+    .then(function (r) { return r.json(); })
+    .then(function (r) { if (r && r.status === 'ok' && r.open === false) { note.hidden = false; btn.textContent = 'Get a registration reminder'; } })
     .catch(function () {});
 })();
 </script>
