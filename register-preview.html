@@ -91,6 +91,11 @@ sitemap: false
   .mtfoa-reg .sum dd { margin: 1px 0 0; font-size: 16px; line-height: 1.35; overflow-wrap: anywhere; }
   .mtfoa-reg .fee { display: flex; justify-content: space-between; align-items: baseline; background: var(--tint); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; margin: 18px 0 8px; font-weight: 700; font-size: 18px; color: var(--navy); }
   .mtfoa-reg .fee b { font-size: 28px; }
+  .mtfoa-reg .agree { border: 2px solid var(--line); border-radius: 10px; padding: 14px 16px; margin: 18px 0 4px; background: #fff; }
+  .mtfoa-reg .agree.bad { border-color: var(--red); background: #fffafa; }
+  .mtfoa-reg .agree label { display: flex; gap: 12px; align-items: flex-start; font-size: 15.5px; line-height: 1.45; font-weight: 400; cursor: pointer; margin: 0; }
+  .mtfoa-reg .agree input[type=checkbox] { width: 22px; height: 22px; flex: none; margin: 1px 0 0; accent-color: var(--navy); }
+  .mtfoa-reg .agree a { font-weight: 600; color: var(--navy); }
   .mtfoa-reg .lock { display: flex; gap: 9px; align-items: flex-start; font-size: 14px; color: var(--soft); line-height: 1.45; margin: 4px 0 0; }
   .mtfoa-reg .done { text-align: center; padding: 8px 0 0; }
   .mtfoa-reg .done .big { width: 68px; height: 68px; border-radius: 50%; background: var(--ok); color: #fff; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; }
@@ -130,7 +135,7 @@ sitemap: false
   var TIMES = (function () { var o = []; for (var m = 8 * 60; m <= 21 * 60; m += 30) { var h = Math.floor(m / 60), mm = m % 60; o.push(((h + 11) % 12 + 1) + ':' + (mm < 10 ? '0' : '') + mm + ' ' + (h < 12 ? 'AM' : 'PM')); } return o; })();
 
   var card = document.getElementById('rgCard');
-  var S = { step: 'wait', kind: '', experienced: null, token: '', user: null, season: '', fee: 12000, open: true, source: '', f: blank(), errs: {}, msg: '', banner: '', bannerAt: '', bannerWarn: false, busy: false, restored: false };
+  var S = { step: 'wait', kind: '', experienced: null, token: '', user: null, season: '', fee: 12000, open: true, source: '', f: blank(), errs: {}, msg: '', banner: '', bannerAt: '', bannerWarn: false, busy: false, restored: false, agree: false };
 
   function blank() {
     return { interest: '', first: '', last: '', email: '', mobile: '', home: '', work: '', prefPhone: 'Mobile', more: false, street: '', city: '', state: 'TN', zip: '',
@@ -172,13 +177,12 @@ sitemap: false
 
   /* ---------- which screens apply to this person ---------- */
   function steps() {
-    var s = ['interest', 'you', 'address', 'exp', 'avail'];
-    if (S.kind === 'returning') s.push('extras');
-    s.push('review');
+    var s = ['interest', 'you', 'address', 'exp', 'avail', 'extras', 'review'];
     return s;
   }
   function flagOnly() { return S.f.interest === 'Flag'; }
   function newNoExp() { return S.kind === 'new' && S.experienced === false; }
+  function showPlayoffs() { return S.kind === 'returning' || S.experienced === true; }   // playoff experience: returning members and experienced officials new to MTFOA
 
   var ICON = {
     football: '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 20.5C2 14 6 6 13 3.5c4-.9 7.500-.5 7.500-.5s.4 3.500-.5 7.500C17.500 17.500 10 22 3.500 20.500z"/><path d="M9 15l6-6M10.500 11.500l2 2M12.500 9.500l2 2M8.500 13.500l2 2"/></svg>',
@@ -287,8 +291,9 @@ sitemap: false
         break;
       case 'extras':
         h = progress() + '<h2 tabindex="-1">Anything else we should know?</h2><p class="rg-lead">All optional &mdash; skip it if nothing applies.</p>' + banner() +
-          fld('postseason', 'Postseason experience (years and rounds)', { area: true, req: false }) + fld('finals', 'State championship finals worked (years)', { area: true, req: false }) +
-          fld('scratches', 'Schools you would like to scratch', { area: true, req: false }) + nav(true, 'Continue');
+          fld('scratches', 'Schools you would like to scratch', { area: true, req: false, hint: 'Use this for a conflict of interest, such as a close family member who plays for that school&rsquo;s varsity team, or a school where you teach or coach. We will not assign you to those schools.' }) +
+          (showPlayoffs() ? fld('postseason', 'Playoff experience (years and rounds)', { area: true, req: false, hint: 'If you have any.' }) : '') +
+          (S.kind === 'returning' ? fld('finals', 'State championship finals worked (years)', { area: true, req: false }) : '') + nav(true, 'Continue');
         break;
       case 'review': h = progress() + reviewView(); break;
     }
@@ -324,6 +329,7 @@ sitemap: false
     var f = S.f, pos = f.prefPositions.join(', ');
     var phones = ['Mobile ' + f.mobile].concat(f.home ? ['Home ' + f.home] : [], f.work ? ['Work ' + f.work] : []).join(' &middot; ');
     function sec(t, to, rows) { return '<div class="sum"><div class="sum-h"><span>' + t + '</span><button type="button" class="rg-link" data-act="goto" data-v="' + to + '">Edit</button></div><dl>' + rows.map(function (r) { return r[1] ? '<dt>' + r[0] + '</dt><dd>' + r[1] + '</dd>' : ''; }).join('') + '</dl></div>'; }
+    var extraRows = [['Schools to scratch', esc(f.scratches) || 'None listed']].concat(showPlayoffs() ? [['Playoff experience', esc(f.postseason) || 'None listed']] : [], S.kind === 'returning' && f.finals ? [['State finals worked', esc(f.finals)]] : []);
     var expRows = S.kind === 'returning' ? [['Years with MTFOA', esc(f.yearsWith)], ['Positions worked', esc(f.worked.join(', '))]] :
       [['How you heard about us', esc(f.howHeard)], ['Prior experience', S.experienced ? esc(f.priorYears + ' years with ' + f.priorAssoc) : 'First-time official'], ['Positions worked', esc(f.worked.join(', '))]];
     return '<h2 tabindex="-1">Review and pay</h2><p class="rg-lead">Check everything looks right, then continue to the secure payment page.</p>' + banner() +
@@ -332,6 +338,9 @@ sitemap: false
       sec('Address and emergency contact', 'address', [['Address', esc(f.street + ', ' + f.city + ', ' + f.state + ' ' + f.zip)], ['Emergency contact', esc(f.emName + ' ' + f.emPhone)]]) +
       sec('Experience', 'exp', expRows) +
       sec('Availability', 'avail', [['Preferred positions', esc(pos)], ['Days', esc(f.days.join(', '))], ['Earliest weekday time', esc(f.time)]]) +
+      sec('Conflicts and experience', 'extras', extraRows) +
+      '<div class="agree' + (S.errs.agree ? ' bad' : '') + '"><label for="rgAgree"><input type="checkbox" id="rgAgree"' + (S.agree ? ' checked' : '') + '><span>I understand that I am an <b>independent contractor</b>, not an employee of MTFOA, and that I will be issued a <b>Form 1099</b>. I agree to follow all posted MTFOA policies. ' +
+      '<a href="/policies-review" target="_blank" rel="noopener">Read the MTFOA policies and insurance information</a> (opens in a new tab).</span></label>' + (S.errs.agree ? '<p class="err" role="alert">' + esc(S.errs.agree) + '</p>' : '') + '</div>' +
       '<div class="fee"><span>' + esc(S.season) + ' registration</span><b>' + money(S.fee) + '</b></div>' +
       '<p class="lock">' + ICON.lock + '<span>You will pay on Stripe&rsquo;s secure page by card or bank account. MTFOA never sees or stores your payment details.</span></p>' +
       nav(true, S.busy ? 'Opening secure payment&hellip;' : 'Continue to secure payment', 'pay');
@@ -367,6 +376,7 @@ sitemap: false
   });
   card.addEventListener('change', function (e) {
     var el = e.target, k = el.getAttribute('data-f');
+    if (el.id === 'rgAgree') { S.agree = !!el.checked; if (S.agree) { delete S.errs.agree; var ab = el.closest('.agree'); if (ab) { ab.classList.remove('bad'); var ae = ab.querySelector('.err'); if (ae) ae.remove(); } } return; }
     if (k && (k === 'mobile' || k === 'home' || k === 'work' || k === 'emPhone')) { var p = fmtPhone(el.value); if (p) { el.value = p; S.f[k] = p; saveDraft(); } }
     if (k === 'home' || k === 'work') { if (!S.f.home && S.f.prefPhone === 'Home') S.f.prefPhone = 'Mobile'; if (!S.f.work && S.f.prefPhone === 'Work') S.f.prefPhone = 'Mobile'; }
   });
@@ -384,7 +394,7 @@ sitemap: false
     else if (act === 'goto') go(v);
     else if (act === 'back') goBack();
     else if (act === 'signout') { clearPass(); S.user = null; S.token = ''; S.kind = ''; S.f = blank(); S.banner = ''; go('start'); }
-    else if (act === 'restart') { clearDraft(); S.f = blank(); S.kind = S.user ? 'returning' : ''; S.experienced = null; S.banner = ''; go(S.user ? 'interest' : 'start'); }
+    else if (act === 'restart') { clearDraft(); S.agree = false; S.f = blank(); S.kind = S.user ? 'returning' : ''; S.experienced = null; S.banner = ''; go(S.user ? 'interest' : 'start'); }
     else if (act === 'next') onNext();
   });
   card.addEventListener('keydown', function (e) { if (e.key === 'Enter' && e.target.tagName === 'INPUT' && e.target.type !== 'checkbox') { e.preventDefault(); onNext(); } });
@@ -476,12 +486,16 @@ sitemap: false
     Object.keys(f).forEach(function (k) { b[k] = f[k]; });
     b.action = 'register'; b.experienced = S.kind === 'new' && S.experienced === true; b.page = location.pathname.replace(/\/+$/, '');
     if (flagOnly()) b.prefPositions = [];
+    b.agree = S.agree === true;
+    if (!showPlayoffs()) { b.postseason = ''; b.finals = ''; }
+    if (S.kind !== 'returning') b.finals = '';
     if (S.kind === 'returning') b.token = S.token; else delete b.token;
     return b;
   }
   function doPay() {
     var order = ['interest', 'you', 'address', 'exp', 'avail'];
     for (var i = 0; i < order.length; i++) { var e = check(order[i]); if (Object.keys(e).length) { S.errs = e; S.msg = 'One of your answers needs attention.'; go(order[i]); S.errs = e; S.msg = 'One of your answers needs attention.'; render(false); return; } }
+    if (!S.agree) { S.errs = { agree: 'Please check the box to confirm the agreement before you pay.' }; S.msg = ''; render(false); var ag = card.querySelector('.agree'); if (ag) ag.scrollIntoView({ block: 'center' }); return; }
     S.busy = true; S.msg = ''; render(false); saveDraft();
     var slow = setTimeout(function () { if (S.busy && S.step === 'review') { S.banner = 'Still working &mdash; please do not close this page. This can take up to a minute.'; S.bannerAt = 'review'; S.bannerWarn = false; render(false); } }, 9000);
     call(payload()).then(function (r) {
