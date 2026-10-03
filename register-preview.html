@@ -416,7 +416,7 @@ sitemap: false
         '<label class="su-keep"><input type="checkbox" id="suKeep"> Keep me signed in on this device</label>' + err +
         '<div class="su-row"><button type="button" class="btn pri" data-act="savepw">Save my password</button><button type="button" class="rg-link" data-act="sendcode">Send a new code</button></div>');
     } else {
-      s1 = stp(1, 'Create your website password', '<p>You can sign in to the Member Portal (your meeting attendance, member resources and board elections), but you do not have a password yet. You will create one now: we will email a 6-digit code to <b>' + e + '</b> to confirm it is you, then you choose your own password.</p>' +
+      s1 = stp(1, 'Create your website password', '<p>The Member Portal gives you your meeting attendance, member resources and board elections. You do not have a password yet, so you will create one now: we will email a 6-digit code to <b>' + e + '</b> to confirm it is you, then you choose your own password.</p>' +
         (u.ready ? '' : '<p class="hint">Your account is still being set up. If the code does not arrive, wait a minute and ask again.</p>') + err +
         '<div class="su-row"><button type="button" class="btn pri" data-act="sendcode">Email me a code to create my password</button></div>');
     }
