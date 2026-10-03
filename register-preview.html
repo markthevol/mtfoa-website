@@ -152,7 +152,7 @@ sitemap: false
   var ROUNDS = ['First round', 'Second round', 'Quarterfinals', 'Semifinals', 'Championship game'];
 
   var card = document.getElementById('rgCard');
-  var S = { step: 'wait', kind: '', experienced: null, token: '', user: null, season: '', fee: 12000, open: true, source: '', f: blank(), errs: {}, msg: '', banner: '', bannerAt: '', bannerWarn: false, busy: false, restored: false, agree: false, setup: null };
+  var S = { step: 'wait', kind: '', experienced: null, token: '', user: null, season: '', fee: 12000, open: true, source: '', f: blank(), errs: {}, msg: '', banner: '', bannerAt: '', bannerWarn: false, busy: false, restored: false, agree: false, setup: null, back: null };
 
   function blank() {
     return { interest: '', first: '', last: '', email: '', mobile: '', home: '', work: '', prefPhone: 'Mobile', more: false, street: '', city: '', state: 'TN', zip: '',
@@ -298,7 +298,7 @@ sitemap: false
       case 'closed': h = '<h2 tabindex="-1">Registration is not open right now</h2><p class="rg-lead">Please check back soon, or watch for an announcement from the association.</p>'; break;
       case 'already': h = '<div class="done"><div class="big">' + ICON.check + '</div><h2 tabindex="-1">You are already registered</h2><p class="rg-lead">We already have your paid ' + esc(S.season) + ' registration. Nothing more is needed here.</p></div>' + nextSteps(); break;
       case 'confirm': h = '<div class="wait"><span class="spin"></span>Confirming your payment&hellip;</div>'; break;
-      case 'done': h = S.setup ? setupView() : '<div class="done"><div class="big">' + ICON.check + '</div><h2 tabindex="-1">You are registered. Thank you!</h2><p class="rg-lead">Your payment went through. A confirmation email is on its way (check your spam folder if you do not see it).</p></div>' + nextSteps();; break;
+      case 'done': h = S.setup ? setupView() : S.back ? backView() : '<div class="done"><div class="big">' + ICON.check + '</div><h2 tabindex="-1">You are registered. Thank you!</h2><p class="rg-lead">Your payment went through. A confirmation email is on its way (check your spam folder if you do not see it).</p></div>' + nextSteps();; break;
       case 'start':
         h = '<h2 tabindex="-1">Welcome! Let&rsquo;s get you registered for ' + esc(S.season) + '.</h2><p class="rg-lead">It takes about 5 minutes. At the end you pay ' + money(S.fee) + ' securely online by card or bank account.</p>' + banner() +
           '<div class="opts">' + cardKind('new', ICON.newbie, 'I am new to MTFOA', 'Welcome! We will walk you through it.') +
@@ -425,6 +425,19 @@ sitemap: false
     var s3 = stp(3, 'Register with the TSSAA on Arbiter', '<p>When TSSAA registration is open, register with the TSSAA on Arbiter (it can only be done while the TSSAA has it open). <a href="/tssaa-registration">Step-by-step guide</a>. A mentor will be assigned to you soon and will reach out.</p>');
     return '<div class="done"><div class="big">' + ICON.check + '</div><h2 tabindex="-1">You are registered. Thank you!</h2><p class="rg-lead">Your payment went through and you have been added to the roster as a Reserve. A confirmation email is on its way (check your spam folder). Please finish these steps:</p></div>' + s1 + s2 + s3;
   }
+  /* ---------- after payment, an EXISTING official (already signed in, already has a password) ---------- */
+  function backView() {
+    var b = S.back, list = [], n = 0, signed = !!readPass();
+    if (signed && (b.photo === 'none' || b.photo === 'low')) {
+      var none = b.photo === 'none';
+      list.push(stp(++n, none ? 'Add your roster photo' : 'Update your roster photo',
+        '<p>' + (none ? 'We do not have a photo of you on the roster yet.' : 'Your roster photo is small and can look blurry.') + ' Please choose a clear, recent photo of yourself. It appears on the public roster once it is approved.</p>' +
+        '<div class="su-row"><button type="button" class="btn pri" data-act="photo">' + (none ? 'Add my photo' : 'Update my photo') + '</button></div>'));
+    }
+    list.push(stp(++n, 'Register with the TSSAA on Arbiter', '<p>When TSSAA registration is open, register (or renew) with the TSSAA on Arbiter (it can only be done while the TSSAA has it open). <a href="/tssaa-registration">Step-by-step guide</a>.</p>'));
+    return '<div class="done"><div class="big">' + ICON.check + '</div><h2 tabindex="-1">You are registered for ' + esc(S.season) + '. Welcome back' + (b.first ? ', ' + esc(b.first) : '') + '!</h2><p class="rg-lead">Your payment went through. A confirmation email is on its way (check your spam folder).' + (list.length > 1 ? ' Please finish these steps:' : ' One more step:') + '</p></div>' + list.join('') +
+      '<p class="hint" style="text-align:center;margin:14px 0 0"><a href="/mtfoamembers">Go to the Member Portal</a></p>';
+  }
   function suErr(msg) { var er = card.querySelector('#suErr'); if (!er) return; er.textContent = msg || ''; er.hidden = !msg; }
   function doSendCode() {
     var u = S.setup; if (!u || u.busy) return;
@@ -458,6 +471,7 @@ sitemap: false
         tries++;
         if (r.status === 'ok' && r.paid) {
           if (r.isNew && r.email) S.setup = { email: r.email, first: r.first || '', ready: !!r.ready, phase: 'start', err: '', busy: false };
+          else if (!r.isNew) S.back = { first: r.first || '', photo: r.photo || '' };
           S.step = 'done'; render(); return;
         }
         if (tries < 8 && (r.status === 'ok' || r.code === 'net' || r.code === 'stripe')) { setTimeout(ask, 2500); return; }
