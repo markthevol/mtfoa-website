@@ -761,6 +761,10 @@ permalink: /members
     mpCall({ action: 'me', token: pass.t }).then(function (r) {
       if (r.status !== 'ok' || !r.photo) return;
       mpMe = r; mpRender();
+      if (/myphoto/.test(location.hash) && !mpBox.hidden) {                 /* arriving from the registration confirmation: open the photo panel */
+        mpBody.hidden = false; mpToggle.setAttribute('aria-expanded', 'true');
+        try { mpBox.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) {}
+      }
     });
   }
 

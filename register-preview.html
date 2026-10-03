@@ -105,6 +105,18 @@ sitemap: false
   .mtfoa-reg .next { text-align: left; border: 1px solid var(--line); border-radius: 10px; padding: 4px 16px 6px; margin: 20px 0 0; }
   .mtfoa-reg .next ol { margin: 10px 0; padding-left: 22px; line-height: 1.55; }
   .mtfoa-reg .next li { margin: 0 0 8px; }
+  .mtfoa-reg .stp { display: flex; gap: 14px; text-align: left; border: 1px solid var(--line); border-radius: 12px; padding: 16px; margin: 0 0 12px; background: #fff; }
+  .mtfoa-reg .stp.off { opacity: .55; background: #f7f9fc; }
+  .mtfoa-reg .stp.ok { border-color: #b9dcc2; background: #f4fbf6; }
+  .mtfoa-reg .stp-n { flex: none; width: 34px; height: 34px; border-radius: 50%; background: var(--navy); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 17px; }
+  .mtfoa-reg .stp.off .stp-n { background: #9aa6bd; }
+  .mtfoa-reg .stp.ok .stp-n { background: var(--ok); }
+  .mtfoa-reg .stp-b { flex: 1; min-width: 0; }
+  .mtfoa-reg .stp-b h3 { margin: 4px 0 6px; font-size: 18px; }
+  .mtfoa-reg .stp-b p { margin: 0 0 10px; line-height: 1.5; }
+  .mtfoa-reg .su-row { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; margin-top: 6px; }
+  .mtfoa-reg .su-keep { display: flex; gap: 9px; align-items: center; font-weight: 400; margin: 0 0 8px; }
+  .mtfoa-reg .su-keep input { width: 20px; height: 20px; }
   .mtfoa-reg .wait { text-align: center; color: var(--soft); padding: 30px 0; font-size: 16px; }
   .mtfoa-reg .spin { width: 22px; height: 22px; border: 3px solid #cfd8e8; border-top-color: var(--navy); border-radius: 50%; display: inline-block; vertical-align: -5px; margin-right: 8px; animation: rgspin .8s linear infinite; }
   @keyframes rgspin { to { transform: rotate(360deg); } }
@@ -140,7 +152,7 @@ sitemap: false
   var ROUNDS = ['First round', 'Second round', 'Quarterfinals', 'Semifinals', 'Championship game'];
 
   var card = document.getElementById('rgCard');
-  var S = { step: 'wait', kind: '', experienced: null, token: '', user: null, season: '', fee: 12000, open: true, source: '', f: blank(), errs: {}, msg: '', banner: '', bannerAt: '', bannerWarn: false, busy: false, restored: false, agree: false };
+  var S = { step: 'wait', kind: '', experienced: null, token: '', user: null, season: '', fee: 12000, open: true, source: '', f: blank(), errs: {}, msg: '', banner: '', bannerAt: '', bannerWarn: false, busy: false, restored: false, agree: false, setup: null };
 
   function blank() {
     return { interest: '', first: '', last: '', email: '', mobile: '', home: '', work: '', prefPhone: 'Mobile', more: false, street: '', city: '', state: 'TN', zip: '',
@@ -285,7 +297,8 @@ sitemap: false
       case 'wait': h = '<div class="wait"><span class="spin"></span>Loading&hellip;</div>'; break;
       case 'closed': h = '<h2 tabindex="-1">Registration is not open right now</h2><p class="rg-lead">Please check back soon, or watch for an announcement from the association.</p>'; break;
       case 'already': h = '<div class="done"><div class="big">' + ICON.check + '</div><h2 tabindex="-1">You are already registered</h2><p class="rg-lead">We already have your paid ' + esc(S.season) + ' registration. Nothing more is needed here.</p></div>' + nextSteps(); break;
-      case 'done': h = '<div class="done"><div class="big">' + ICON.check + '</div><h2 tabindex="-1">You are registered. Thank you!</h2><p class="rg-lead">Your payment went through. A confirmation email is on its way (check your spam folder if you do not see it).</p></div>' + nextSteps(); break;
+      case 'confirm': h = '<div class="wait"><span class="spin"></span>Confirming your payment&hellip;</div>'; break;
+      case 'done': h = S.setup ? setupView() : '<div class="done"><div class="big">' + ICON.check + '</div><h2 tabindex="-1">You are registered. Thank you!</h2><p class="rg-lead">Your payment went through. A confirmation email is on its way (check your spam folder if you do not see it).</p></div>' + nextSteps();; break;
       case 'start':
         h = '<h2 tabindex="-1">Welcome! Let&rsquo;s get you registered for ' + esc(S.season) + '.</h2><p class="rg-lead">It takes about 5 minutes. At the end you pay ' + money(S.fee) + ' securely online by card or bank account.</p>' + banner() +
           '<div class="opts">' + cardKind('new', ICON.newbie, 'I am new to MTFOA', 'Welcome! We will walk you through it.') +
@@ -388,6 +401,70 @@ sitemap: false
       '<p class="lock">' + ICON.lock + '<span>You will pay on Stripe&rsquo;s secure page by card or bank account. MTFOA never sees or stores your payment details.</span></p>' +
       nav(true, S.busy ? 'Opening secure payment&hellip;' : 'Continue to secure payment', 'pay');
   }
+  /* ---------- after payment, a NEW official: set a password with an emailed code, then add a roster photo ---------- */
+  function stp(n, title, body, cls) {
+    return '<div class="stp ' + (cls || '') + '"><div class="stp-n">' + (cls === 'ok' ? ICON.tick : n) + '</div><div class="stp-b"><h3>' + title + '</h3>' + body + '</div></div>';
+  }
+  function setupView() {
+    var u = S.setup, e = esc(u.email), err = '<p class="err" id="suErr" role="alert"' + (u.err ? '' : ' hidden') + '>' + esc(u.err || '') + '</p>', s1;
+    if (u.phase === 'done') {
+      s1 = stp(1, 'Your website login is ready', '<p>You are signed in on this device. Next time, sign in on the <a href="/mtfoamembers">Member Portal</a> with <b>' + e + '</b> and your password.</p>', 'ok');
+    } else if (u.phase === 'code') {
+      s1 = stp(1, 'Set up your website login', '<p>We emailed a 6-digit code to <b>' + e + '</b>. Type it here and choose a password (at least 8 characters). Check your spam folder if it does not arrive.</p>' +
+        '<div class="fld"><label for="suCode">6-digit code</label><input type="text" id="suCode" inputmode="numeric" autocomplete="one-time-code" maxlength="8"></div>' +
+        '<div class="fld"><label for="suPw">Choose a password</label><input type="password" id="suPw" autocomplete="new-password"></div>' +
+        '<label class="su-keep"><input type="checkbox" id="suKeep"> Keep me signed in on this device</label>' + err +
+        '<div class="su-row"><button type="button" class="btn pri" data-act="savepw">Save my password</button><button type="button" class="rg-link" data-act="sendcode">Send a new code</button></div>');
+    } else {
+      s1 = stp(1, 'Set up your website login', '<p>This gives you the Member Portal: your meeting attendance, member resources and board elections. We will email a 6-digit code to <b>' + e + '</b>.</p>' +
+        (u.ready ? '' : '<p class="hint">Your account is still being set up. If the code does not arrive, wait a minute and ask again.</p>') + err +
+        '<div class="su-row"><button type="button" class="btn pri" data-act="sendcode">Email me a code</button></div>');
+    }
+    var s2 = u.phase === 'done' ? stp(2, 'Add your roster photo', '<p>Choose a clear, recent photo of yourself. It appears on the public roster once it is approved.</p><div class="su-row"><button type="button" class="btn pri" data-act="photo">Add my photo</button></div>')
+      : stp(2, 'Add your roster photo', '<p>Available after step 1.</p>', 'off');
+    var s3 = stp(3, 'Register with the TSSAA on Arbiter', '<p><a href="/tssaa-registration">Step-by-step guide</a>. A mentor will be assigned to you soon and will reach out.</p>');
+    return '<div class="done"><div class="big">' + ICON.check + '</div><h2 tabindex="-1">You are registered. Thank you!</h2><p class="rg-lead">Your payment went through and you have been added to the roster as a Reserve. A confirmation email is on its way (check your spam folder). Please finish these steps:</p></div>' + s1 + s2 + s3;
+  }
+  function suErr(msg) { var er = card.querySelector('#suErr'); if (!er) return; er.textContent = msg || ''; er.hidden = !msg; }
+  function doSendCode() {
+    var u = S.setup; if (!u || u.busy) return;
+    u.busy = true; u.err = ''; suErr('');
+    card.querySelectorAll('[data-act=sendcode]').forEach(function (b) { b.disabled = true; });
+    call({ action: 'requestcode', email: u.email }).then(function (r) {
+      u.busy = false;
+      if (r.status === 'ok') { u.phase = 'code'; render(false); var c = card.querySelector('#suCode'); if (c) c.focus(); }
+      else { u.err = r.message || 'We could not send the code. Please try again in a moment.'; render(false); }
+    });
+  }
+  function doSavePw() {
+    var u = S.setup; if (!u || u.busy) return;
+    var code = (card.querySelector('#suCode') || {}).value || '', pw = (card.querySelector('#suPw') || {}).value || '', keep = !!(card.querySelector('#suKeep') || {}).checked;
+    code = code.replace(/\s+/g, '');
+    if (!/^\d{4,8}$/.test(code)) { suErr('Please type the 6-digit code from the email.'); return; }
+    if (pw.length < 8) { suErr('Please choose a password of at least 8 characters.'); return; }
+    u.busy = true; suErr('');
+    var btn = card.querySelector('[data-act=savepw]'); if (btn) { btn.disabled = true; btn.textContent = 'Saving\u2026'; }
+    call({ action: 'setpassword', email: u.email, code: code, password: pw, remember: keep }).then(function (r) {
+      u.busy = false;
+      if (r.status === 'ok' && r.token) { savePass(r.token, r.hours || 12, keep); u.phase = 'done'; u.err = ''; render(); }
+      else { if (btn) { btn.disabled = false; btn.textContent = 'Save my password'; } suErr(r.message || 'That did not work. Please check the code and try again.'); }
+    });
+  }
+  function confirmPaid(sid) {
+    S.step = 'confirm'; render(false);
+    var tries = 0;
+    (function ask() {
+      call({ action: 'regconfirm', session: sid }).then(function (r) {
+        tries++;
+        if (r.status === 'ok' && r.paid) {
+          if (r.isNew && r.email) S.setup = { email: r.email, first: r.first || '', ready: !!r.ready, phase: 'start', err: '', busy: false };
+          S.step = 'done'; render(); return;
+        }
+        if (tries < 8 && (r.status === 'ok' || r.code === 'net' || r.code === 'stripe')) { setTimeout(ask, 2500); return; }
+        S.step = 'done'; render();
+      });
+    })();
+  }
   function nextSteps() {
     return '<div class="next"><h3 style="margin-top:12px">What to do next</h3><ol>' +
       '<li><b>Set up your Member Portal login</b> if you have not already (meeting attendance, resources, nominations). <a href="/mtfoamembers">Open the Member Portal</a></li>' +
@@ -436,6 +513,9 @@ sitemap: false
     else if (act === 'kind') { S.kind = v; card.querySelectorAll('[data-act=kind]').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); }); S.msg = ''; var m1 = card.querySelector('.rg-msg'); if (m1) m1.remove(); }
     else if (act === 'exp') { S.experienced = v === 'yes'; delete S.errs.experienced; render(false); }
     else if (act === 'more') { S.f.more = true; render(false); }
+    else if (act === 'sendcode') doSendCode();
+    else if (act === 'savepw') doSavePw();
+    else if (act === 'photo') { window.location.href = '/members#myphoto'; }
     else if (act === 'pladd') { if (S.f.pl.length >= plYears().length) return; S.f.pl.push({ y: '', r: '' }); delete S.errs.pl; syncPl(); render(false); var sel = card.querySelectorAll('.plrow select[data-pl=y]'); if (sel.length) sel[sel.length - 1].focus(); }
     else if (act === 'pldel') { S.f.pl.splice(Number(b.getAttribute('data-i')), 1); delete S.errs.pl; syncPl(); render(false); }
     else if (act === 'goto') go(v);
@@ -456,6 +536,8 @@ sitemap: false
         if (S.token) return loadPrefill(); return go('signin');
       case 'signin': return doSignIn();
       case 'review': return doPay();
+      case 'done': if (S.setup && S.setup.phase === 'code') doSavePw(); return;
+      case 'confirm': return;
       default:
         var errs = check(S.step);
         if (Object.keys(errs).length) { S.errs = errs; S.msg = 'Please fix the highlighted items.'; render(false); var first = card.querySelector('.fld.bad input, .fld.bad select, .fld.bad textarea'); if (first) first.focus(); else { var er = card.querySelector('.err'); if (er) er.scrollIntoView({ block: 'center' }); } return; }
@@ -567,7 +649,7 @@ sitemap: false
       if (r.status === 'ok') { S.season = r.season; S.fee = r.feeCents; S.open = r.open; }
       else { S.season = ''; }
       S.token = readPass();
-      if (q.get('paid') === '1') { clearDraft(); S.step = 'done'; return render(); }
+      if (q.get('paid') === '1') { clearDraft(); if (q.get('s')) return confirmPaid(q.get('s')); S.step = 'done'; return render(); }
       if (!S.open) { S.step = 'closed'; return render(); }
       var d = loadDraft();
       if (d) { S.f = Object.assign(blank(), d.f); S.kind = d.kind || ''; S.experienced = d.experienced; S.restored = true; }
