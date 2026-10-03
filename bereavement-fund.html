@@ -1,0 +1,128 @@
+---
+title: MTFOA Bereavement Fund
+description: >-
+  Donate to the MTFOA Bereavement Fund by card.
+permalink: /bereavement-fund
+robots: noindex
+sitemap: false
+---
+<!-- ============================================================
+     Bereavement Fund donations. Hidden from the menu and from search engines; linked from the Member
+     Resources page (Financial > MTFOA Bereavement Fund).
+     The donor chooses a whole-dollar amount here; the Roster script (public action "donate") opens a Stripe
+     Checkout page for exactly that amount, card only. Card details are typed on Stripe's page and never touch
+     this site or the sheet. On return, "donateconfirm" asks Stripe whether it was paid and writes one row to the
+     "Bereavement Donations" tab (Stripe stays the official record).
+   ============================================================ -->
+<div class="mtfoa-fund">
+<style>
+  .mtfoa-fund { --navy: #1f3864; --red: #b81f12; --tint: #eef3fa; --line: #d5dcea; --ink: #1b2233; --soft: #5b667b;
+    max-width: 620px; margin: 0 auto; padding: 8px 16px 64px; font-family: 'Barlow', Arial, Helvetica, sans-serif; color: var(--ink); background: #fff; color-scheme: light; }
+  .mtfoa-fund *, .mtfoa-fund *::before, .mtfoa-fund *::after { box-sizing: border-box; }
+  .mtfoa-fund .bf-hero { text-align: center; padding: 22px 8px 14px; }
+  .mtfoa-fund .bf-eyebrow { font-family: 'Barlow Condensed', Arial, sans-serif; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; font-size: 14px; color: var(--red); }
+  .mtfoa-fund h1 { font-family: 'Barlow Condensed', Arial, sans-serif; font-weight: 700; font-size: clamp(30px, 7vw, 42px); line-height: 1.05; color: var(--navy); margin: 4px 0 0; }
+  .mtfoa-fund .bf-card { border: 1px solid var(--line); border-radius: 12px; padding: 20px 18px 22px; background: #fff; box-shadow: 0 2px 10px rgba(31, 56, 100, .06); }
+  .mtfoa-fund p { margin: 0 0 12px; line-height: 1.55; font-size: 16.5px; }
+  .mtfoa-fund h2 { font-family: 'Barlow Condensed', Arial, sans-serif; font-weight: 700; font-size: 24px; color: var(--navy); margin: 0 0 8px; }
+  .mtfoa-fund .bf-amts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 14px 0 12px; }
+  .mtfoa-fund .bf-amt { font: inherit; font-weight: 700; font-size: 20px; padding: 14px 6px; border: 2px solid var(--line); border-radius: 10px; background: #fff; color: var(--navy); cursor: pointer; }
+  .mtfoa-fund .bf-amt:hover { border-color: var(--navy); }
+  .mtfoa-fund .bf-amt[aria-pressed="true"] { background: var(--navy); border-color: var(--navy); color: #fff; }
+  .mtfoa-fund label { display: block; font-weight: 600; margin: 6px 0 4px; }
+  .mtfoa-fund .bf-other { display: flex; align-items: center; gap: 8px; }
+  .mtfoa-fund .bf-other span { font-size: 22px; font-weight: 700; color: var(--navy); }
+  .mtfoa-fund input[type=text] { font: inherit; font-size: 18px; width: 140px; padding: 11px 12px; border: 2px solid var(--line); border-radius: 10px; color: var(--ink); background: #fff; }
+  .mtfoa-fund input[type=text]:focus, .mtfoa-fund .bf-amt:focus-visible, .mtfoa-fund .bf-go:focus-visible { outline: 3px solid #7aa2e3; outline-offset: 2px; }
+  .mtfoa-fund .bf-hint { font-size: 14.5px; color: var(--soft); margin: 6px 0 0; }
+  .mtfoa-fund .bf-go { display: block; width: 100%; margin-top: 20px; font: inherit; font-weight: 700; font-size: 18px; letter-spacing: .5px; padding: 16px; border: 0; border-radius: 10px; background: var(--red); color: #fff; cursor: pointer; }
+  .mtfoa-fund .bf-go:hover { background: #9c190e; }
+  .mtfoa-fund .bf-go[disabled] { opacity: .6; cursor: default; }
+  .mtfoa-fund .bf-err { background: #fff3f1; border: 1px solid #e6b3ad; color: #7a1d14; border-radius: 10px; padding: 10px 14px; margin: 14px 0 0; display: none; }
+  .mtfoa-fund .bf-note { background: var(--tint); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; margin: 0 0 16px; font-size: 16px; line-height: 1.5; }
+  .mtfoa-fund .bf-thanks { text-align: center; padding: 8px 0 4px; }
+  .mtfoa-fund .bf-thanks h2 { font-size: 30px; }
+  .mtfoa-fund .bf-secure { text-align: center; color: var(--soft); font-size: 14.5px; margin-top: 16px; }
+  @media (max-width: 420px) { .mtfoa-fund .bf-amts { grid-template-columns: repeat(2, 1fr); } }
+</style>
+
+<div class="bf-hero">
+  <div class="bf-eyebrow">Middle Tennessee Football Officials Association</div>
+  <h1>Bereavement Fund</h1>
+</div>
+
+<div class="bf-card" id="bfCard">
+  <div id="bfMsg" role="status" aria-live="polite"></div>
+  <div id="bfForm">
+    <p>Thank you for giving to the MTFOA Bereavement Fund. Choose an amount, then you will go to a secure payment page to pay by card.</p>
+    <h2>Amount</h2>
+    <div class="bf-amts" role="group" aria-label="Donation amount">
+      <button type="button" class="bf-amt" data-amt="10" aria-pressed="false">$10</button>
+      <button type="button" class="bf-amt" data-amt="25" aria-pressed="false">$25</button>
+      <button type="button" class="bf-amt" data-amt="50" aria-pressed="false">$50</button>
+      <button type="button" class="bf-amt" data-amt="100" aria-pressed="false">$100</button>
+    </div>
+    <label for="bfOther">Or enter another amount</label>
+    <div class="bf-other"><span aria-hidden="true">$</span><input type="text" id="bfOther" inputmode="numeric" autocomplete="off" maxlength="5" aria-describedby="bfHint"></div>
+    <p class="bf-hint" id="bfHint">Whole dollars, from $5 to $5,000.</p>
+    <div class="bf-err" id="bfErr" role="alert"></div>
+    <button type="button" class="bf-go" id="bfGo">Continue to secure payment</button>
+    <p class="bf-secure">Payment is handled by Stripe. The MTFOA never sees or stores your card details.</p>
+  </div>
+</div>
+
+<script>
+(function () {
+  var API = 'https://script.google.com/macros/s/AKfycbzrUU5NYuD3X_3ljgA92e_hnMJNs8efwNYwTzttqO7-dy7v2uvZnG4Iu5NjPcr36nkw/exec';
+  var form = document.getElementById('bfForm'), msg = document.getElementById('bfMsg'), err = document.getElementById('bfErr');
+  var other = document.getElementById('bfOther'), go = document.getElementById('bfGo'), chosen = 0;
+
+  function call(body) {
+    return fetch(API, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) })
+      .then(function (r) { return r.json(); }).catch(function () { return { status: 'error', code: 'net' }; });
+  }
+  function showErr(t) { err.textContent = t; err.style.display = t ? 'block' : 'none'; }
+  function press(btn) {
+    [].forEach.call(document.querySelectorAll('.bf-amt'), function (b) { b.setAttribute('aria-pressed', b === btn ? 'true' : 'false'); });
+  }
+  function note(html) { msg.innerHTML = html ? '<div class="bf-note">' + html + '</div>' : ''; }
+
+  [].forEach.call(document.querySelectorAll('.bf-amt'), function (b) {
+    b.addEventListener('click', function () { chosen = parseInt(b.getAttribute('data-amt'), 10); other.value = ''; press(b); showErr(''); });
+  });
+  other.addEventListener('input', function () {
+    other.value = other.value.replace(/[^0-9]/g, '');
+    chosen = other.value ? parseInt(other.value, 10) : 0; press(null); showErr('');
+  });
+  go.addEventListener('click', function () {
+    if (!(chosen >= 5 && chosen <= 5000)) { showErr('Please choose an amount from $5 to $5,000.'); return; }
+    go.disabled = true; go.textContent = 'Opening the payment page…'; showErr('');
+    call({ action: 'donate', amount: chosen }).then(function (r) {
+      if (r && r.status === 'ok' && r.url) { window.location.href = r.url; return; }
+      go.disabled = false; go.textContent = 'Continue to secure payment';
+      showErr((r && r.message) || 'We could not open the payment page. Please try again in a moment.');
+    });
+  });
+
+  var q = new URLSearchParams(location.search);
+  if (q.get('canceled')) note('Your payment was canceled. Nothing was charged. You can choose an amount below whenever you are ready.');
+  var sid = q.get('s');
+  if (q.get('paid') && sid) {
+    form.style.display = 'none';
+    msg.innerHTML = '<div class="bf-thanks"><h2>Confirming your donation&hellip;</h2></div>';
+    var tries = 0;
+    (function ask() {
+      call({ action: 'donateconfirm', session: sid }).then(function (r) {
+        tries++;
+        if (r && r.status === 'ok' && r.paid) {
+          msg.innerHTML = '<div class="bf-thanks"><h2>Thank you!</h2><p>Your donation of $' + String(r.amount) + ' to the MTFOA Bereavement Fund was received. Stripe will email you a receipt.</p></div>';
+          return;
+        }
+        if (tries < 6) { setTimeout(ask, 2500); return; }
+        msg.innerHTML = '<div class="bf-thanks"><h2>Thank you!</h2><p>Your payment is being confirmed. Stripe will email you a receipt once it is complete.</p></div>';
+      });
+    })();
+  }
+})();
+</script>
+</div>

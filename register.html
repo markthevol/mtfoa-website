@@ -185,7 +185,7 @@ sitemap: false
   function saveDraft() {
     clearTimeout(saveTimer);
     saveTimer = setTimeout(function () {
-      try { if (S.step === 'wait' || S.step === 'done' || S.step === 'already' || S.step === 'closed') return;
+      try { if (S.step === 'wait' || S.step === 'done' || S.step === 'processing' || S.step === 'already' || S.step === 'closed') return;
         localStorage.setItem(DRAFT, JSON.stringify({ t: Date.now(), kind: S.kind, experienced: S.experienced, step: S.step, imported: S.imported, infoOk: S.infoOk, f: S.f })); } catch (e) {}
     }, 250);
   }
@@ -306,6 +306,7 @@ sitemap: false
         break;
       case 'already': h = '<div class="done"><div class="big">' + ICON.check + '</div><h2 tabindex="-1">You are already registered</h2><p class="rg-lead">We already have your paid ' + esc(S.season) + ' registration. Nothing more is needed here.</p></div>' + nextSteps(); break;
       case 'confirm': h = '<div class="wait"><span class="spin"></span>Confirming your payment&hellip;</div>'; break;
+      case 'processing': h = processingView(); break;
       case 'done': h = S.setup ? setupView() : S.back ? backView() : '<div class="done"><div class="big">' + ICON.check + '</div><h2 tabindex="-1">You are registered. Thank you!</h2><p class="rg-lead">Your payment went through. A confirmation email is on its way (check your spam folder if you do not see it).</p></div>' + nextSteps();; break;
       case 'start':
         h = '<h2 tabindex="-1">Welcome! Let&rsquo;s get you registered for ' + esc(S.season) + '.</h2><p class="rg-lead">It takes about 5 minutes. At the end you pay ' + money(S.fee) + ' securely online by card or bank account.</p>' + banner() +
@@ -523,10 +524,21 @@ sitemap: false
           else if (!r.isNew) S.back = { first: r.first || '', photo: r.photo || '' };
           S.step = 'done'; render(); return;
         }
+        if (r.status === 'ok' && r.processing) { S.late = false; S.step = 'processing'; render(); return; }
         if (tries < 8 && (r.status === 'ok' || r.code === 'net' || r.code === 'stripe')) { setTimeout(ask, 2500); return; }
-        S.step = 'done'; render();
+        S.late = true; S.step = 'processing'; render();
       });
     })();
+  }
+  /* A bank-account payment takes several business days to clear, and a card payment can occasionally be slow to confirm.
+     Either way the Roster script finishes the registration by itself (checked hourly) and sends the confirmation email. */
+  function processingView() {
+    var bank = !S.late;
+    return '<div class="done"><div class="big">' + ICON.check + '</div><h2 tabindex="-1">' + (bank ? 'Your bank payment is processing' : 'We are confirming your payment') + '</h2>' +
+      '<p class="rg-lead">' + (bank
+        ? 'Thank you. A bank payment takes a few business days to clear. Your registration will be finished automatically as soon as it clears, and you will get a confirmation email then.'
+        : 'This is taking longer than usual. Your registration will be finished automatically as soon as the payment is confirmed, and you will get a confirmation email then.') + '</p>' +
+      '<p>You do not need to do anything else, and please do not pay again. If you have not heard from us within a few days, contact an MTFOA board member.</p></div>';
   }
   function nextSteps() {
     return '<div class="next"><h3 style="margin-top:12px">What to do next</h3><ol>' +
