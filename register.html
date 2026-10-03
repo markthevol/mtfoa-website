@@ -1,32 +1,761 @@
 ---
-title: 2026 Registration
+title: Registration
 description: >-
-  MTFOA Annual Registration for 2026 — sign up and pay your dues.
+  MTFOA season registration: a short step-by-step form, then secure online payment.
 permalink: /register
 robots: noindex
 sitemap: false
 ---
 <!-- ============================================================
-     MTFOA 2026 Registration page.
-     On WebsiteBuilder this was a native "Form" widget embedding a Google
-     Form (id 1FAIpQLSe8RcDsNbi99EcZ46Ktwx6X2B82U4yuGmoYxlc0nf186X1YNA); the
-     form's own title/description/instructions are all inside the form
-     itself, so this page is just the embed plus a plain-text fallback link.
-     Hidden from the site menu and from search engines on WSB too.
+     MTFOA season registration (replaced the embedded Google Form on /register on 2026-10-03;
+     /register-preview now just redirects here).
+     One question group per screen, saved as you go. Sends everything to the Roster
+     Apps Script ("register" action), which stores it on the Registrations tab and
+     opens a Stripe Checkout page. Card and bank details are typed on Stripe's page
+     only - they never touch mtfoa.org or the Apps Script.
+     Returning members sign in first (same sign-in as the Member Portal) so their
+     details are prefilled from last season.
    ============================================================ -->
-<div class="mtfoa-register">
+<div class="mtfoa-reg">
 <style>
-  .mtfoa-register { max-width: 760px; margin: 0 auto; padding: 28px 22px 60px; font-family: 'Barlow', Arial, Helvetica, sans-serif; }
-  .mtfoa-register .mr-open { display: block; text-align: center; background: #1f3864; color: #fff; font-weight: 700;
-    letter-spacing: 0.5px; text-decoration: none; padding: 16px 20px; border-radius: 5px; margin: 0 0 22px; }
-  .mtfoa-register .mr-open:hover { background: #16274a; }
-  .mtfoa-register .mr-note { font-size: 14px; color: #666; text-align: center; margin: 0 0 26px; }
-  .mtfoa-register iframe { width: 100%; min-height: 1400px; border: 1px solid #dfe4ee; border-radius: 6px; display: block; }
+  .mtfoa-reg { --navy: #1f3864; --navy-d: #16274a; --red: #b81f12; --tint: #eef3fa; --line: #d5dcea; --ink: #1b2233; --soft: #5b667b; --ok: #1d7a34;
+    max-width: 680px; margin: 0 auto; padding: 8px 16px 64px; font-family: 'Barlow', Arial, Helvetica, sans-serif; color: var(--ink); background: #fff; color-scheme: light; }
+  .mtfoa-reg *, .mtfoa-reg *::before, .mtfoa-reg *::after { box-sizing: border-box; }
+  .mtfoa-reg .rg-hero { text-align: center; padding: 22px 8px 18px; }
+  .mtfoa-reg .rg-eyebrow { font-family: 'Barlow Condensed', Arial, sans-serif; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; font-size: 14px; color: var(--red); }
+  .mtfoa-reg .rg-hero h1 { font-family: 'Barlow Condensed', Arial, sans-serif; font-weight: 700; font-size: clamp(30px, 7vw, 42px); line-height: 1.05; color: var(--navy); margin: 4px 0 0; }
+  .mtfoa-reg .rg-card { background: #fff; border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 2px 14px rgba(31, 56, 100, .07); padding: 22px 20px 24px; }
+  .mtfoa-reg .rg-prog { margin: 0 0 18px; }
+  .mtfoa-reg .rg-prog-top { display: flex; justify-content: space-between; font-size: 13.5px; color: var(--soft); font-weight: 600; margin-bottom: 7px; }
+  .mtfoa-reg .rg-bar { height: 7px; background: #e6ebf4; border-radius: 99px; overflow: hidden; }
+  .mtfoa-reg .rg-bar > i { display: block; height: 100%; background: var(--navy); border-radius: 99px; transition: width .3s ease; }
+  .mtfoa-reg h2 { font-family: 'Barlow Condensed', Arial, sans-serif; font-weight: 700; font-size: clamp(25px, 5.6vw, 31px); line-height: 1.12; color: var(--navy); margin: 0 0 6px; outline: none; }
+  .mtfoa-reg .rg-lead { font-size: 16.5px; line-height: 1.5; color: var(--soft); margin: 0 0 20px; }
+  .mtfoa-reg h3 { font-size: 17px; font-weight: 600; color: var(--navy); margin: 24px 0 4px; }
+  .mtfoa-reg .rg-note { font-size: 14px; color: var(--soft); line-height: 1.45; margin: 4px 0 0; }
+  .mtfoa-reg .rg-banner { background: var(--tint); border: 1px solid var(--line); border-radius: 9px; padding: 11px 14px; font-size: 14.5px; line-height: 1.45; margin: 0 0 16px; display: flex; gap: 10px; justify-content: space-between; align-items: flex-start; }
+  .mtfoa-reg .rg-banner.warn { background: #fdf1ef; border-color: #f0c9c3; }
+  .mtfoa-reg .rg-link { background: none; border: 0; padding: 0; font: inherit; font-weight: 600; color: var(--navy); text-decoration: underline; cursor: pointer; white-space: nowrap; }
+  .mtfoa-reg a { color: var(--navy); font-weight: 600; }
+
+  .mtfoa-reg .fld { margin: 0 0 16px; }
+  .mtfoa-reg .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
+  .mtfoa-reg .row3 { display: grid; grid-template-columns: 1.6fr 1fr; gap: 0 14px; }
+  .mtfoa-reg label { display: block; font-weight: 600; font-size: 15.5px; margin: 0 0 6px; }
+  .mtfoa-reg label .opt { font-weight: 400; color: var(--soft); font-size: 13.5px; }
+  .mtfoa-reg input[type=text], .mtfoa-reg input[type=email], .mtfoa-reg input[type=tel], .mtfoa-reg input[type=password], .mtfoa-reg select, .mtfoa-reg textarea {
+    width: 100%; font: inherit; font-size: 17px; color: var(--ink); background: #fff; border: 1.5px solid #b9c3d6; border-radius: 9px; padding: 13px 14px; min-height: 50px; appearance: none; -webkit-appearance: none; }
+  .mtfoa-reg select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9'%3E%3Cpath d='M1 1l6 6 6-6' fill='none' stroke='%231f3864' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 38px; }
+  .mtfoa-reg textarea { min-height: 96px; resize: vertical; line-height: 1.4; }
+  .mtfoa-reg input:focus, .mtfoa-reg select:focus, .mtfoa-reg textarea:focus { outline: none; border-color: var(--navy); box-shadow: 0 0 0 3px rgba(31, 56, 100, .18); }
+  .mtfoa-reg input[readonly] { background: #f3f5f9; color: var(--soft); }
+  .mtfoa-reg .hint { font-size: 13.5px; color: var(--soft); margin: 6px 0 0; line-height: 1.4; }
+  .mtfoa-reg .fld.bad input, .mtfoa-reg .fld.bad select, .mtfoa-reg .fld.bad textarea { border-color: var(--red); background: #fffafa; }
+  .mtfoa-reg .err { color: var(--red); font-size: 14px; font-weight: 600; margin: 6px 0 0; }
+  .mtfoa-reg .rg-msg { background: #fdf1ef; border: 1px solid #f0c9c3; color: #8a1a10; border-radius: 9px; padding: 11px 14px; font-weight: 600; font-size: 15px; margin: 0 0 16px; }
+
+  .mtfoa-reg .opts { display: grid; gap: 12px; margin: 0 0 18px; }
+  .mtfoa-reg .opt-card { display: flex; align-items: center; gap: 14px; text-align: left; width: 100%; font: inherit; color: var(--ink); background: #fff; border: 2px solid var(--line); border-radius: 12px; padding: 16px; cursor: pointer; min-height: 72px; transition: border-color .12s, background .12s; }
+  .mtfoa-reg .opt-card:hover { border-color: #9fb0cf; }
+  .mtfoa-reg .opt-card[aria-pressed=true] { border-color: var(--navy); background: var(--tint); }
+  .mtfoa-reg .opt-card .ic { flex: none; width: 46px; height: 46px; border-radius: 50%; background: var(--tint); display: flex; align-items: center; justify-content: center; color: var(--navy); }
+  .mtfoa-reg .opt-card[aria-pressed=true] .ic { background: var(--navy); color: #fff; }
+  .mtfoa-reg .opt-card b { display: block; font-size: 18px; line-height: 1.2; }
+  .mtfoa-reg .opt-card span.sub { display: block; font-size: 14.5px; color: var(--soft); margin-top: 3px; line-height: 1.35; }
+  .mtfoa-reg .opt-card .tick { margin-left: auto; flex: none; width: 24px; height: 24px; border-radius: 50%; border: 2px solid #b9c3d6; display: flex; align-items: center; justify-content: center; color: transparent; }
+  .mtfoa-reg .opt-card[aria-pressed=true] .tick { background: var(--navy); border-color: var(--navy); color: #fff; }
+  .mtfoa-reg .chips { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 8px; }
+  .mtfoa-reg .chip { font: inherit; font-weight: 600; font-size: 16px; color: var(--ink); background: #fff; border: 2px solid var(--line); border-radius: 99px; padding: 10px 18px; min-height: 46px; cursor: pointer; transition: border-color .12s, background .12s; }
+  .mtfoa-reg .chip:hover { border-color: #9fb0cf; }
+  .mtfoa-reg .chip[aria-pressed=true] { background: var(--navy); border-color: var(--navy); color: #fff; }
+  .mtfoa-reg .chip small { font-weight: 400; opacity: .8; font-size: 13px; }
+  .mtfoa-reg .quick { font-size: 14px; margin: 0 0 18px; color: var(--soft); }
+  .mtfoa-reg .quick .rg-link { margin-left: 10px; }
+  .mtfoa-reg .more { display: inline-block; margin: 0 0 16px; }
+
+  .mtfoa-reg .nav { display: flex; gap: 12px; align-items: center; margin-top: 26px; }
+  .mtfoa-reg .btn { font: inherit; font-weight: 700; font-size: 17px; letter-spacing: .3px; border-radius: 10px; min-height: 54px; padding: 12px 26px; cursor: pointer; border: 2px solid var(--navy); transition: background .12s; }
+  .mtfoa-reg .btn.pri { background: var(--navy); color: #fff; flex: 1; }
+  .mtfoa-reg .btn.pri:hover { background: var(--navy-d); }
+  .mtfoa-reg .btn.sec { background: #fff; color: var(--navy); }
+  .mtfoa-reg .btn.sec:hover { background: var(--tint); }
+  .mtfoa-reg .btn[disabled] { opacity: .6; cursor: wait; }
+  .mtfoa-reg .btn.pay { background: var(--red); border-color: var(--red); }
+  .mtfoa-reg .btn.pay:hover { background: #961710; }
+  .mtfoa-reg .btn:focus-visible, .mtfoa-reg .chip:focus-visible, .mtfoa-reg .opt-card:focus-visible, .mtfoa-reg .rg-link:focus-visible { outline: 3px solid rgba(31, 56, 100, .45); outline-offset: 2px; }
+
+  .mtfoa-reg .sum { border: 1px solid var(--line); border-radius: 10px; margin: 0 0 14px; overflow: hidden; }
+  .mtfoa-reg .sum-h { display: flex; justify-content: space-between; align-items: center; background: #f4f6fa; padding: 9px 14px; font-weight: 700; font-size: 15px; color: var(--navy); }
+  .mtfoa-reg .sum dl { margin: 0; padding: 4px 14px 8px; }
+  .mtfoa-reg .sum dt { font-size: 13px; color: var(--soft); margin-top: 8px; }
+  .mtfoa-reg .sum dd { margin: 1px 0 0; font-size: 16px; line-height: 1.35; overflow-wrap: anywhere; }
+  .mtfoa-reg .fee { display: flex; justify-content: space-between; align-items: baseline; background: var(--tint); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; margin: 18px 0 8px; font-weight: 700; font-size: 18px; color: var(--navy); }
+  .mtfoa-reg .fee b { font-size: 28px; }
+  .mtfoa-reg .plrow { display: grid; grid-template-columns: 1fr 1.5fr auto; gap: 10px; align-items: center; margin: 0 0 10px; }
+  .mtfoa-reg .plrow .rg-link { padding: 8px 4px; }
+  @media (max-width: 520px) { .mtfoa-reg .plrow { grid-template-columns: 1fr 1fr; } .mtfoa-reg .plrow .rg-link { grid-column: 1 / -1; justify-self: end; padding: 0 2px 6px; } }
+  .mtfoa-reg .agree { border: 2px solid var(--line); border-radius: 10px; padding: 14px 16px; margin: 18px 0 4px; background: #fff; }
+  .mtfoa-reg .agree.bad { border-color: var(--red); background: #fffafa; }
+  .mtfoa-reg .agree label { display: flex; gap: 12px; align-items: flex-start; font-size: 15.5px; line-height: 1.45; font-weight: 400; cursor: pointer; margin: 0; }
+  .mtfoa-reg .agree input[type=checkbox] { width: 22px; height: 22px; flex: none; margin: 1px 0 0; accent-color: var(--navy); }
+  .mtfoa-reg .agree a { font-weight: 600; color: var(--navy); }
+  .mtfoa-reg .lock { display: flex; gap: 9px; align-items: flex-start; font-size: 14px; color: var(--soft); line-height: 1.45; margin: 4px 0 0; }
+  .mtfoa-reg .done { text-align: center; padding: 8px 0 0; }
+  .mtfoa-reg .done .big { width: 68px; height: 68px; border-radius: 50%; background: var(--ok); color: #fff; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; }
+  .mtfoa-reg .next { text-align: left; border: 1px solid var(--line); border-radius: 10px; padding: 4px 16px 6px; margin: 20px 0 0; }
+  .mtfoa-reg .next ol { margin: 10px 0; padding-left: 22px; line-height: 1.55; }
+  .mtfoa-reg .next li { margin: 0 0 8px; }
+  .mtfoa-reg .remind { border: 1px solid var(--line); border-radius: 12px; padding: 16px; background: var(--tint); margin-top: 6px; }
+  .mtfoa-reg .remind.ok { background: #f4fbf6; border-color: #b9dcc2; }
+  .mtfoa-reg .remind h3 { margin: 0 0 6px; font-size: 19px; }
+  .mtfoa-reg .stp { display: flex; gap: 14px; text-align: left; border: 1px solid var(--line); border-radius: 12px; padding: 16px; margin: 0 0 12px; background: #fff; }
+  .mtfoa-reg .stp.off { opacity: .55; background: #f7f9fc; }
+  .mtfoa-reg .stp.ok { border-color: #b9dcc2; background: #f4fbf6; }
+  .mtfoa-reg .stp-n { flex: none; width: 34px; height: 34px; border-radius: 50%; background: var(--navy); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 17px; }
+  .mtfoa-reg .stp.off .stp-n { background: #9aa6bd; }
+  .mtfoa-reg .stp.ok .stp-n { background: var(--ok); }
+  .mtfoa-reg .stp-b { flex: 1; min-width: 0; }
+  .mtfoa-reg .stp-b h3 { margin: 4px 0 6px; font-size: 18px; }
+  .mtfoa-reg .stp-b p { margin: 0 0 10px; line-height: 1.5; }
+  .mtfoa-reg .su-row { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; margin-top: 6px; }
+  .mtfoa-reg .su-keep { display: flex; gap: 9px; align-items: center; font-weight: 400; margin: 0 0 8px; }
+  .mtfoa-reg .su-keep input { width: 20px; height: 20px; }
+  .mtfoa-reg .wait { text-align: center; color: var(--soft); padding: 30px 0; font-size: 16px; }
+  .mtfoa-reg .spin { width: 22px; height: 22px; border: 3px solid #cfd8e8; border-top-color: var(--navy); border-radius: 50%; display: inline-block; vertical-align: -5px; margin-right: 8px; animation: rgspin .8s linear infinite; }
+  @keyframes rgspin { to { transform: rotate(360deg); } }
+  @media (max-width: 520px) {
+    .mtfoa-reg .rg-card { padding: 18px 14px 20px; border-radius: 10px; }
+    .mtfoa-reg .row2, .mtfoa-reg .row3 { grid-template-columns: 1fr; }
+    .mtfoa-reg .row3 .fld.zip { max-width: 180px; }
+    .mtfoa-reg .nav { flex-direction: column-reverse; align-items: stretch; }
+    .mtfoa-reg .btn.sec { border-color: transparent; background: none; min-height: 44px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .mtfoa-reg * { transition: none !important; animation-duration: 2s !important; } }
 </style>
-<a class="mr-open" href="https://forms.gle/nMzbpwiG48ph2UjE7" target="_blank" rel="noopener">Open the 2026 Registration Form &rarr;</a>
-<p class="mr-note">
-  Some browsers block the embedded form below from loading (Google requires third-party
-  storage access to verify sign-in) — the button above always works and opens it in a new tab.
-</p>
-<iframe src="https://docs.google.com/forms/d/e/1FAIpQLSe8RcDsNbi99EcZ46Ktwx6X2B82U4yuGmoYxlc0nf186X1YNA/viewform?embedded=true" title="MTFOA Annual Registration - 2026">Loading…</iframe>
+
+<div class="rg-hero">
+  <div class="rg-eyebrow">Middle Tennessee Football Officials Association</div>
+  <h1 id="rgTitle">Registration</h1>
+</div>
+<div class="rg-card" id="rgCard" aria-live="polite">
+  <noscript><p class="rg-msg">This form needs JavaScript. Please turn it on, or try a different browser.</p></noscript>
+  <div class="wait"><span class="spin"></span>Loading&hellip;</div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var API = 'https://script.google.com/macros/s/AKfycbzrUU5NYuD3X_3ljgA92e_hnMJNs8efwNYwTzttqO7-dy7v2uvZnG4Iu5NjPcr36nkw/exec';
+  var PASS = 'mtfoa_pass', DRAFT = 'mtfoa_reg_draft';
+  var POS = [{ k: 'Referee' }, { k: 'Umpire' }, { k: 'Head Linesman', n: 'includes deep wing' }, { k: 'Line Judge', n: 'includes deep wing' }, { k: 'Back Judge' }];
+  var DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+  var STATES = 'AL AK AZ AR CA CO CT DE DC FL GA HI ID IL IN IA KS KY LA ME MD MA MI MN MS MO MT NE NV NH NJ NM NY NC ND OH OK OR PA RI SC SD TN TX UT VT VA WA WV WI WY'.split(' ');
+  var TIMES = (function () { var o = []; for (var m = 8 * 60; m <= 21 * 60; m += 30) { var h = Math.floor(m / 60), mm = m % 60; o.push(((h + 11) % 12 + 1) + ':' + (mm < 10 ? '0' : '') + mm + ' ' + (h < 12 ? 'AM' : 'PM')); } return o; })();
+
+  var ROUNDS = ['First round', 'Second round', 'Quarterfinals', 'Semifinals', 'Championship game'];
+
+  var card = document.getElementById('rgCard');
+  var S = { step: 'wait', kind: '', experienced: null, token: '', user: null, season: '', fee: 12000, open: true, source: '', f: blank(), errs: {}, msg: '', banner: '', bannerAt: '', bannerWarn: false, busy: false, restored: false, agree: false, setup: null, back: null, imported: false, infoOk: false, remind: { name: '', email: '', busy: false, done: false, already: false, member: false, err: '' } };
+
+  function blank() {
+    return { interest: '', first: '', last: '', email: '', mobile: '', home: '', work: '', prefPhone: 'Mobile', more: false, street: '', city: '', state: 'TN', zip: '',
+      emName: '', emPhone: '', yearsWith: '', worked: [], prefPositions: [], days: [], time: '', postseason: '', finals: '', scratches: '', pl: [], plNote: '', plOlder: '',
+      howHeard: '', priorAssoc: '', priorYears: '' };
+  }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function $(sel) { return card.querySelector(sel); }
+  function money(c) { return '$' + (c / 100).toFixed(2); }
+  function empty(v) { return Array.isArray(v) ? !v.length : !String(v == null ? '' : v).trim(); }
+
+  /* ---------- the Member Portal sign-in (same storage the portal uses) ---------- */
+  function readPass() {
+    try { var raw = localStorage.getItem(PASS) || sessionStorage.getItem(PASS); var o = raw && JSON.parse(raw); return o && o.t && o.x > Date.now() ? o.t : ''; } catch (e) { return ''; }
+  }
+  function savePass(token, hours, keep) {
+    try { var v = JSON.stringify({ t: token, x: Date.now() + hours * 3600 * 1000 }); localStorage.removeItem(PASS); sessionStorage.removeItem(PASS); (keep ? localStorage : sessionStorage).setItem(PASS, v); } catch (e) {}
+  }
+  function clearPass() { try { localStorage.removeItem(PASS); sessionStorage.removeItem(PASS); sessionStorage.removeItem('mtfoa_me'); } catch (e) {} }
+  function call(body) {
+    return fetch(API, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) })
+      .then(function (r) { return r.json(); }).catch(function () { return { status: 'error', code: 'net', message: 'We could not reach the server. Please check your connection and try again.' }; });
+  }
+
+  /* ---------- progress saved on this device (never the password or card details) ---------- */
+  var saveTimer = 0;
+  function saveDraft() {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(function () {
+      try { if (S.step === 'wait' || S.step === 'done' || S.step === 'already' || S.step === 'closed') return;
+        localStorage.setItem(DRAFT, JSON.stringify({ t: Date.now(), kind: S.kind, experienced: S.experienced, step: S.step, imported: S.imported, infoOk: S.infoOk, f: S.f })); } catch (e) {}
+    }, 250);
+  }
+  function loadDraft() {
+    try { var d = JSON.parse(localStorage.getItem(DRAFT) || 'null'); if (d && d.t > Date.now() - 14 * 86400000 && d.f) return d; } catch (e) {}
+    return null;
+  }
+  function clearDraft() { try { localStorage.removeItem(DRAFT); } catch (e) {} }
+
+  /* ---------- which screens apply to this person ---------- */
+  function steps() {
+    var s = ['interest', 'you', 'address', 'exp', 'avail', 'extras', 'review'];
+    if (S.kind === 'returning' && S.imported) {   /* last season's answers were imported: review them first; if they are all still right, the screens that are already filled in are skipped */
+      s = S.infoOk ? ['checkinfo', 'interest', 'extras', 'review'] : ['checkinfo', 'interest', 'you', 'address', 'exp', 'avail', 'extras', 'review'];
+    }
+    return s;
+  }
+  function flagOnly() { return S.f.interest === 'Flag'; }
+  function newNoExp() { return S.kind === 'new' && S.experienced === false; }
+  /* ---------- playoff experience: one line per season (season + highest round), saved as text in the same sheet column ---------- */
+  function plYears() { var y0 = new Date().getFullYear(), a = []; for (var i = 0; i < 5; i++) a.push(String(y0 - i)); return a; }   /* the last five seasons */
+  function plDone(r) { return !!(r && r.y && r.r); }
+  function syncPl() {
+    var parts = S.f.pl.filter(plDone).sort(function (a, b) { return Number(b.y) - Number(a.y); }).map(function (r) { return r.y + ' \u2013 ' + r.r; });
+    if (String(S.f.plOlder || '').trim()) parts.push('Older state championships: ' + String(S.f.plOlder).trim());
+    if (String(S.f.plNote || '').trim()) parts.push(String(S.f.plNote).trim());
+    S.f.postseason = parts.join('; ');
+    S.plInit = true;
+  }
+  function initPl() {   /* answers from an earlier registration were free text: turn the "year - round" ones back into lines and keep the rest as a note */
+    if (S.plInit) return; S.plInit = true;
+    if (S.f.pl.length || !String(S.f.postseason || '').trim() && !String(S.f.finals || '').trim()) return;
+    var left = [], yrs = plYears();
+    String(S.f.postseason || '').split(/;\s*/).forEach(function (tok) {
+      var m = tok.match(/^(\d{4}) \u2013 (.+)$/), o = tok.match(/^Older state championships: (.+)$/);
+      if (m && ROUNDS.indexOf(m[2]) >= 0 && yrs.indexOf(m[1]) >= 0 && !S.f.pl.some(function (r) { return r.y === m[1]; })) S.f.pl.push({ y: m[1], r: m[2] });
+      else if (o) S.f.plOlder = o[1].trim();
+      else if (tok.trim()) left.push(tok.trim());
+    });
+    if (S.kind === 'returning' && String(S.f.finals || '').trim()) left.push('State finals worked: ' + String(S.f.finals).trim());
+    S.f.plNote = left.join('; ');
+    syncPl();
+  }
+  function plBlock() {
+    var yrs = plYears(), oldest = yrs[yrs.length - 1];
+    var rows = S.f.pl.map(function (r, i) {
+      return '<div class="plrow"><select data-pl="y" data-i="' + i + '" aria-label="Season"><option value="">Season&hellip;</option>' + yrs.map(function (y) { var taken = S.f.pl.some(function (o, k) { return k !== i && o.y === y; }); return '<option' + (r.y === y ? ' selected' : '') + (taken ? ' disabled' : '') + '>' + y + '</option>'; }).join('') + '</select>' +
+        '<select data-pl="r" data-i="' + i + '" aria-label="Highest round worked"><option value="">Highest round&hellip;</option>' + ROUNDS.map(function (x) { return '<option' + (r.r === x ? ' selected' : '') + '>' + x + '</option>'; }).join('') + '</select>' +
+        '<button type="button" class="rg-link" data-act="pldel" data-i="' + i + '" aria-label="Remove this season">Remove</button></div>';
+    }).join('');
+    return '<div class="fld' + (S.errs.pl ? ' bad' : '') + '"><label>Playoff experience <span class="opt">(optional)</span></label>' +
+      '<p class="hint" style="margin:0 0 10px">Add a line for each of your last five seasons (' + oldest + ' to ' + yrs[0] + ') that you worked the playoffs, in any state. Skip this if you have none.</p>' + rows +
+      (S.f.pl.length < yrs.length ? '<button type="button" class="rg-link more" data-act="pladd" style="margin:2px 0 0">+ Add a season</button>' : '<p class="hint" style="margin:2px 0 0">That is all five seasons.</p>') + errLine('pl') +
+      '<div class="fld" style="margin-top:16px"><label for="f_plOlder">State championship games before ' + oldest + ' <span class="opt">(optional)</span></label><input type="text" id="f_plOlder" data-f="plOlder" maxlength="120" autocomplete="off" value="' + esc(S.f.plOlder) + '" placeholder="For example, 2018, 2015"><p class="hint">If you worked a state championship game more than five years ago, list the year or years.</p></div>' +
+      (String(S.f.plNote || '').trim() ? '<div class="fld" style="margin-top:14px"><label for="f_plNote">Other playoff details from your earlier registration <span class="opt">(edit if needed)</span></label><textarea id="f_plNote" data-f="plNote" rows="3" maxlength="800">' + esc(S.f.plNote) + '</textarea></div>' : '') + '</div>';
+  }
+  function showPlayoffs() { return S.kind === 'returning' || S.experienced === true; }   // playoff experience: returning members and experienced officials new to MTFOA
+
+  var ICON = {
+    football: '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 20.5C2 14 6 6 13 3.5c4-.9 7.500-.5 7.500-.5s.4 3.500-.5 7.500C17.500 17.500 10 22 3.500 20.500z"/><path d="M9 15l6-6M10.500 11.500l2 2M12.500 9.500l2 2M8.500 13.500l2 2"/></svg>',
+    flag: '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V3"/><path d="M5 4h12l-2.500 4L17 12H5"/></svg>',
+    both: '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.600 5.400 5.900.8-4.300 4.200 1 5.900L12 16.500 6.800 19.300l1-5.900L3.500 9.200l5.900-.8z"/></svg>',
+    newbie: '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.500"/><path d="M2.500 20c0-3.600 2.900-6 6.500-6s6.500 2.400 6.500 6M19 8v6M16 11h6"/></svg>',
+    back: '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.500"/><path d="M4.500 20c0-3.800 3.400-6.500 7.500-6.500s7.500 2.700 7.500 6.500"/></svg>',
+    tick: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.500" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.500l4.500 4.500L19 7"/></svg>',
+    check: '<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.500l4.500 4.500L19 7"/></svg>',
+    lock: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px"><rect x="4" y="10.500" width="16" height="10" rx="2"/><path d="M8 10.500V7a4 4 0 0 1 8 0v3.500"/></svg>'
+  };
+
+  /* ---------- small building blocks ---------- */
+  function fld(id, label, o) {
+    o = o || {};
+    var v = S.f[id], bad = S.errs[id];
+    var attrs = ' id="f_' + id + '" data-f="' + id + '" value="' + esc(v) + '"' + (o.ac ? ' autocomplete="' + o.ac + '"' : ' autocomplete="off"') +
+      (o.im ? ' inputmode="' + o.im + '"' : '') + (o.ph ? ' placeholder="' + esc(o.ph) + '"' : '') + (o.ro ? ' readonly' : '') + (o.max ? ' maxlength="' + o.max + '"' : '');
+    var input = o.area ? '<textarea id="f_' + id + '" data-f="' + id + '" rows="3" maxlength="1000"' + (o.ph ? ' placeholder="' + esc(o.ph) + '"' : '') + '>' + esc(v) + '</textarea>'
+      : '<input type="' + (o.type || 'text') + '"' + attrs + (bad ? ' aria-invalid="true"' : '') + '>';
+    return '<div class="fld' + (bad ? ' bad' : '') + (o.cls ? ' ' + o.cls : '') + '"><label for="f_' + id + '">' + esc(label) + (o.req === false ? ' <span class="opt">(optional)</span>' : '') + '</label>' +
+      input + (o.hint ? '<p class="hint">' + o.hint + '</p>' : '') + (bad ? '<p class="err" role="alert">' + esc(bad) + '</p>' : '') + '</div>';
+  }
+  function card1(field, val, icon, title, sub) {
+    var on = S.f[field] === val;
+    return '<button type="button" class="opt-card" data-act="pick" data-f="' + field + '" data-v="' + esc(val) + '" aria-pressed="' + on + '"><span class="ic">' + icon + '</span><span><b>' + esc(title) + '</b>' + (sub ? '<span class="sub">' + esc(sub) + '</span>' : '') + '</span><span class="tick">' + ICON.tick + '</span></button>';
+  }
+  function chips(field, items, label) {
+    return '<div class="chips" role="group" aria-label="' + esc(label) + '">' + items.map(function (it) {
+      var k = it.k || it, on = S.f[field].indexOf(k) >= 0;
+      return '<button type="button" class="chip" data-act="toggle" data-f="' + field + '" data-v="' + esc(k) + '" aria-pressed="' + on + '">' + esc(k) + (it.n ? ' <small>(' + esc(it.n) + ')</small>' : '') + '</button>';
+    }).join('') + '</div>';
+  }
+  function errLine(id) { return S.errs[id] ? '<p class="err" role="alert">' + esc(S.errs[id]) + '</p>' : ''; }
+  function nav(back, nextLabel, cls) {
+    return '<div class="nav">' + (back ? '<button type="button" class="btn sec" data-act="back">Back</button>' : '') +
+      '<button type="button" class="btn pri' + (cls ? ' ' + cls : '') + '" data-act="next"' + (S.busy ? ' disabled' : '') + '>' + nextLabel + '</button></div>';
+  }
+  function banner() {
+    var out = '';
+    if (S.msg) out += '<div class="rg-msg" role="alert">' + esc(S.msg) + '</div>';
+    if (S.banner && S.bannerAt === S.step) out += '<div class="rg-banner' + (S.bannerWarn ? ' warn' : '') + '"><span>' + S.banner + '</span></div>';
+    return out;
+  }
+  function progress() {
+    var list = steps(), i = list.indexOf(S.step);
+    if (i < 0) return '';
+    return '<div class="rg-prog"><div class="rg-prog-top"><span>Step ' + (i + 1) + ' of ' + list.length + '</span><span>' + Math.round((i + 1) / list.length * 100) + '%</span></div><div class="rg-bar"><i style="width:' + ((i + 1) / list.length * 100) + '%"></i></div></div>';
+  }
+  function signedInLine() {
+    return S.user ? '<div class="rg-banner"><span>Signed in as <b>' + esc(S.user.name || S.user.email) + '</b>.</span><button type="button" class="rg-link" data-act="signout">Not you?</button></div>' : '';
+  }
+
+  /* ---------- the screens ---------- */
+  function view() {
+    var h = '';
+    switch (S.step) {
+      case 'wait': h = '<div class="wait"><span class="spin"></span>Loading&hellip;</div>'; break;
+      case 'closed':
+        h = '<h2 tabindex="-1">Registration is closed for now</h2><p class="rg-lead">MTFOA registration for the ' + esc(S.season) + ' season is not open right now. <b>Current MTFOA officials</b> will be notified directly when it opens, so there is nothing you need to do.</p>' + remindBox();
+        break;
+      case 'already': h = '<div class="done"><div class="big">' + ICON.check + '</div><h2 tabindex="-1">You are already registered</h2><p class="rg-lead">We already have your paid ' + esc(S.season) + ' registration. Nothing more is needed here.</p></div>' + nextSteps(); break;
+      case 'confirm': h = '<div class="wait"><span class="spin"></span>Confirming your payment&hellip;</div>'; break;
+      case 'done': h = S.setup ? setupView() : S.back ? backView() : '<div class="done"><div class="big">' + ICON.check + '</div><h2 tabindex="-1">You are registered. Thank you!</h2><p class="rg-lead">Your payment went through. A confirmation email is on its way (check your spam folder if you do not see it).</p></div>' + nextSteps();; break;
+      case 'start':
+        h = '<h2 tabindex="-1">Welcome! Let&rsquo;s get you registered for ' + esc(S.season) + '.</h2><p class="rg-lead">It takes about 5 minutes. At the end you pay ' + money(S.fee) + ' securely online by card or bank account.</p>' + banner() +
+          '<div class="opts">' + cardKind('new', ICON.newbie, 'I am new to MTFOA', 'Welcome! We will walk you through it.') +
+          cardKind('returning', ICON.back, 'I have officiated with MTFOA before', 'Sign in and we will fill in what we already know.') + '</div>' +
+          '<div class="nav"><button type="button" class="btn pri" data-act="next">Continue</button></div>';
+        break;
+      case 'signin':
+        h = '<h2 tabindex="-1">Sign in</h2><p class="rg-lead">Use your Member Portal login. We will fill in your details from last season so you only need to check them.</p>' + banner() +
+          '<div class="fld' + (S.errs.si ? ' bad' : '') + '"><label for="siEmail">Email</label><input type="email" id="siEmail" autocomplete="username" inputmode="email" value="' + esc(S.f.email) + '"></div>' +
+          '<div class="fld"><label for="siPass">Password</label><input type="password" id="siPass" autocomplete="current-password"></div>' +
+          '<label style="font-weight:400;display:flex;gap:9px;align-items:center;margin:0 0 6px"><input type="checkbox" id="siKeep" style="width:20px;height:20px"> Keep me signed in on this device</label>' +
+          '<p class="rg-note">Never set a password, or forgot it? <a href="/mtfoamembers">Set one up on the Member Portal</a> (it takes a minute), then come back here &mdash; we will save your place.</p>' +
+          '<div class="nav"><button type="button" class="btn sec" data-act="back">Back</button><button type="button" class="btn pri" data-act="next"' + (S.busy ? ' disabled' : '') + '>' + (S.busy ? 'Signing in&hellip;' : 'Sign in') + '</button></div>';
+        break;
+      case 'checkinfo': h = signedInLine() + infoView(); break;
+      case 'interest':
+        h = progress() + signedInLine() + '<h2 tabindex="-1">What would you like to officiate?</h2><p class="rg-lead">Pick the one that fits.</p>' + banner() +
+          '<div class="opts">' + card1('interest', 'Tackle', ICON.football, 'Tackle football', '') + card1('interest', 'Flag', ICON.flag, 'Flag football', '') + card1('interest', 'Both', ICON.both, 'Both tackle and flag', '') + '</div>' + errLine('interest') + nav(S.kind === 'new' || !S.user || S.imported, 'Continue');
+        break;
+      case 'you':
+        h = progress() + '<h2 tabindex="-1">A little about you</h2><p class="rg-lead">We use this to contact you about assignments and meetings.</p>' + banner() +
+          '<div class="row2">' + fld('first', 'First name', { ac: 'given-name' }) + fld('last', 'Last name', { ac: 'family-name' }) + '</div>' +
+          (S.kind === 'returning' ? fld('email', 'Email', { ro: true, type: 'email', hint: 'This is your Member Portal email.' }) :
+            fld('email', 'Email', { type: 'email', ac: 'email', im: 'email', hint: 'Use your <b>Arbiter email</b>. If you do not have an Arbiter account yet, use the email you plan to register with on Arbiter.' })) +
+          fld('mobile', 'Mobile phone', { type: 'tel', ac: 'tel', im: 'tel', ph: '615-555-1234' }) +
+          (S.f.more ? fld('home', 'Home phone', { type: 'tel', im: 'tel', req: false }) + fld('work', 'Work phone', { type: 'tel', im: 'tel', req: false }) + prefPhone() :
+            '<button type="button" class="rg-link more" data-act="more">+ Add a home or work phone</button>') + nav(true, 'Continue');
+        break;
+      case 'address':
+        h = progress() + '<h2 tabindex="-1">Where do you live?</h2><p class="rg-lead">Your mailing address.</p>' + banner() +
+          fld('street', 'Street address', { ac: 'address-line1' }) + fld('city', 'City', { ac: 'address-level2' }) +
+          '<div class="row2"><div class="fld' + (S.errs.state ? ' bad' : '') + '"><label for="f_state">State</label><select id="f_state" data-f="state" autocomplete="address-level1">' +
+          STATES.map(function (s) { return '<option' + (S.f.state === s ? ' selected' : '') + '>' + s + '</option>'; }).join('') + '</select>' + (S.errs.state ? '<p class="err" role="alert">' + esc(S.errs.state) + '</p>' : '') + '</div>' +
+          fld('zip', 'ZIP code', { ac: 'postal-code', im: 'numeric', max: 10, cls: 'zip' }) + '</div>' +
+          '<h3>Emergency contact</h3><p class="rg-note" style="margin:0 0 12px">Someone we can call if something happens at a game.</p>' +
+          '<div class="row2">' + fld('emName', 'Contact name', { ac: 'off' }) + fld('emPhone', 'Contact phone', { type: 'tel', im: 'tel' }) + '</div>' + nav(true, 'Continue');
+        break;
+      case 'exp': h = progress() + expView(); break;
+      case 'avail':
+        h = progress() + '<h2 tabindex="-1">When can you work?</h2><p class="rg-lead">Tell us your availability. You can always adjust it later with your assigner.</p>' + banner() +
+          (flagOnly() ? '' : '<h3>Positions you would like to work</h3><p class="rg-note" style="margin:0 0 10px">Choose all that apply.</p>' + chips('prefPositions', newNoExp() ? POS.slice(1) : POS, 'Preferred positions') + errLine('prefPositions')) +
+          '<h3>Days you can work</h3><div class="chips" style="margin-top:10px" role="group" aria-label="Days available">' + DAYS.map(function (d) { return '<button type="button" class="chip" data-act="toggle" data-f="days" data-v="' + d + '" aria-pressed="' + (S.f.days.indexOf(d) >= 0) + '">' + d + '</button>'; }).join('') + '</div>' +
+          '<p class="quick">Quick pick:<button type="button" class="rg-link" data-act="days" data-v="all">Every day</button><button type="button" class="rg-link" data-act="days" data-v="wk">Weekdays</button><button type="button" class="rg-link" data-act="days" data-v="none">Clear</button></p>' + errLine('days') +
+          '<div class="fld' + (S.errs.time ? ' bad' : '') + '" style="margin-top:22px"><label for="f_time">Earliest time you can start on a weekday</label><select id="f_time" data-f="time"><option value="">Choose a time&hellip;</option>' +
+          timeOpts().map(function (t) { return '<option' + (S.f.time === t ? ' selected' : '') + '>' + t + '</option>'; }).join('') + '</select><p class="hint">For example, after work or after school.</p>' + (S.errs.time ? '<p class="err" role="alert">' + esc(S.errs.time) + '</p>' : '') + '</div>' + nav(true, 'Continue');
+        break;
+      case 'extras':
+        h = progress() + '<h2 tabindex="-1">Anything else we should know?</h2><p class="rg-lead">All optional &mdash; skip it if nothing applies.</p>' + banner() +
+          fld('scratches', 'Schools you would like to scratch', { area: true, req: false, hint: 'Use this for a conflict of interest, such as a close family member who plays for that school&rsquo;s varsity team, or a school where you teach or coach. We will not assign you to those schools.' }) +
+          (showPlayoffs() ? (initPl(), plBlock()) : '') + nav(true, 'Continue');
+        break;
+      case 'review': h = progress() + reviewView(); break;
+    }
+    return h;
+  }
+  function cardKind(v, icon, title, sub) {
+    return '<button type="button" class="opt-card" data-act="kind" data-v="' + v + '" aria-pressed="' + (S.kind === v) + '"><span class="ic">' + icon + '</span><span><b>' + title + '</b><span class="sub">' + sub + '</span></span><span class="tick">' + ICON.tick + '</span></button>';
+  }
+  function prefPhone() {
+    var opts = ['Mobile']; if (S.f.home) opts.push('Home'); if (S.f.work) opts.push('Work');
+    if (opts.length < 2) return '';
+    return '<div class="fld"><label>Best number for game assignments</label><div class="chips" role="group" aria-label="Preferred phone">' + opts.map(function (o) { return '<button type="button" class="chip" data-act="pick" data-f="prefPhone" data-v="' + o + '" aria-pressed="' + (S.f.prefPhone === o) + '">' + o + '</button>'; }).join('') + '</div></div>';
+  }
+  function timeOpts() { var t = TIMES.slice(); if (S.f.time && t.indexOf(S.f.time) < 0) t.push(S.f.time); return t; }
+  function expView() {
+    var h = '<h2 tabindex="-1">Your experience</h2>' + banner();
+    if (S.kind === 'returning') {
+      h += '<p class="rg-lead">How long have you worked with MTFOA?</p><div class="opts">' + card1('yearsWith', 'Two Years or Less', ICON.back, 'Two years or less', '') + card1('yearsWith', 'Three Years or More', ICON.back, 'Three years or more', '') + '</div>' + errLine('yearsWith');
+      if (!flagOnly()) h += '<h3>Positions you have worked</h3><p class="rg-note" style="margin:0 0 10px">Choose all that apply.</p>' + chips('worked', POS, 'Positions worked');
+    } else {
+      h += '<p class="rg-lead">Just a few quick questions.</p>' + fld('howHeard', 'How did you hear about MTFOA?', { ph: 'A friend, a school, the TSSAA website, ...' }) +
+        '<h3 style="margin-top:6px">Which best describes you?</h3><div class="opts" style="margin-top:12px">' +
+        '<button type="button" class="opt-card" data-act="exp" data-v="no" aria-pressed="' + (S.experienced === false) + '"><span class="ic">' + ICON.newbie + '</span><span><b>I&rsquo;m a first-time official</b><span class="sub">I haven&rsquo;t officiated football before</span></span><span class="tick">' + ICON.tick + '</span></button>' +
+        '<button type="button" class="opt-card" data-act="exp" data-v="yes" aria-pressed="' + (S.experienced === true) + '"><span class="ic">' + ICON.back + '</span><span><b>I&rsquo;ve officiated before</b><span class="sub">With another association or in another state</span></span><span class="tick">' + ICON.tick + '</span></button></div>' + errLine('experienced');
+      if (S.experienced === true) {
+        h += fld('priorAssoc', 'Which association(s) did you work for?') + fld('priorYears', 'How many years of experience?', { im: 'numeric', max: 30, ph: 'For example, 5' });
+        if (!flagOnly()) h += '<h3>Positions you primarily worked</h3><p class="rg-note" style="margin:0 0 10px">Choose all that apply.</p>' + chips('worked', POS, 'Positions worked');
+      }
+    }
+    return h + nav(true, 'Continue');
+  }
+  function reviewView() {
+    if (showPlayoffs()) { initPl(); syncPl(); }
+    var f = S.f, pos = f.prefPositions.join(', ');
+    var phones = ['Mobile ' + f.mobile].concat(f.home ? ['Home ' + f.home] : [], f.work ? ['Work ' + f.work] : []).join(' &middot; ');
+    function sec(t, to, rows) { return '<div class="sum"><div class="sum-h"><span>' + t + '</span><button type="button" class="rg-link" data-act="goto" data-v="' + to + '">Edit</button></div><dl>' + rows.map(function (r) { return r[1] ? '<dt>' + r[0] + '</dt><dd>' + r[1] + '</dd>' : ''; }).join('') + '</dl></div>'; }
+    var br = function (x) { return esc(x).replace(/\n/g, '<br>'); };
+    var extraRows = [['Schools to scratch', br(f.scratches) || 'None listed']].concat(showPlayoffs() ? [['Playoff experience', esc(f.postseason).replace(/; /g, '<br>') || 'None listed']] : []);
+    var expRows = S.kind === 'returning' ? [['Years with MTFOA', esc(f.yearsWith)], ['Positions worked', esc(f.worked.join(', '))]] :
+      [['How you heard about us', esc(f.howHeard)], ['Prior experience', S.experienced ? esc(f.priorYears + ' years with ' + f.priorAssoc) : 'First-time official'], ['Positions worked', esc(f.worked.join(', '))]];
+    return '<h2 tabindex="-1">Review and pay</h2><p class="rg-lead">Check everything looks right, then continue to the secure payment page.</p>' + banner() +
+      sec('Officiating', 'interest', [['Interested in', esc({ Tackle: 'Tackle football', Flag: 'Flag football', Both: 'Both tackle and flag' }[f.interest] || '')]]) +
+      sec('About you', 'you', [['Name', esc(f.first + ' ' + f.last)], ['Email', esc(f.email)], ['Phone', esc(phones).replace(/&amp;middot;/g, '&middot;')]]) +
+      sec('Address and emergency contact', 'address', [['Address', esc(f.street + ', ' + f.city + ', ' + f.state + ' ' + f.zip)], ['Emergency contact', esc(f.emName + ' ' + f.emPhone)]]) +
+      sec('Experience', 'exp', expRows) +
+      sec('Availability', 'avail', [['Preferred positions', esc(pos)], ['Days', esc(f.days.join(', '))], ['Earliest weekday time', esc(f.time)]]) +
+      sec('Conflicts and experience', 'extras', extraRows) +
+      '<div class="agree' + (S.errs.agree ? ' bad' : '') + '"><label for="rgAgree"><input type="checkbox" id="rgAgree"' + (S.agree ? ' checked' : '') + '><span>I understand that I am an <b>independent contractor</b>, not an employee of MTFOA, and that I will be issued a <b>Form 1099</b>. I agree to follow all posted MTFOA policies. ' +
+      '<a href="/policies-review" target="_blank" rel="noopener">Read the MTFOA policies and insurance information</a> (opens in a new tab).</span></label>' + (S.errs.agree ? '<p class="err" role="alert">' + esc(S.errs.agree) + '</p>' : '') + '</div>' +
+      '<div class="fee"><span>' + esc(S.season) + ' registration</span><b>' + money(S.fee) + '</b></div>' +
+      '<p class="lock">' + ICON.lock + '<span>You will pay on Stripe&rsquo;s secure page by card or bank account. MTFOA never sees or stores your payment details.</span></p>' +
+      nav(true, S.busy ? 'Opening secure payment&hellip;' : 'Continue to secure payment', 'pay');
+  }
+  /* ---------- registration is closed: a new official can ask for one email when it opens ---------- */
+  function remindBox() {
+    var r = S.remind;
+    if (r.member) return '<div class="remind"><h3>You are already on the MTFOA list</h3><p class="rg-note" style="margin:0">That email address belongs to a current official, so you will be notified directly when registration opens. Nothing more to do.</p></div>';
+    if (r.done || r.already) return '<div class="remind ok"><h3>' + (r.already ? 'You are already on the list' : 'You are on the list') + '</h3><p class="rg-note" style="margin:0">We will email <b>' + esc(r.email) + '</b> once, when registration opens.</p></div>';
+    return '<div class="remind"><h3>New to MTFOA? Get a reminder.</h3><p class="rg-note" style="margin:0 0 12px">Leave your name and email and we will send you one email when registration opens. We will not use it for anything else.</p>' +
+      '<div class="fld"><label for="rmName">Your name</label><input type="text" id="rmName" autocomplete="name" value="' + esc(r.name) + '"></div>' +
+      '<div class="fld"><label for="rmEmail">Your email</label><input type="email" id="rmEmail" autocomplete="email" inputmode="email" value="' + esc(r.email) + '"></div>' +
+      (r.err ? '<p class="err" role="alert">' + esc(r.err) + '</p>' : '') +
+      '<button type="button" class="btn pri" data-act="remind"' + (r.busy ? ' disabled' : '') + '>' + (r.busy ? 'Saving&hellip;' : 'Remind me when registration opens') + '</button></div>';
+  }
+  function doRemind() {
+    var r = S.remind; if (r.busy) return;
+    r.name = (card.querySelector('#rmName') || {}).value || r.name; r.email = (card.querySelector('#rmEmail') || {}).value || r.email;
+    if (!String(r.name).trim()) { r.err = 'Please enter your name.'; render(false); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(r.email).trim())) { r.err = 'Please enter a valid email address.'; render(false); return; }
+    r.busy = true; r.err = ''; render(false);
+    call({ action: 'regremindme', name: r.name.trim(), email: r.email.trim() }).then(function (x) {
+      r.busy = false;
+      if (x.status === 'ok') { r.done = !!x.done; r.already = !!x.already; r.member = !!x.member; render(false); }
+      else { r.err = x.message || 'We could not save that. Please try again in a moment.'; render(false); }
+    });
+  }
+
+  /* ---------- returning official: last season's answers were just imported - are they still right? ---------- */
+  function infoView() {
+    var f = S.f, bad = ['you', 'address', 'exp', 'avail'].filter(function (s) { return Object.keys(check(s)).length; });
+    var phones = [f.mobile ? 'Mobile ' + f.mobile : 'Mobile: not on file'].concat(f.home ? ['Home ' + f.home] : [], f.work ? ['Work ' + f.work] : []).map(esc).join(' &middot; ');
+    function blk(title, rows) { return '<div class="sum"><div class="sum-h"><span>' + title + '</span></div><dl>' + rows.map(function (r) { return r[1] ? '<dt>' + r[0] + '</dt><dd>' + r[1] + '</dd>' : ''; }).join('') + '</dl></div>'; }
+    var h = '<h2 tabindex="-1">Is this still accurate?</h2><p class="rg-lead">We filled in what we have from your ' + esc(S.source || 'last registration') + '. Please look it over and tell us whether it is all still correct.</p>' + banner() +
+      blk('Contact', [['Name', esc(f.first + ' ' + f.last)], ['Email', esc(f.email)], ['Phone', phones]]) +
+      blk('Address', [['Mailing address', esc(f.street + ', ' + f.city + ', ' + f.state + ' ' + f.zip)]]) +
+      blk('Emergency contact', [['Name and phone', esc(f.emName + ' ' + f.emPhone)]]) +
+      blk('With MTFOA', [['Years with MTFOA', esc(f.yearsWith)], ['Positions you have worked', esc(f.worked.join(', '))]]) +
+      blk('Availability', [['Positions you would like to work', esc(f.prefPositions.join(', '))], ['Days', esc(f.days.join(', '))], ['Earliest weekday time', esc(f.time)]]);
+    if (bad.length) h += '<p class="rg-msg" style="margin-top:14px">A few details are missing or need fixing, so we will go through each screen with you.</p><div class="nav"><button type="button" class="btn pri" data-act="infochange">Update my information</button></div>';
+    else h += '<div class="nav"><button type="button" class="btn sec" data-act="infochange">Something has changed</button><button type="button" class="btn pri" data-act="infook">Yes, all of this is still accurate</button></div>';
+    return h;
+  }
+
+  /* ---------- after payment, a NEW official: set a password with an emailed code, then add a roster photo ---------- */
+  function stp(n, title, body, cls) {
+    return '<div class="stp ' + (cls || '') + '"><div class="stp-n">' + (cls === 'ok' ? ICON.tick : n) + '</div><div class="stp-b"><h3>' + title + '</h3>' + body + '</div></div>';
+  }
+  function setupView() {
+    var u = S.setup, e = esc(u.email), err = '<p class="err" id="suErr" role="alert"' + (u.err ? '' : ' hidden') + '>' + esc(u.err || '') + '</p>', s1;
+    if (u.phase === 'done') {
+      s1 = stp(1, 'Your website password is ready', '<p>You are signed in on this device. Next time, sign in on the <a href="/mtfoamembers">Member Portal</a> with <b>' + e + '</b> and the password you just created.</p>', 'ok');
+    } else if (u.phase === 'code') {
+      s1 = stp(1, 'Create your website password', '<p>We emailed a 6-digit code to <b>' + e + '</b>. Type it here, then create your password (at least 8 characters). Check your spam folder if the email does not arrive.</p>' +
+        '<div class="fld"><label for="suCode">6-digit code</label><input type="text" id="suCode" inputmode="numeric" autocomplete="one-time-code" maxlength="8"></div>' +
+        '<div class="fld"><label for="suPw">Create a password</label><input type="password" id="suPw" autocomplete="new-password"></div>' +
+        '<label class="su-keep"><input type="checkbox" id="suKeep"> Keep me signed in on this device</label>' + err +
+        '<div class="su-row"><button type="button" class="btn pri" data-act="savepw">Save my password</button><button type="button" class="rg-link" data-act="sendcode">Send a new code</button></div>');
+    } else {
+      s1 = stp(1, 'Create your website password', '<p>The Member Portal gives you your meeting attendance, member resources, and more. You do not have a password yet, so you will create one now: we will email a 6-digit code to <b>' + e + '</b> to confirm it is you, then you choose your own password.</p>' +
+        (u.ready ? '' : '<p class="hint">Your account is still being set up. If the code does not arrive, wait a minute and ask again.</p>') + err +
+        '<div class="su-row"><button type="button" class="btn pri" data-act="sendcode">Email me a code to create my password</button></div>');
+    }
+    var s2 = u.phase === 'done' ? stp(2, 'Add your roster photo', '<p>Choose a clear, recent photo of yourself. It appears on the public roster once it is approved.</p><div class="su-row"><button type="button" class="btn pri" data-act="photo">Add my photo</button></div>')
+      : stp(2, 'Add your roster photo', '<p>Available after step 1.</p>', 'off');
+    var s3 = stp(3, 'Register with the TSSAA on Arbiter', '<p>When TSSAA registration is open, register with the TSSAA on Arbiter (it can only be done while the TSSAA has it open). <a href="/tssaa-registration">Step-by-step guide</a>. A mentor will be assigned to you soon and will reach out.</p>');
+    return '<div class="done"><div class="big">' + ICON.check + '</div><h2 tabindex="-1">You are registered. Thank you!</h2><p class="rg-lead">Your payment went through and you have been added to the roster as a Reserve. A confirmation email is on its way (check your spam folder). Please finish these steps:</p></div>' + s1 + s2 + s3;
+  }
+  /* ---------- after payment, an EXISTING official (already signed in, already has a password) ---------- */
+  function backView() {
+    var b = S.back, list = [], n = 0, signed = !!readPass();
+    if (signed && (b.photo === 'none' || b.photo === 'low' || b.photo === 'rounded')) {
+      var none = b.photo === 'none', round = b.photo === 'rounded';
+      list.push(stp(++n, none ? 'Add your roster photo' : 'Update your roster photo',
+        '<p>' + (none ? 'We do not have a photo of you on the roster yet.' : round ? 'Your roster photo is low resolution and should be replaced.' : 'Your roster photo is small and can look blurry.') + ' Please choose a clear, recent photo of yourself. It appears on the public roster once it is approved.</p>' +
+        '<div class="su-row"><button type="button" class="btn pri" data-act="photo">' + (none ? 'Add my photo' : 'Update my photo') + '</button></div>'));
+    }
+    list.push(stp(++n, 'Register with the TSSAA on Arbiter', '<p>When TSSAA registration is open, register (or renew) with the TSSAA on Arbiter (it can only be done while the TSSAA has it open). <a href="/tssaa-registration">Step-by-step guide</a>.</p>'));
+    return '<div class="done"><div class="big">' + ICON.check + '</div><h2 tabindex="-1">You are registered for ' + esc(S.season) + '. Welcome back' + (b.first ? ', ' + esc(b.first) : '') + '!</h2><p class="rg-lead">Your payment went through. A confirmation email is on its way (check your spam folder).' + (list.length > 1 ? ' Please finish these steps:' : ' One more step:') + '</p></div>' + list.join('') +
+      '<p class="hint" style="text-align:center;margin:14px 0 0"><a href="/mtfoamembers">Go to the Member Portal</a></p>';
+  }
+  function suErr(msg) { var er = card.querySelector('#suErr'); if (!er) return; er.textContent = msg || ''; er.hidden = !msg; }
+  function doSendCode() {
+    var u = S.setup; if (!u || u.busy) return;
+    u.busy = true; u.err = ''; suErr('');
+    card.querySelectorAll('[data-act=sendcode]').forEach(function (b) { b.disabled = true; });
+    call({ action: 'requestcode', email: u.email }).then(function (r) {
+      u.busy = false;
+      if (r.status === 'ok') { u.phase = 'code'; render(false); var c = card.querySelector('#suCode'); if (c) c.focus(); }
+      else { u.err = r.message || 'We could not send the code. Please try again in a moment.'; render(false); }
+    });
+  }
+  function doSavePw() {
+    var u = S.setup; if (!u || u.busy) return;
+    var code = (card.querySelector('#suCode') || {}).value || '', pw = (card.querySelector('#suPw') || {}).value || '', keep = !!(card.querySelector('#suKeep') || {}).checked;
+    code = code.replace(/\s+/g, '');
+    if (!/^\d{4,8}$/.test(code)) { suErr('Please type the 6-digit code from the email.'); return; }
+    if (pw.length < 8) { suErr('Please choose a password of at least 8 characters.'); return; }
+    u.busy = true; suErr('');
+    var btn = card.querySelector('[data-act=savepw]'); if (btn) { btn.disabled = true; btn.textContent = 'Saving\u2026'; }
+    call({ action: 'setpassword', email: u.email, code: code, password: pw, remember: keep }).then(function (r) {
+      u.busy = false;
+      if (r.status === 'ok' && r.token) { savePass(r.token, r.hours || 12, keep); u.phase = 'done'; u.err = ''; render(); }
+      else { if (btn) { btn.disabled = false; btn.textContent = 'Save my password'; } suErr(r.message || 'That did not work. Please check the code and try again.'); }
+    });
+  }
+  function confirmPaid(sid) {
+    S.step = 'confirm'; render(false);
+    var tries = 0;
+    (function ask() {
+      call({ action: 'regconfirm', session: sid }).then(function (r) {
+        tries++;
+        if (r.status === 'ok' && r.paid) {
+          if (r.isNew && r.email) S.setup = { email: r.email, first: r.first || '', ready: !!r.ready, phase: 'start', err: '', busy: false };
+          else if (!r.isNew) S.back = { first: r.first || '', photo: r.photo || '' };
+          S.step = 'done'; render(); return;
+        }
+        if (tries < 8 && (r.status === 'ok' || r.code === 'net' || r.code === 'stripe')) { setTimeout(ask, 2500); return; }
+        S.step = 'done'; render();
+      });
+    })();
+  }
+  function nextSteps() {
+    return '<div class="next"><h3 style="margin-top:12px">What to do next</h3><ol>' +
+      '<li><b>Create your Member Portal password</b> if you have not already (meeting attendance, resources, nominations). <a href="/mtfoamembers">Open the Member Portal</a></li>' +
+      '<li><b>When TSSAA registration is open, register with the TSSAA on Arbiter.</b> <a href="/tssaa-registration">Step-by-step guide</a></li></ol></div>';
+  }
+
+  /* ---------- rendering and events ---------- */
+  function render(focus) {
+    card.innerHTML = view();
+    var t = document.getElementById('rgTitle'); if (t) t.textContent = S.season ? S.season + ' Registration' : 'Registration';
+    if (focus !== false) { var h = card.querySelector('h2'); if (h) { try { h.focus({ preventScroll: true }); } catch (e) { h.focus(); } card.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' }); } }
+    saveDraft();
+  }
+  function go(step) { S.step = step; S.errs = {}; S.msg = ''; render(); }
+  function goNext() { var l = steps(), i = l.indexOf(S.step); go(l[Math.min(i + 1, l.length - 1)]); }
+  function goBack() {
+    var l = steps(), i = l.indexOf(S.step);
+    if (S.step === 'signin') return go('start');
+    if (S.step === 'interest') return go(S.kind === 'returning' && S.imported ? 'checkinfo' : (S.kind === 'returning' && !S.user ? 'signin' : 'start'));
+    go(l[Math.max(i - 1, 0)]);
+  }
+
+  card.addEventListener('input', function (e) {
+    var el = e.target, k = el.getAttribute('data-f');
+    if (el.id === 'rmName') { S.remind.name = el.value; return; }
+    if (el.id === 'rmEmail') { S.remind.email = el.value; return; }
+    if (!k) return;
+    S.f[k] = el.value;
+    if (k === 'plNote' || k === 'plOlder') syncPl();
+    if (S.errs[k]) { delete S.errs[k]; var box = el.closest('.fld'); if (box) { box.classList.remove('bad'); var er = box.querySelector('.err'); if (er) er.remove(); } }
+    saveDraft();
+  });
+  card.addEventListener('change', function (e) {
+    var el = e.target, k = el.getAttribute('data-f');
+    if (el.getAttribute('data-pl')) { var row = S.f.pl[Number(el.getAttribute('data-i'))]; if (row) { row[el.getAttribute('data-pl')] = el.value; delete S.errs.pl; var eb = card.querySelector('.fld.bad'); if (eb && !S.errs.pl) { eb.classList.remove('bad'); var ee = eb.querySelector('.err'); if (ee) ee.remove(); } syncPl(); saveDraft(); var mm = card.querySelector('.rg-msg'); if (mm && !Object.keys(S.errs).length) { mm.remove(); S.msg = ''; } } return; }
+    if (el.id === 'rgAgree') { S.agree = !!el.checked; if (S.agree) { delete S.errs.agree; var ab = el.closest('.agree'); if (ab) { ab.classList.remove('bad'); var ae = ab.querySelector('.err'); if (ae) ae.remove(); } } return; }
+    if (k && (k === 'mobile' || k === 'home' || k === 'work' || k === 'emPhone')) { var p = fmtPhone(el.value); if (p) { el.value = p; S.f[k] = p; saveDraft(); } }
+    if (k === 'home' || k === 'work') { if (!S.f.home && S.f.prefPhone === 'Home') S.f.prefPhone = 'Mobile'; if (!S.f.work && S.f.prefPhone === 'Work') S.f.prefPhone = 'Mobile'; }
+  });
+  function fmtPhone(v) { var d = String(v).replace(/\D/g, ''); if (d.length === 11 && d.charAt(0) === '1') d = d.slice(1); return d.length === 10 ? d.slice(0, 3) + '-' + d.slice(3, 6) + '-' + d.slice(6) : ''; }
+
+  card.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-act]'); if (!b || !card.contains(b)) return;
+    var act = b.getAttribute('data-act'), k = b.getAttribute('data-f'), v = b.getAttribute('data-v');
+    if (act === 'pick') { S.f[k] = v; delete S.errs[k]; card.querySelectorAll('[data-act=pick][data-f=' + k + ']').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); }); var er = card.querySelector('.err'); if (er && k === 'interest') er.remove(); saveDraft(); }
+    else if (act === 'toggle') { var a = S.f[k], i = a.indexOf(v); if (i >= 0) a.splice(i, 1); else a.push(v); b.setAttribute('aria-pressed', i < 0 ? 'true' : 'false'); delete S.errs[k]; saveDraft(); }
+    else if (act === 'days') { S.f.days = v === 'all' ? DAYS.slice() : v === 'wk' ? DAYS.slice(0, 5) : []; delete S.errs.days; render(false); }
+    else if (act === 'kind') { S.kind = v; card.querySelectorAll('[data-act=kind]').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); }); S.msg = ''; var m1 = card.querySelector('.rg-msg'); if (m1) m1.remove(); }
+    else if (act === 'exp') { S.experienced = v === 'yes'; delete S.errs.experienced; render(false); }
+    else if (act === 'more') { S.f.more = true; render(false); }
+    else if (act === 'sendcode') doSendCode();
+    else if (act === 'savepw') doSavePw();
+    else if (act === 'photo') { window.location.href = '/members#myphoto'; }
+    else if (act === 'pladd') { if (S.f.pl.length >= plYears().length) return; S.f.pl.push({ y: '', r: '' }); delete S.errs.pl; syncPl(); render(false); var sel = card.querySelectorAll('.plrow select[data-pl=y]'); if (sel.length) sel[sel.length - 1].focus(); }
+    else if (act === 'pldel') { S.f.pl.splice(Number(b.getAttribute('data-i')), 1); delete S.errs.pl; syncPl(); render(false); }
+    else if (act === 'remind') doRemind();
+    else if (act === 'infook') { S.infoOk = true; go('interest'); }
+    else if (act === 'infochange') { S.infoOk = false; go('interest'); }
+    else if (act === 'goto') { S.infoOk = false; go(v); }
+    else if (act === 'back') goBack();
+    else if (act === 'signout') { clearPass(); S.plInit = false; S.imported = false; S.infoOk = false; S.user = null; S.token = ''; S.kind = ''; S.f = blank(); S.banner = ''; go('start'); }
+    else if (act === 'restart') { clearDraft(); S.agree = false; S.plInit = false; S.imported = false; S.infoOk = false; S.f = blank(); S.kind = S.user ? 'returning' : ''; S.experienced = null; S.banner = ''; go(S.user ? 'interest' : 'start'); }
+    else if (act === 'next') onNext();
+  });
+  card.addEventListener('keydown', function (e) { if (e.key === 'Enter' && e.target.tagName === 'INPUT' && e.target.type !== 'checkbox') { e.preventDefault(); onNext(); } });
+
+  function onNext() {
+    if (S.busy) return;
+    switch (S.step) {
+      case 'start':
+        if (!S.kind) { S.msg = 'Please choose one of the two options above.'; render(false); return; }
+        S.msg = '';
+        if (S.kind === 'new') { S.user = null; return go('interest'); }
+        if (S.token) return loadPrefill(); return go('signin');
+      case 'signin': return doSignIn();
+      case 'review': return doPay();
+      case 'done': if (S.setup && S.setup.phase === 'code') doSavePw(); return;
+      case 'confirm': return;
+      case 'closed': return doRemind();
+      default:
+        var errs = check(S.step);
+        if (Object.keys(errs).length) { S.errs = errs; S.msg = 'Please fix the highlighted items.'; render(false); var first = card.querySelector('.fld.bad input, .fld.bad select, .fld.bad textarea'); if (first) first.focus(); else { var er = card.querySelector('.err'); if (er) er.scrollIntoView({ block: 'center' }); } return; }
+        goNext();
+    }
+  }
+
+  /* ---------- checking each screen (the server checks again) ---------- */
+  function check(step) {
+    var f = S.f, e = {};
+    if (step === 'interest' && !f.interest) e.interest = 'Please choose tackle, flag, or both.';
+    if (step === 'you') {
+      if (!f.first.trim()) e.first = 'Required'; if (!f.last.trim()) e.last = 'Required';
+      if (S.kind === 'new' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email.trim())) e.email = 'Please enter a valid email address.';
+      if (!fmtPhone(f.mobile)) e.mobile = 'Please enter a 10-digit phone number.';
+      if (f.home.trim() && !fmtPhone(f.home)) e.home = 'Needs 10 digits, or leave blank.';
+      if (f.work.trim() && !fmtPhone(f.work)) e.work = 'Needs 10 digits, or leave blank.';
+    }
+    if (step === 'address') {
+      if (!f.street.trim()) e.street = 'Required'; if (!f.city.trim()) e.city = 'Required';
+      if (!/^\d{5}(-\d{4})?$/.test(f.zip.trim())) e.zip = 'Please enter a 5-digit ZIP.';
+      if (!f.emName.trim()) e.emName = 'Required';
+      if (!fmtPhone(f.emPhone)) e.emPhone = 'Please enter a 10-digit phone number.';
+    }
+    if (step === 'exp') {
+      if (S.kind === 'returning') { if (!f.yearsWith) e.yearsWith = 'Please choose one.'; }
+      else {
+        if (!f.howHeard.trim()) e.howHeard = 'Required';
+        if (S.experienced === null) e.experienced = 'Please choose one.';
+        if (S.experienced === true) { if (!f.priorAssoc.trim()) e.priorAssoc = 'Required'; if (!f.priorYears.trim()) e.priorYears = 'Required'; }
+      }
+    }
+    if (step === 'extras' && showPlayoffs() && S.f.pl.some(function (r) { return !plDone(r); })) e.pl = 'Please choose both a season and a round on each line, or remove the line.';
+    if (step === 'avail') {
+      if (!flagOnly() && !f.prefPositions.length) e.prefPositions = 'Please choose at least one position.';
+      if (!f.days.length) e.days = 'Please choose at least one day.';
+      if (!f.time) e.time = 'Please choose a time.';
+    }
+    return e;
+  }
+
+  /* ---------- talking to the server ---------- */
+  function doSignIn() {
+    var em = $('#siEmail').value.trim(), pw = $('#siPass').value, keep = $('#siKeep').checked;
+    S.f.email = em;
+    if (!em || !pw) { S.msg = 'Please type your email and your password.'; render(false); return; }
+    S.busy = true; S.msg = ''; render(false);
+    var slow = setTimeout(function () { if (S.busy && S.step === 'signin') { S.banner = 'Still signing you in &mdash; this can take a little while the first time.'; S.bannerAt = 'signin'; render(false); } }, 9000);
+    call({ action: 'signin', email: em, password: pw, remember: keep }).then(function (r) {
+      clearTimeout(slow); S.banner = ''; S.busy = false;
+      if (r.status !== 'ok') { S.msg = r.message || 'That did not work. Please check your email and password.'; render(false); return; }
+      savePass(r.token, r.hours || 12, keep); S.token = r.token; S.user = r.user || { email: em };
+      loadPrefill();
+    });
+  }
+  function applyFields(fields) {
+    if (!fields) return;
+    Object.keys(fields).forEach(function (k) { if (k in S.f && empty(S.f[k]) && !empty(fields[k])) S.f[k] = fields[k]; });
+    if (S.f.home || S.f.work) S.f.more = true;
+  }
+  function loadPrefill() {
+    S.step = 'wait'; render(false);
+    call({ action: 'regprefill', token: S.token }).then(function (r) {
+      if (r.status !== 'ok') { clearPass(); S.token = ''; S.user = null; S.msg = r.code === 'auth' ? 'Your sign-in expired. Please sign in again.' : (r.message || 'Please sign in again.'); S.step = 'signin'; render(false); return; }
+      S.kind = 'returning'; S.user = S.user || {}; S.user.email = S.user.email || (r.fields && r.fields.email) || ''; S.user.name = r.name || S.user.name || '';
+      if (r.paid) { clearDraft(); S.step = 'already'; render(); return; }
+      var em = (S.user.email || '').toLowerCase(); S.f.email = em || S.f.email;
+      applyFields(r.fields);
+      if (empty(S.f.first) && r.name) { var p = String(r.name).trim().split(/\s+/); S.f.first = p.shift() || ''; S.f.last = p.join(' '); }
+      S.imported = !!r.fields; S.infoOk = false; S.source = r.source || ''; S.banner = ''; S.bannerAt = '';
+      go(S.imported ? 'checkinfo' : 'interest');
+    });
+  }
+  function payload() {
+    if (showPlayoffs()) { initPl(); syncPl(); }
+    var f = S.f, b = {};
+    Object.keys(f).forEach(function (k) { b[k] = f[k]; });
+    b.action = 'register'; b.experienced = S.kind === 'new' && S.experienced === true; b.page = location.pathname.replace(/\/+$/, '');
+    if (flagOnly()) b.prefPositions = [];
+    b.agree = S.agree === true;
+    if (!showPlayoffs()) b.postseason = '';
+    b.finals = S.kind === 'returning' ? S.f.pl.filter(function (r) { return plDone(r) && r.r === 'Championship game'; }).map(function (r) { return r.y; }).concat(String(S.f.plOlder || '').trim() ? [String(S.f.plOlder).trim()] : []).join(', ') : '';   /* state finals worked = the seasons with a championship game, plus any older ones */
+    delete b.pl; delete b.plNote; delete b.plOlder;
+    if (S.kind === 'returning') b.token = S.token; else delete b.token;
+    return b;
+  }
+  function doPay() {
+    var order = ['interest', 'you', 'address', 'exp', 'avail', 'extras'];
+    for (var i = 0; i < order.length; i++) { var e = check(order[i]); if (Object.keys(e).length) { S.infoOk = false; S.errs = e; S.msg = 'One of your answers needs attention.'; go(order[i]); S.errs = e; S.msg = 'One of your answers needs attention.'; render(false); return; } }
+    if (!S.agree) { S.errs = { agree: 'Please check the box to confirm the agreement before you pay.' }; S.msg = ''; render(false); var ag = card.querySelector('.agree'); if (ag) ag.scrollIntoView({ block: 'center' }); return; }
+    S.busy = true; S.msg = ''; render(false); saveDraft();
+    var slow = setTimeout(function () { if (S.busy && S.step === 'review') { S.banner = 'Still working &mdash; please do not close this page. This can take up to a minute.'; S.bannerAt = 'review'; S.bannerWarn = false; render(false); } }, 9000);
+    call(payload()).then(function (r) {
+      clearTimeout(slow); S.banner = ''; S.busy = false;
+      if (r.status === 'ok' && r.url) { window.location.href = r.url; S.busy = true; return; }
+      if (r.code === 'already') { clearDraft(); S.step = 'already'; render(); return; }
+      if (r.code === 'signin') { S.kind = 'returning'; S.msg = r.message; S.step = 'signin'; render(); return; }
+      if (r.code === 'auth') { clearPass(); S.token = ''; S.user = null; S.msg = r.message; S.step = 'signin'; render(); return; }
+      S.msg = r.message || 'Something went wrong. Please try again.'; render(false);
+    });
+  }
+
+  /* ---------- start up ---------- */
+  function start() {
+    var q = new URLSearchParams(location.search);
+    var tok0 = readPass();   // signed-in? ask for the prefill and the profile at the same time as the settings, not one after another
+    var pPre = tok0 ? call({ action: 'regprefill', token: tok0 }) : null, pMe = tok0 ? call({ action: 'me', token: tok0 }) : null;
+    call({ action: 'reginfo' }).then(function (r) {
+      if (r.status === 'ok') { S.season = r.season; S.fee = r.feeCents; S.open = r.open; }
+      else { S.season = ''; }
+      S.token = readPass();
+      if (q.get('paid') === '1') { clearDraft(); if (q.get('s')) return confirmPaid(q.get('s')); S.step = 'done'; return render(); }
+      if (!S.open) { S.step = 'closed'; return render(); }
+      var d = loadDraft();
+      if (d) { S.f = Object.assign(blank(), d.f); S.kind = d.kind || ''; S.experienced = d.experienced; S.restored = true; }
+      var canceled = q.get('canceled') === '1' && d;
+      if (canceled) { S.banner = 'Your payment was not completed and <b>you have not been charged</b>. Your answers are saved &mdash; continue when you are ready.'; S.bannerWarn = true; S.bannerAt = 'review'; }
+      else if (d) { S.banner = 'Welcome back &mdash; we saved your progress. <button type="button" class="rg-link" data-act="restart">Start over</button>'; S.bannerAt = d.step || 'start'; }
+      if (S.token) {
+        S.kind = 'returning';
+        S.step = 'wait'; render(false);
+        (pPre || call({ action: 'regprefill', token: S.token })).then(function (p) {
+          if (p.status !== 'ok') { clearPass(); S.token = ''; S.user = null; S.kind = d && d.kind === 'new' ? 'new' : ''; S.step = S.kind ? (d.step || 'interest') : 'start'; return render(false); }
+          S.user = { email: (S.f.email || ''), name: p.name || '' };
+          (pMe || call({ action: 'me', token: S.token })).then(function (m) { if (m && m.status === 'ok' && m.user) { S.user.email = m.user.email; S.user.name = m.user.name; S.f.email = m.user.email; } finish(p, d); });
+        });
+        return;
+      }
+      if (d && d.kind === 'returning') S.kind = 'returning';
+      var steps0 = steps();
+      S.step = d && d.step && (steps0.indexOf(d.step) >= 0) && S.kind ? d.step : 'start';
+      if (S.kind === 'returning' && !S.token) S.step = 'start';
+      if (canceled && S.kind === 'new') S.step = 'review';
+      if (S.bannerAt && S.bannerAt !== 'review') S.bannerAt = S.step;
+      render(false);
+    });
+  }
+  function finish(p, d) {
+    if (p.paid) { clearDraft(); S.step = 'already'; return render(); }
+    applyFields(p.fields);
+    if (empty(S.f.first) && p.name) { var parts = String(p.name).trim().split(/\s+/); S.f.first = parts.shift() || ''; S.f.last = parts.join(' '); }
+    S.imported = !!p.fields; S.infoOk = !!(d && d.infoOk && S.imported); S.source = p.source || S.source;
+    if (!d) { S.banner = ''; S.bannerAt = ''; }
+    var l = steps(), canc = new URLSearchParams(location.search).get('canceled') === '1' && d;
+    S.step = canc ? 'review' : (d && d.step && l.indexOf(d.step) >= 0 ? d.step : (S.imported ? 'checkinfo' : 'interest'));
+    if (d && !canc) S.bannerAt = S.step;
+    render(false);
+  }
+  start();
+})();
+</script>
 </div>
