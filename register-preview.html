@@ -144,7 +144,7 @@ sitemap: false
 
   function blank() {
     return { interest: '', first: '', last: '', email: '', mobile: '', home: '', work: '', prefPhone: 'Mobile', more: false, street: '', city: '', state: 'TN', zip: '',
-      emName: '', emPhone: '', yearsWith: '', worked: [], prefPositions: [], days: [], time: '', postseason: '', finals: '', scratches: '', pl: [], plNote: '',
+      emName: '', emPhone: '', yearsWith: '', worked: [], prefPositions: [], days: [], time: '', postseason: '', finals: '', scratches: '', pl: [], plNote: '', plOlder: '',
       howHeard: '', priorAssoc: '', priorYears: '' };
   }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
@@ -188,9 +188,11 @@ sitemap: false
   function flagOnly() { return S.f.interest === 'Flag'; }
   function newNoExp() { return S.kind === 'new' && S.experienced === false; }
   /* ---------- playoff experience: one line per season (season + highest round), saved as text in the same sheet column ---------- */
+  function plYears() { var y0 = new Date().getFullYear(), a = []; for (var i = 0; i < 5; i++) a.push(String(y0 - i)); return a; }   /* the last five seasons */
   function plDone(r) { return !!(r && r.y && r.r); }
   function syncPl() {
-    var parts = S.f.pl.filter(plDone).map(function (r) { return r.y + ' \u2013 ' + r.r; });
+    var parts = S.f.pl.filter(plDone).sort(function (a, b) { return Number(b.y) - Number(a.y); }).map(function (r) { return r.y + ' \u2013 ' + r.r; });
+    if (String(S.f.plOlder || '').trim()) parts.push('Older state championships: ' + String(S.f.plOlder).trim());
     if (String(S.f.plNote || '').trim()) parts.push(String(S.f.plNote).trim());
     S.f.postseason = parts.join('; ');
     S.plInit = true;
@@ -198,26 +200,28 @@ sitemap: false
   function initPl() {   /* answers from an earlier registration were free text: turn the "year - round" ones back into lines and keep the rest as a note */
     if (S.plInit) return; S.plInit = true;
     if (S.f.pl.length || !String(S.f.postseason || '').trim() && !String(S.f.finals || '').trim()) return;
-    var left = [];
+    var left = [], yrs = plYears();
     String(S.f.postseason || '').split(/;\s*/).forEach(function (tok) {
-      var m = tok.match(/^(\d{4}) \u2013 (.+)$/);
-      if (m && ROUNDS.indexOf(m[2]) >= 0) S.f.pl.push({ y: m[1], r: m[2] }); else if (tok.trim()) left.push(tok.trim());
+      var m = tok.match(/^(\d{4}) \u2013 (.+)$/), o = tok.match(/^Older state championships: (.+)$/);
+      if (m && ROUNDS.indexOf(m[2]) >= 0 && yrs.indexOf(m[1]) >= 0 && !S.f.pl.some(function (r) { return r.y === m[1]; })) S.f.pl.push({ y: m[1], r: m[2] });
+      else if (o) S.f.plOlder = o[1].trim();
+      else if (tok.trim()) left.push(tok.trim());
     });
     if (S.kind === 'returning' && String(S.f.finals || '').trim()) left.push('State finals worked: ' + String(S.f.finals).trim());
     S.f.plNote = left.join('; ');
     syncPl();
   }
   function plBlock() {
-    var y0 = new Date().getFullYear(), yrs = [];
-    for (var i = 0; i < 26; i++) yrs.push(String(y0 - i));
+    var yrs = plYears(), oldest = yrs[yrs.length - 1];
     var rows = S.f.pl.map(function (r, i) {
-      return '<div class="plrow"><select data-pl="y" data-i="' + i + '" aria-label="Season"><option value="">Season&hellip;</option>' + yrs.map(function (y) { return '<option' + (r.y === y ? ' selected' : '') + '>' + y + '</option>'; }).join('') + '</select>' +
+      return '<div class="plrow"><select data-pl="y" data-i="' + i + '" aria-label="Season"><option value="">Season&hellip;</option>' + yrs.map(function (y) { var taken = S.f.pl.some(function (o, k) { return k !== i && o.y === y; }); return '<option' + (r.y === y ? ' selected' : '') + (taken ? ' disabled' : '') + '>' + y + '</option>'; }).join('') + '</select>' +
         '<select data-pl="r" data-i="' + i + '" aria-label="Highest round worked"><option value="">Highest round&hellip;</option>' + ROUNDS.map(function (x) { return '<option' + (r.r === x ? ' selected' : '') + '>' + x + '</option>'; }).join('') + '</select>' +
         '<button type="button" class="rg-link" data-act="pldel" data-i="' + i + '" aria-label="Remove this season">Remove</button></div>';
     }).join('');
     return '<div class="fld' + (S.errs.pl ? ' bad' : '') + '"><label>Playoff experience <span class="opt">(optional)</span></label>' +
-      '<p class="hint" style="margin:0 0 10px">Add a line for each season you worked the playoffs, in any state. Skip this if you have none.</p>' + rows +
-      '<button type="button" class="rg-link more" data-act="pladd" style="margin:2px 0 0">+ Add a season</button>' + errLine('pl') +
+      '<p class="hint" style="margin:0 0 10px">Add a line for each of your last five seasons (' + oldest + ' to ' + yrs[0] + ') that you worked the playoffs, in any state. Skip this if you have none.</p>' + rows +
+      (S.f.pl.length < yrs.length ? '<button type="button" class="rg-link more" data-act="pladd" style="margin:2px 0 0">+ Add a season</button>' : '<p class="hint" style="margin:2px 0 0">That is all five seasons.</p>') + errLine('pl') +
+      '<div class="fld" style="margin-top:16px"><label for="f_plOlder">State championship games before ' + oldest + ' <span class="opt">(optional)</span></label><input type="text" id="f_plOlder" data-f="plOlder" maxlength="120" autocomplete="off" value="' + esc(S.f.plOlder) + '" placeholder="For example, 2018, 2015"><p class="hint">If you worked a state championship game more than five years ago, list the year or years.</p></div>' +
       (String(S.f.plNote || '').trim() ? '<div class="fld" style="margin-top:14px"><label for="f_plNote">Other playoff details from your earlier registration <span class="opt">(edit if needed)</span></label><textarea id="f_plNote" data-f="plNote" rows="3" maxlength="800">' + esc(S.f.plNote) + '</textarea></div>' : '') + '</div>';
   }
   function showPlayoffs() { return S.kind === 'returning' || S.experienced === true; }   // playoff experience: returning members and experienced officials new to MTFOA
@@ -363,6 +367,7 @@ sitemap: false
     return h + nav(true, 'Continue');
   }
   function reviewView() {
+    if (showPlayoffs()) { initPl(); syncPl(); }
     var f = S.f, pos = f.prefPositions.join(', ');
     var phones = ['Mobile ' + f.mobile].concat(f.home ? ['Home ' + f.home] : [], f.work ? ['Work ' + f.work] : []).join(' &middot; ');
     function sec(t, to, rows) { return '<div class="sum"><div class="sum-h"><span>' + t + '</span><button type="button" class="rg-link" data-act="goto" data-v="' + to + '">Edit</button></div><dl>' + rows.map(function (r) { return r[1] ? '<dt>' + r[0] + '</dt><dd>' + r[1] + '</dd>' : ''; }).join('') + '</dl></div>'; }
@@ -409,7 +414,7 @@ sitemap: false
     var el = e.target, k = el.getAttribute('data-f');
     if (!k) return;
     S.f[k] = el.value;
-    if (k === 'plNote') syncPl();
+    if (k === 'plNote' || k === 'plOlder') syncPl();
     if (S.errs[k]) { delete S.errs[k]; var box = el.closest('.fld'); if (box) { box.classList.remove('bad'); var er = box.querySelector('.err'); if (er) er.remove(); } }
     saveDraft();
   });
@@ -431,7 +436,7 @@ sitemap: false
     else if (act === 'kind') { S.kind = v; card.querySelectorAll('[data-act=kind]').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); }); S.msg = ''; var m1 = card.querySelector('.rg-msg'); if (m1) m1.remove(); }
     else if (act === 'exp') { S.experienced = v === 'yes'; delete S.errs.experienced; render(false); }
     else if (act === 'more') { S.f.more = true; render(false); }
-    else if (act === 'pladd') { S.f.pl.push({ y: '', r: '' }); delete S.errs.pl; syncPl(); render(false); var sel = card.querySelectorAll('.plrow select[data-pl=y]'); if (sel.length) sel[sel.length - 1].focus(); }
+    else if (act === 'pladd') { if (S.f.pl.length >= plYears().length) return; S.f.pl.push({ y: '', r: '' }); delete S.errs.pl; syncPl(); render(false); var sel = card.querySelectorAll('.plrow select[data-pl=y]'); if (sel.length) sel[sel.length - 1].focus(); }
     else if (act === 'pldel') { S.f.pl.splice(Number(b.getAttribute('data-i')), 1); delete S.errs.pl; syncPl(); render(false); }
     else if (act === 'goto') go(v);
     else if (act === 'back') goBack();
@@ -525,14 +530,15 @@ sitemap: false
     });
   }
   function payload() {
+    if (showPlayoffs()) { initPl(); syncPl(); }
     var f = S.f, b = {};
     Object.keys(f).forEach(function (k) { b[k] = f[k]; });
     b.action = 'register'; b.experienced = S.kind === 'new' && S.experienced === true; b.page = location.pathname.replace(/\/+$/, '');
     if (flagOnly()) b.prefPositions = [];
     b.agree = S.agree === true;
     if (!showPlayoffs()) b.postseason = '';
-    b.finals = S.kind === 'returning' ? S.f.pl.filter(function (r) { return plDone(r) && r.r === 'Championship game'; }).map(function (r) { return r.y; }).join(', ') : '';   /* state finals worked = the seasons with a championship game */
-    delete b.pl; delete b.plNote;
+    b.finals = S.kind === 'returning' ? S.f.pl.filter(function (r) { return plDone(r) && r.r === 'Championship game'; }).map(function (r) { return r.y; }).concat(String(S.f.plOlder || '').trim() ? [String(S.f.plOlder).trim()] : []).join(', ') : '';   /* state finals worked = the seasons with a championship game, plus any older ones */
+    delete b.pl; delete b.plNote; delete b.plOlder;
     if (S.kind === 'returning') b.token = S.token; else delete b.token;
     return b;
   }
