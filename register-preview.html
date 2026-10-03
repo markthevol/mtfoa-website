@@ -91,6 +91,9 @@ sitemap: false
   .mtfoa-reg .sum dd { margin: 1px 0 0; font-size: 16px; line-height: 1.35; overflow-wrap: anywhere; }
   .mtfoa-reg .fee { display: flex; justify-content: space-between; align-items: baseline; background: var(--tint); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; margin: 18px 0 8px; font-weight: 700; font-size: 18px; color: var(--navy); }
   .mtfoa-reg .fee b { font-size: 28px; }
+  .mtfoa-reg .plrow { display: grid; grid-template-columns: 1fr 1.5fr auto; gap: 10px; align-items: center; margin: 0 0 10px; }
+  .mtfoa-reg .plrow .rg-link { padding: 8px 4px; }
+  @media (max-width: 520px) { .mtfoa-reg .plrow { grid-template-columns: 1fr 1fr; } .mtfoa-reg .plrow .rg-link { grid-column: 1 / -1; justify-self: end; padding: 0 2px 6px; } }
   .mtfoa-reg .agree { border: 2px solid var(--line); border-radius: 10px; padding: 14px 16px; margin: 18px 0 4px; background: #fff; }
   .mtfoa-reg .agree.bad { border-color: var(--red); background: #fffafa; }
   .mtfoa-reg .agree label { display: flex; gap: 12px; align-items: flex-start; font-size: 15.5px; line-height: 1.45; font-weight: 400; cursor: pointer; margin: 0; }
@@ -134,12 +137,14 @@ sitemap: false
   var STATES = 'AL AK AZ AR CA CO CT DE DC FL GA HI ID IL IN IA KS KY LA ME MD MA MI MN MS MO MT NE NV NH NJ NM NY NC ND OH OK OR PA RI SC SD TN TX UT VT VA WA WV WI WY'.split(' ');
   var TIMES = (function () { var o = []; for (var m = 8 * 60; m <= 21 * 60; m += 30) { var h = Math.floor(m / 60), mm = m % 60; o.push(((h + 11) % 12 + 1) + ':' + (mm < 10 ? '0' : '') + mm + ' ' + (h < 12 ? 'AM' : 'PM')); } return o; })();
 
+  var ROUNDS = ['First round', 'Second round', 'Quarterfinals', 'Semifinals', 'Championship game'];
+
   var card = document.getElementById('rgCard');
   var S = { step: 'wait', kind: '', experienced: null, token: '', user: null, season: '', fee: 12000, open: true, source: '', f: blank(), errs: {}, msg: '', banner: '', bannerAt: '', bannerWarn: false, busy: false, restored: false, agree: false };
 
   function blank() {
     return { interest: '', first: '', last: '', email: '', mobile: '', home: '', work: '', prefPhone: 'Mobile', more: false, street: '', city: '', state: 'TN', zip: '',
-      emName: '', emPhone: '', yearsWith: '', worked: [], prefPositions: [], days: [], time: '', postseason: '', finals: '', scratches: '',
+      emName: '', emPhone: '', yearsWith: '', worked: [], prefPositions: [], days: [], time: '', postseason: '', finals: '', scratches: '', pl: [], plNote: '',
       howHeard: '', priorAssoc: '', priorYears: '' };
   }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
@@ -182,6 +187,39 @@ sitemap: false
   }
   function flagOnly() { return S.f.interest === 'Flag'; }
   function newNoExp() { return S.kind === 'new' && S.experienced === false; }
+  /* ---------- playoff experience: one line per season (season + highest round), saved as text in the same sheet column ---------- */
+  function plDone(r) { return !!(r && r.y && r.r); }
+  function syncPl() {
+    var parts = S.f.pl.filter(plDone).map(function (r) { return r.y + ' \u2013 ' + r.r; });
+    if (String(S.f.plNote || '').trim()) parts.push(String(S.f.plNote).trim());
+    S.f.postseason = parts.join('; ');
+    S.plInit = true;
+  }
+  function initPl() {   /* answers from an earlier registration were free text: turn the "year - round" ones back into lines and keep the rest as a note */
+    if (S.plInit) return; S.plInit = true;
+    if (S.f.pl.length || !String(S.f.postseason || '').trim() && !String(S.f.finals || '').trim()) return;
+    var left = [];
+    String(S.f.postseason || '').split(/;\s*/).forEach(function (tok) {
+      var m = tok.match(/^(\d{4}) \u2013 (.+)$/);
+      if (m && ROUNDS.indexOf(m[2]) >= 0) S.f.pl.push({ y: m[1], r: m[2] }); else if (tok.trim()) left.push(tok.trim());
+    });
+    if (S.kind === 'returning' && String(S.f.finals || '').trim()) left.push('State finals worked: ' + String(S.f.finals).trim());
+    S.f.plNote = left.join('; ');
+    syncPl();
+  }
+  function plBlock() {
+    var y0 = new Date().getFullYear(), yrs = [];
+    for (var i = 0; i < 26; i++) yrs.push(String(y0 - i));
+    var rows = S.f.pl.map(function (r, i) {
+      return '<div class="plrow"><select data-pl="y" data-i="' + i + '" aria-label="Season"><option value="">Season&hellip;</option>' + yrs.map(function (y) { return '<option' + (r.y === y ? ' selected' : '') + '>' + y + '</option>'; }).join('') + '</select>' +
+        '<select data-pl="r" data-i="' + i + '" aria-label="Highest round worked"><option value="">Highest round&hellip;</option>' + ROUNDS.map(function (x) { return '<option' + (r.r === x ? ' selected' : '') + '>' + x + '</option>'; }).join('') + '</select>' +
+        '<button type="button" class="rg-link" data-act="pldel" data-i="' + i + '" aria-label="Remove this season">Remove</button></div>';
+    }).join('');
+    return '<div class="fld' + (S.errs.pl ? ' bad' : '') + '"><label>Playoff experience <span class="opt">(optional)</span></label>' +
+      '<p class="hint" style="margin:0 0 10px">Add a line for each season you worked the playoffs, in any state. Skip this if you have none.</p>' + rows +
+      '<button type="button" class="rg-link more" data-act="pladd" style="margin:2px 0 0">+ Add a season</button>' + errLine('pl') +
+      (String(S.f.plNote || '').trim() ? '<div class="fld" style="margin-top:14px"><label for="f_plNote">Other playoff details from your earlier registration <span class="opt">(edit if needed)</span></label><textarea id="f_plNote" data-f="plNote" rows="3" maxlength="800">' + esc(S.f.plNote) + '</textarea></div>' : '') + '</div>';
+  }
   function showPlayoffs() { return S.kind === 'returning' || S.experienced === true; }   // playoff experience: returning members and experienced officials new to MTFOA
 
   var ICON = {
@@ -292,8 +330,7 @@ sitemap: false
       case 'extras':
         h = progress() + '<h2 tabindex="-1">Anything else we should know?</h2><p class="rg-lead">All optional &mdash; skip it if nothing applies.</p>' + banner() +
           fld('scratches', 'Schools you would like to scratch', { area: true, req: false, hint: 'Use this for a conflict of interest, such as a close family member who plays for that school&rsquo;s varsity team, or a school where you teach or coach. We will not assign you to those schools.' }) +
-          (showPlayoffs() ? fld('postseason', 'Playoff experience (years and rounds)', { area: true, req: false, hint: 'If you have any.' }) : '') +
-          (S.kind === 'returning' ? fld('finals', 'State championship finals worked (years)', { area: true, req: false }) : '') + nav(true, 'Continue');
+          (showPlayoffs() ? (initPl(), plBlock()) : '') + nav(true, 'Continue');
         break;
       case 'review': h = progress() + reviewView(); break;
     }
@@ -330,7 +367,7 @@ sitemap: false
     var phones = ['Mobile ' + f.mobile].concat(f.home ? ['Home ' + f.home] : [], f.work ? ['Work ' + f.work] : []).join(' &middot; ');
     function sec(t, to, rows) { return '<div class="sum"><div class="sum-h"><span>' + t + '</span><button type="button" class="rg-link" data-act="goto" data-v="' + to + '">Edit</button></div><dl>' + rows.map(function (r) { return r[1] ? '<dt>' + r[0] + '</dt><dd>' + r[1] + '</dd>' : ''; }).join('') + '</dl></div>'; }
     var br = function (x) { return esc(x).replace(/\n/g, '<br>'); };
-    var extraRows = [['Schools to scratch', br(f.scratches) || 'None listed']].concat(showPlayoffs() ? [['Playoff experience', br(f.postseason) || 'None listed']] : [], S.kind === 'returning' && f.finals ? [['State finals worked', br(f.finals)]] : []);
+    var extraRows = [['Schools to scratch', br(f.scratches) || 'None listed']].concat(showPlayoffs() ? [['Playoff experience', esc(f.postseason).replace(/; /g, '<br>') || 'None listed']] : []);
     var expRows = S.kind === 'returning' ? [['Years with MTFOA', esc(f.yearsWith)], ['Positions worked', esc(f.worked.join(', '))]] :
       [['How you heard about us', esc(f.howHeard)], ['Prior experience', S.experienced ? esc(f.priorYears + ' years with ' + f.priorAssoc) : 'First-time official'], ['Positions worked', esc(f.worked.join(', '))]];
     return '<h2 tabindex="-1">Review and pay</h2><p class="rg-lead">Check everything looks right, then continue to the secure payment page.</p>' + banner() +
@@ -372,11 +409,13 @@ sitemap: false
     var el = e.target, k = el.getAttribute('data-f');
     if (!k) return;
     S.f[k] = el.value;
+    if (k === 'plNote') syncPl();
     if (S.errs[k]) { delete S.errs[k]; var box = el.closest('.fld'); if (box) { box.classList.remove('bad'); var er = box.querySelector('.err'); if (er) er.remove(); } }
     saveDraft();
   });
   card.addEventListener('change', function (e) {
     var el = e.target, k = el.getAttribute('data-f');
+    if (el.getAttribute('data-pl')) { var row = S.f.pl[Number(el.getAttribute('data-i'))]; if (row) { row[el.getAttribute('data-pl')] = el.value; delete S.errs.pl; var eb = card.querySelector('.fld.bad'); if (eb && !S.errs.pl) { eb.classList.remove('bad'); var ee = eb.querySelector('.err'); if (ee) ee.remove(); } syncPl(); saveDraft(); var mm = card.querySelector('.rg-msg'); if (mm && !Object.keys(S.errs).length) { mm.remove(); S.msg = ''; } } return; }
     if (el.id === 'rgAgree') { S.agree = !!el.checked; if (S.agree) { delete S.errs.agree; var ab = el.closest('.agree'); if (ab) { ab.classList.remove('bad'); var ae = ab.querySelector('.err'); if (ae) ae.remove(); } } return; }
     if (k && (k === 'mobile' || k === 'home' || k === 'work' || k === 'emPhone')) { var p = fmtPhone(el.value); if (p) { el.value = p; S.f[k] = p; saveDraft(); } }
     if (k === 'home' || k === 'work') { if (!S.f.home && S.f.prefPhone === 'Home') S.f.prefPhone = 'Mobile'; if (!S.f.work && S.f.prefPhone === 'Work') S.f.prefPhone = 'Mobile'; }
@@ -392,10 +431,12 @@ sitemap: false
     else if (act === 'kind') { S.kind = v; card.querySelectorAll('[data-act=kind]').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); }); S.msg = ''; var m1 = card.querySelector('.rg-msg'); if (m1) m1.remove(); }
     else if (act === 'exp') { S.experienced = v === 'yes'; delete S.errs.experienced; render(false); }
     else if (act === 'more') { S.f.more = true; render(false); }
+    else if (act === 'pladd') { S.f.pl.push({ y: '', r: '' }); delete S.errs.pl; syncPl(); render(false); var sel = card.querySelectorAll('.plrow select[data-pl=y]'); if (sel.length) sel[sel.length - 1].focus(); }
+    else if (act === 'pldel') { S.f.pl.splice(Number(b.getAttribute('data-i')), 1); delete S.errs.pl; syncPl(); render(false); }
     else if (act === 'goto') go(v);
     else if (act === 'back') goBack();
-    else if (act === 'signout') { clearPass(); S.user = null; S.token = ''; S.kind = ''; S.f = blank(); S.banner = ''; go('start'); }
-    else if (act === 'restart') { clearDraft(); S.agree = false; S.f = blank(); S.kind = S.user ? 'returning' : ''; S.experienced = null; S.banner = ''; go(S.user ? 'interest' : 'start'); }
+    else if (act === 'signout') { clearPass(); S.plInit = false; S.user = null; S.token = ''; S.kind = ''; S.f = blank(); S.banner = ''; go('start'); }
+    else if (act === 'restart') { clearDraft(); S.agree = false; S.plInit = false; S.f = blank(); S.kind = S.user ? 'returning' : ''; S.experienced = null; S.banner = ''; go(S.user ? 'interest' : 'start'); }
     else if (act === 'next') onNext();
   });
   card.addEventListener('keydown', function (e) { if (e.key === 'Enter' && e.target.tagName === 'INPUT' && e.target.type !== 'checkbox') { e.preventDefault(); onNext(); } });
@@ -442,6 +483,7 @@ sitemap: false
         if (S.experienced === true) { if (!f.priorAssoc.trim()) e.priorAssoc = 'Required'; if (!f.priorYears.trim()) e.priorYears = 'Required'; }
       }
     }
+    if (step === 'extras' && showPlayoffs() && S.f.pl.some(function (r) { return !plDone(r); })) e.pl = 'Please choose both a season and a round on each line, or remove the line.';
     if (step === 'avail') {
       if (!flagOnly() && !f.prefPositions.length) e.prefPositions = 'Please choose at least one position.';
       if (!f.days.length) e.days = 'Please choose at least one day.';
@@ -488,13 +530,14 @@ sitemap: false
     b.action = 'register'; b.experienced = S.kind === 'new' && S.experienced === true; b.page = location.pathname.replace(/\/+$/, '');
     if (flagOnly()) b.prefPositions = [];
     b.agree = S.agree === true;
-    if (!showPlayoffs()) { b.postseason = ''; b.finals = ''; }
-    if (S.kind !== 'returning') b.finals = '';
+    if (!showPlayoffs()) b.postseason = '';
+    b.finals = S.kind === 'returning' ? S.f.pl.filter(function (r) { return plDone(r) && r.r === 'Championship game'; }).map(function (r) { return r.y; }).join(', ') : '';   /* state finals worked = the seasons with a championship game */
+    delete b.pl; delete b.plNote;
     if (S.kind === 'returning') b.token = S.token; else delete b.token;
     return b;
   }
   function doPay() {
-    var order = ['interest', 'you', 'address', 'exp', 'avail'];
+    var order = ['interest', 'you', 'address', 'exp', 'avail', 'extras'];
     for (var i = 0; i < order.length; i++) { var e = check(order[i]); if (Object.keys(e).length) { S.errs = e; S.msg = 'One of your answers needs attention.'; go(order[i]); S.errs = e; S.msg = 'One of your answers needs attention.'; render(false); return; } }
     if (!S.agree) { S.errs = { agree: 'Please check the box to confirm the agreement before you pay.' }; S.msg = ''; render(false); var ag = card.querySelector('.agree'); if (ag) ag.scrollIntoView({ block: 'center' }); return; }
     S.busy = true; S.msg = ''; render(false); saveDraft();
