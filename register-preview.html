@@ -329,7 +329,8 @@ sitemap: false
     var f = S.f, pos = f.prefPositions.join(', ');
     var phones = ['Mobile ' + f.mobile].concat(f.home ? ['Home ' + f.home] : [], f.work ? ['Work ' + f.work] : []).join(' &middot; ');
     function sec(t, to, rows) { return '<div class="sum"><div class="sum-h"><span>' + t + '</span><button type="button" class="rg-link" data-act="goto" data-v="' + to + '">Edit</button></div><dl>' + rows.map(function (r) { return r[1] ? '<dt>' + r[0] + '</dt><dd>' + r[1] + '</dd>' : ''; }).join('') + '</dl></div>'; }
-    var extraRows = [['Schools to scratch', esc(f.scratches) || 'None listed']].concat(showPlayoffs() ? [['Playoff experience', esc(f.postseason) || 'None listed']] : [], S.kind === 'returning' && f.finals ? [['State finals worked', esc(f.finals)]] : []);
+    var br = function (x) { return esc(x).replace(/\n/g, '<br>'); };
+    var extraRows = [['Schools to scratch', br(f.scratches) || 'None listed']].concat(showPlayoffs() ? [['Playoff experience', br(f.postseason) || 'None listed']] : [], S.kind === 'returning' && f.finals ? [['State finals worked', br(f.finals)]] : []);
     var expRows = S.kind === 'returning' ? [['Years with MTFOA', esc(f.yearsWith)], ['Positions worked', esc(f.worked.join(', '))]] :
       [['How you heard about us', esc(f.howHeard)], ['Prior experience', S.experienced ? esc(f.priorYears + ' years with ' + f.priorAssoc) : 'First-time official'], ['Positions worked', esc(f.worked.join(', '))]];
     return '<h2 tabindex="-1">Review and pay</h2><p class="rg-lead">Check everything looks right, then continue to the secure payment page.</p>' + banner() +
