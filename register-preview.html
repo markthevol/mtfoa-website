@@ -451,7 +451,7 @@ sitemap: false
     if (signed && (b.photo === 'none' || b.photo === 'low' || b.photo === 'rounded')) {
       var none = b.photo === 'none', round = b.photo === 'rounded';
       list.push(stp(++n, none ? 'Add your roster photo' : 'Update your roster photo',
-        '<p>' + (none ? 'We do not have a photo of you on the roster yet.' : round ? 'Your roster photo is a rounded crop taken from Arbiter.' : 'Your roster photo is small and can look blurry.') + ' Please choose a clear, recent photo of yourself' + (round ? ' (a regular photo, not a rounded crop)' : '') + '. It appears on the public roster once it is approved.</p>' +
+        '<p>' + (none ? 'We do not have a photo of you on the roster yet.' : round ? 'Your roster photo is low resolution and should be replaced.' : 'Your roster photo is small and can look blurry.') + ' Please choose a clear, recent photo of yourself. It appears on the public roster once it is approved.</p>' +
         '<div class="su-row"><button type="button" class="btn pri" data-act="photo">' + (none ? 'Add my photo' : 'Update my photo') + '</button></div>'));
     }
     list.push(stp(++n, 'Register with the TSSAA on Arbiter', '<p>When TSSAA registration is open, register (or renew) with the TSSAA on Arbiter (it can only be done while the TSSAA has it open). <a href="/tssaa-registration">Step-by-step guide</a>.</p>'));
