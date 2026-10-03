@@ -406,7 +406,7 @@ sitemap: false
       sec('Availability', 'avail', [['Preferred positions', esc(pos)], ['Days', esc(f.days.join(', '))], ['Earliest weekday time', esc(f.time)]]) +
       sec('Conflicts and experience', 'extras', extraRows) +
       '<div class="agree' + (S.errs.agree ? ' bad' : '') + '"><label for="rgAgree"><input type="checkbox" id="rgAgree"' + (S.agree ? ' checked' : '') + '><span>I understand that I am an <b>independent contractor</b>, not an employee of MTFOA, and that I will be issued a <b>Form 1099</b>. I agree to follow all posted MTFOA policies. ' +
-      '<a href="/policies-review" target="_blank" rel="noopener">Read the MTFOA policies and insurance information</a> (opens in a new tab).</span></label>' + (S.errs.agree ? '<p class="err" role="alert">' + esc(S.errs.agree) + '</p>' : '') + '</div>' +
+      '<a href="/policies-review" target="_blank" rel="noopener">Read the MTFOA policies and insurance information</a> (opens in a new tab). Your information is handled as described in our <a href="/privacy" target="_blank" rel="noopener">Privacy Policy</a>.</span></label>' + (S.errs.agree ? '<p class="err" role="alert">' + esc(S.errs.agree) + '</p>' : '') + '</div>' +
       '<div class="fee"><span>' + esc(S.season) + ' registration</span><b>' + money(S.fee) + '</b></div>' +
       '<p class="lock">' + ICON.lock + '<span>You will pay on Stripe&rsquo;s secure page by card or bank account. MTFOA never sees or stores your payment details.</span></p>' +
       nav(true, S.busy ? 'Opening secure payment&hellip;' : 'Continue to secure payment', 'pay');
