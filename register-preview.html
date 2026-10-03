@@ -152,7 +152,7 @@ sitemap: false
   var ROUNDS = ['First round', 'Second round', 'Quarterfinals', 'Semifinals', 'Championship game'];
 
   var card = document.getElementById('rgCard');
-  var S = { step: 'wait', kind: '', experienced: null, token: '', user: null, season: '', fee: 12000, open: true, source: '', f: blank(), errs: {}, msg: '', banner: '', bannerAt: '', bannerWarn: false, busy: false, restored: false, agree: false, setup: null, back: null };
+  var S = { step: 'wait', kind: '', experienced: null, token: '', user: null, season: '', fee: 12000, open: true, source: '', f: blank(), errs: {}, msg: '', banner: '', bannerAt: '', bannerWarn: false, busy: false, restored: false, agree: false, setup: null, back: null, imported: false, infoOk: false };
 
   function blank() {
     return { interest: '', first: '', last: '', email: '', mobile: '', home: '', work: '', prefPhone: 'Mobile', more: false, street: '', city: '', state: 'TN', zip: '',
@@ -183,7 +183,7 @@ sitemap: false
     clearTimeout(saveTimer);
     saveTimer = setTimeout(function () {
       try { if (S.step === 'wait' || S.step === 'done' || S.step === 'already' || S.step === 'closed') return;
-        localStorage.setItem(DRAFT, JSON.stringify({ t: Date.now(), kind: S.kind, experienced: S.experienced, step: S.step, f: S.f })); } catch (e) {}
+        localStorage.setItem(DRAFT, JSON.stringify({ t: Date.now(), kind: S.kind, experienced: S.experienced, step: S.step, imported: S.imported, infoOk: S.infoOk, f: S.f })); } catch (e) {}
     }, 250);
   }
   function loadDraft() {
@@ -195,6 +195,9 @@ sitemap: false
   /* ---------- which screens apply to this person ---------- */
   function steps() {
     var s = ['interest', 'you', 'address', 'exp', 'avail', 'extras', 'review'];
+    if (S.kind === 'returning' && S.imported) {   /* last season's answers were imported: review them first; if they are all still right, the screens that are already filled in are skipped */
+      s = S.infoOk ? ['checkinfo', 'interest', 'extras', 'review'] : ['checkinfo', 'interest', 'you', 'address', 'exp', 'avail', 'extras', 'review'];
+    }
     return s;
   }
   function flagOnly() { return S.f.interest === 'Flag'; }
@@ -313,9 +316,10 @@ sitemap: false
           '<p class="rg-note">Never set a password, or forgot it? <a href="/mtfoamembers">Set one up on the Member Portal</a> (it takes a minute), then come back here &mdash; we will save your place.</p>' +
           '<div class="nav"><button type="button" class="btn sec" data-act="back">Back</button><button type="button" class="btn pri" data-act="next"' + (S.busy ? ' disabled' : '') + '>' + (S.busy ? 'Signing in&hellip;' : 'Sign in') + '</button></div>';
         break;
+      case 'checkinfo': h = signedInLine() + infoView(); break;
       case 'interest':
         h = progress() + signedInLine() + '<h2 tabindex="-1">What would you like to officiate?</h2><p class="rg-lead">Pick the one that fits.</p>' + banner() +
-          '<div class="opts">' + card1('interest', 'Tackle', ICON.football, 'Tackle football', '') + card1('interest', 'Flag', ICON.flag, 'Flag football', '') + card1('interest', 'Both', ICON.both, 'Both tackle and flag', '') + '</div>' + errLine('interest') + nav(S.kind === 'new' || !S.user, 'Continue');
+          '<div class="opts">' + card1('interest', 'Tackle', ICON.football, 'Tackle football', '') + card1('interest', 'Flag', ICON.flag, 'Flag football', '') + card1('interest', 'Both', ICON.both, 'Both tackle and flag', '') + '</div>' + errLine('interest') + nav(S.kind === 'new' || !S.user || S.imported, 'Continue');
         break;
       case 'you':
         h = progress() + '<h2 tabindex="-1">A little about you</h2><p class="rg-lead">We use this to contact you about assignments and meetings.</p>' + banner() +
@@ -401,6 +405,22 @@ sitemap: false
       '<p class="lock">' + ICON.lock + '<span>You will pay on Stripe&rsquo;s secure page by card or bank account. MTFOA never sees or stores your payment details.</span></p>' +
       nav(true, S.busy ? 'Opening secure payment&hellip;' : 'Continue to secure payment', 'pay');
   }
+  /* ---------- returning official: last season's answers were just imported - are they still right? ---------- */
+  function infoView() {
+    var f = S.f, bad = ['you', 'address', 'exp', 'avail'].filter(function (s) { return Object.keys(check(s)).length; });
+    var phones = [f.mobile ? 'Mobile ' + f.mobile : 'Mobile: not on file'].concat(f.home ? ['Home ' + f.home] : [], f.work ? ['Work ' + f.work] : []).map(esc).join(' &middot; ');
+    function blk(title, rows) { return '<div class="sum"><div class="sum-h"><span>' + title + '</span></div><dl>' + rows.map(function (r) { return r[1] ? '<dt>' + r[0] + '</dt><dd>' + r[1] + '</dd>' : ''; }).join('') + '</dl></div>'; }
+    var h = '<h2 tabindex="-1">Is this still accurate?</h2><p class="rg-lead">We filled in what we have from your ' + esc(S.source || 'last registration') + '. Please look it over and tell us whether it is all still correct.</p>' + banner() +
+      blk('Contact', [['Name', esc(f.first + ' ' + f.last)], ['Email', esc(f.email)], ['Phone', phones]]) +
+      blk('Address', [['Mailing address', esc(f.street + ', ' + f.city + ', ' + f.state + ' ' + f.zip)]]) +
+      blk('Emergency contact', [['Name and phone', esc(f.emName + ' ' + f.emPhone)]]) +
+      blk('With MTFOA', [['Years with MTFOA', esc(f.yearsWith)], ['Positions you have worked', esc(f.worked.join(', '))]]) +
+      blk('Availability', [['Positions you would like to work', esc(f.prefPositions.join(', '))], ['Days', esc(f.days.join(', '))], ['Earliest weekday time', esc(f.time)]]);
+    if (bad.length) h += '<p class="rg-msg" style="margin-top:14px">A few details are missing or need fixing, so we will go through each screen with you.</p><div class="nav"><button type="button" class="btn pri" data-act="infochange">Update my information</button></div>';
+    else h += '<div class="nav"><button type="button" class="btn sec" data-act="infochange">Something has changed</button><button type="button" class="btn pri" data-act="infook">Yes, all of this is still accurate</button></div>';
+    return h;
+  }
+
   /* ---------- after payment, a NEW official: set a password with an emailed code, then add a roster photo ---------- */
   function stp(n, title, body, cls) {
     return '<div class="stp ' + (cls || '') + '"><div class="stp-n">' + (cls === 'ok' ? ICON.tick : n) + '</div><div class="stp-b"><h3>' + title + '</h3>' + body + '</div></div>';
@@ -428,10 +448,10 @@ sitemap: false
   /* ---------- after payment, an EXISTING official (already signed in, already has a password) ---------- */
   function backView() {
     var b = S.back, list = [], n = 0, signed = !!readPass();
-    if (signed && (b.photo === 'none' || b.photo === 'low')) {
-      var none = b.photo === 'none';
+    if (signed && (b.photo === 'none' || b.photo === 'low' || b.photo === 'rounded')) {
+      var none = b.photo === 'none', round = b.photo === 'rounded';
       list.push(stp(++n, none ? 'Add your roster photo' : 'Update your roster photo',
-        '<p>' + (none ? 'We do not have a photo of you on the roster yet.' : 'Your roster photo is small and can look blurry.') + ' Please choose a clear, recent photo of yourself. It appears on the public roster once it is approved.</p>' +
+        '<p>' + (none ? 'We do not have a photo of you on the roster yet.' : round ? 'Your roster photo is a rounded crop taken from Arbiter.' : 'Your roster photo is small and can look blurry.') + ' Please choose a clear, recent photo of yourself' + (round ? ' (a regular photo, not a rounded crop)' : '') + '. It appears on the public roster once it is approved.</p>' +
         '<div class="su-row"><button type="button" class="btn pri" data-act="photo">' + (none ? 'Add my photo' : 'Update my photo') + '</button></div>'));
     }
     list.push(stp(++n, 'Register with the TSSAA on Arbiter', '<p>When TSSAA registration is open, register (or renew) with the TSSAA on Arbiter (it can only be done while the TSSAA has it open). <a href="/tssaa-registration">Step-by-step guide</a>.</p>'));
@@ -497,7 +517,7 @@ sitemap: false
   function goBack() {
     var l = steps(), i = l.indexOf(S.step);
     if (S.step === 'signin') return go('start');
-    if (S.step === 'interest') return go(S.kind === 'returning' && !S.user ? 'signin' : 'start');
+    if (S.step === 'interest') return go(S.kind === 'returning' && S.imported ? 'checkinfo' : (S.kind === 'returning' && !S.user ? 'signin' : 'start'));
     go(l[Math.max(i - 1, 0)]);
   }
 
@@ -532,10 +552,12 @@ sitemap: false
     else if (act === 'photo') { window.location.href = '/members#myphoto'; }
     else if (act === 'pladd') { if (S.f.pl.length >= plYears().length) return; S.f.pl.push({ y: '', r: '' }); delete S.errs.pl; syncPl(); render(false); var sel = card.querySelectorAll('.plrow select[data-pl=y]'); if (sel.length) sel[sel.length - 1].focus(); }
     else if (act === 'pldel') { S.f.pl.splice(Number(b.getAttribute('data-i')), 1); delete S.errs.pl; syncPl(); render(false); }
-    else if (act === 'goto') go(v);
+    else if (act === 'infook') { S.infoOk = true; go('interest'); }
+    else if (act === 'infochange') { S.infoOk = false; go('interest'); }
+    else if (act === 'goto') { S.infoOk = false; go(v); }
     else if (act === 'back') goBack();
-    else if (act === 'signout') { clearPass(); S.plInit = false; S.user = null; S.token = ''; S.kind = ''; S.f = blank(); S.banner = ''; go('start'); }
-    else if (act === 'restart') { clearDraft(); S.agree = false; S.plInit = false; S.f = blank(); S.kind = S.user ? 'returning' : ''; S.experienced = null; S.banner = ''; go(S.user ? 'interest' : 'start'); }
+    else if (act === 'signout') { clearPass(); S.plInit = false; S.imported = false; S.infoOk = false; S.user = null; S.token = ''; S.kind = ''; S.f = blank(); S.banner = ''; go('start'); }
+    else if (act === 'restart') { clearDraft(); S.agree = false; S.plInit = false; S.imported = false; S.infoOk = false; S.f = blank(); S.kind = S.user ? 'returning' : ''; S.experienced = null; S.banner = ''; go(S.user ? 'interest' : 'start'); }
     else if (act === 'next') onNext();
   });
   card.addEventListener('keydown', function (e) { if (e.key === 'Enter' && e.target.tagName === 'INPUT' && e.target.type !== 'checkbox') { e.preventDefault(); onNext(); } });
@@ -621,8 +643,8 @@ sitemap: false
       var em = (S.user.email || '').toLowerCase(); S.f.email = em || S.f.email;
       applyFields(r.fields);
       if (empty(S.f.first) && r.name) { var p = String(r.name).trim().split(/\s+/); S.f.first = p.shift() || ''; S.f.last = p.join(' '); }
-      S.banner = r.fields ? 'We filled in what we have from your ' + esc(r.source || 'last registration') + '. Please check each screen and fix anything that has changed.' : ''; S.bannerAt = 'interest';
-      go('interest');
+      S.imported = !!r.fields; S.infoOk = false; S.source = r.source || ''; S.banner = ''; S.bannerAt = '';
+      go(S.imported ? 'checkinfo' : 'interest');
     });
   }
   function payload() {
@@ -640,7 +662,7 @@ sitemap: false
   }
   function doPay() {
     var order = ['interest', 'you', 'address', 'exp', 'avail', 'extras'];
-    for (var i = 0; i < order.length; i++) { var e = check(order[i]); if (Object.keys(e).length) { S.errs = e; S.msg = 'One of your answers needs attention.'; go(order[i]); S.errs = e; S.msg = 'One of your answers needs attention.'; render(false); return; } }
+    for (var i = 0; i < order.length; i++) { var e = check(order[i]); if (Object.keys(e).length) { S.infoOk = false; S.errs = e; S.msg = 'One of your answers needs attention.'; go(order[i]); S.errs = e; S.msg = 'One of your answers needs attention.'; render(false); return; } }
     if (!S.agree) { S.errs = { agree: 'Please check the box to confirm the agreement before you pay.' }; S.msg = ''; render(false); var ag = card.querySelector('.agree'); if (ag) ag.scrollIntoView({ block: 'center' }); return; }
     S.busy = true; S.msg = ''; render(false); saveDraft();
     var slow = setTimeout(function () { if (S.busy && S.step === 'review') { S.banner = 'Still working &mdash; please do not close this page. This can take up to a minute.'; S.bannerAt = 'review'; S.bannerWarn = false; render(false); } }, 9000);
@@ -693,9 +715,10 @@ sitemap: false
     if (p.paid) { clearDraft(); S.step = 'already'; return render(); }
     applyFields(p.fields);
     if (empty(S.f.first) && p.name) { var parts = String(p.name).trim().split(/\s+/); S.f.first = parts.shift() || ''; S.f.last = parts.join(' '); }
-    if (!d) { S.banner = p.fields ? 'We filled in what we have from your ' + esc(p.source || 'last registration') + '. Please check each screen and fix anything that has changed.' : ''; S.bannerAt = 'interest'; }
+    S.imported = !!p.fields; S.infoOk = !!(d && d.infoOk && S.imported); S.source = p.source || S.source;
+    if (!d) { S.banner = ''; S.bannerAt = ''; }
     var l = steps(), canc = new URLSearchParams(location.search).get('canceled') === '1' && d;
-    S.step = canc ? 'review' : (d && d.step && l.indexOf(d.step) >= 0 ? d.step : 'interest');
+    S.step = canc ? 'review' : (d && d.step && l.indexOf(d.step) >= 0 ? d.step : (S.imported ? 'checkinfo' : 'interest'));
     if (d && !canc) S.bannerAt = S.step;
     render(false);
   }
